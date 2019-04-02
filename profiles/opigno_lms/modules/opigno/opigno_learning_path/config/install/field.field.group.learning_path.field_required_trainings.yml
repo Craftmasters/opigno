@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_required_trainings
+    - group.type.learning_path
+id: group.learning_path.field_required_trainings
+field_name: field_required_trainings
+entity_type: group
+bundle: learning_path
+label: 'Required Trainings'
+description: 'You can specify the list of trainings that the user must complete before starting this training. You can choose one or more trainings (separated by comma).'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:group'
+  handler_settings:
+    target_bundles:
+      learning_path: learning_path
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

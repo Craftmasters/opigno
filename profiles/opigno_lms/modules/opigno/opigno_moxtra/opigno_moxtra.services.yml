@@ -1,0 +1,42 @@
+services:
+  opigno_moxtra.opigno_api:
+    class: Drupal\opigno_moxtra\OpignoService
+    arguments:
+      - '@string_translation'
+      - '@config.factory'
+      - '@logger.factory'
+      - '@cache.default'
+      - '@datetime.time'
+      - '@messenger'
+      - '@http_client'
+  opigno_moxtra.moxtra_api:
+    class: Drupal\opigno_moxtra\MoxtraService
+    arguments:
+      - '@string_translation'
+      - '@config.factory'
+      - '@logger.factory'
+      - '@messenger'
+      - '@http_client'
+      - '@opigno_moxtra.opigno_api'
+  opigno_moxtra.event_subscriber:
+    class: '\Drupal\opigno_moxtra\EventSubscriber\EventSubscriber'
+    arguments:
+      - '@string_translation'
+      - '@current_user'
+      - '@current_route_match'
+      - '@datetime.time'
+      - '@entity_type.manager'
+      - '@opigno_moxtra.opigno_api'
+      - '@opigno_moxtra.moxtra_api'
+    tags:
+      - { name: 'event_subscriber' }
+  opigno_moxtra.meeting_controller:
+    class: Drupal\opigno_moxtra\Controller\MeetingController
+    arguments:
+      - '@opigno_moxtra.opigno_api'
+      - '@opigno_moxtra.moxtra_api'
+  opigno_moxtra.workspace_controller:
+    class: Drupal\opigno_moxtra\Controller\WorkspaceController
+    arguments:
+      - '@opigno_moxtra.opigno_api'
+      - '@opigno_moxtra.moxtra_api'

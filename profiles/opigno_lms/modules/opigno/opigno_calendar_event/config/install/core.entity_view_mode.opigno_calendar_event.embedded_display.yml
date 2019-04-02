@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_calendar_event
+id: opigno_calendar_event.embedded_display
+label: 'Embedded display'
+targetEntityType: opigno_calendar_event
+cache: true

@@ -1,0 +1,441 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_ilt.module.
+ */
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Link;
+use Drupal\group\Entity\Group;
+use Drupal\opigno_calendar_event\Entity\CalendarEvent;
+use Drupal\opigno_group_manager\OpignoGroupContext;
+use Drupal\opigno_ilt\Entity\ILT;
+use Drupal\user\UserInterface;
+
+/**
+ * Converts database datetime string to the ISO-8601 format without a timezone.
+ *
+ * @param string $datetime_string
+ *   Datetime string.
+ *
+ * @return string
+ *   ISO-8601 without a timezone.
+ */
+function _opigno_ilt_datetime_to_iso($datetime_string) {
+  if (!isset($datetime_string)) {
+    return NULL;
+  }
+
+  $datetime = DrupalDateTime::createFromFormat(
+    DrupalDateTime::FORMAT,
+    $datetime_string
+  );
+
+  return $datetime->setTimezone(new \DateTimeZone('UTC'))
+    ->format('Y-m-d\TH:i:s');
+}
+
+/**
+ * Returns upcoming ILTs.
+ *
+ * @param \Drupal\user\UserInterface $user
+ *   User.
+ *
+ * @return \Drupal\opigno_ilt\ILTInterface[]
+ *   Upcoming ILTs.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _opigno_ilt_upcoming(UserInterface $user) {
+  $timestamp = \Drupal::time()->getRequestTime();
+  $now = DrupalDateTime::createFromTimestamp($timestamp);
+  $now_str = $now->format(DrupalDateTime::FORMAT);
+
+  // Load upcoming meeting.
+  $ilts_ids = \Drupal::entityTypeManager()
+    ->getStorage('opigno_ilt')
+    ->getQuery()
+    ->condition('date__value', $now_str, '>')
+    ->execute();
+  $ilts = ILT::loadMultiple($ilts_ids);
+
+  // Load user groups.
+  $groups_ids = [];
+  $membership_service = \Drupal::service('group.membership_loader');
+  $memberships = $membership_service->loadByUser($user);
+  /** @var \Drupal\group\GroupMembership[] $memberships */
+  foreach ($memberships as $membership) {
+    $group = $membership->getGroup();
+    if ($group->getGroupType()->id() !== 'learning_path') {
+      continue;
+    }
+
+    $groups_ids[] = $group->id();
+  }
+
+  $user_id = \Drupal::currentUser()->id();
+  $ilts = array_filter($ilts, function ($ilt) use (
+    $user_id,
+    $groups_ids
+  ) {
+    /** @var \Drupal\opigno_ilt\ILTInterface $ilt */
+    // Remove ILTs that are not related to the current user groups.
+    if (!in_array($ilt->getTrainingId(), $groups_ids)) {
+      return FALSE;
+    }
+
+    // Remove ILTs with the member restriction without the current user.
+    if (!$ilt->isMember($user_id)) {
+      return FALSE;
+    }
+
+    return TRUE;
+  });
+
+  return $ilts;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function opigno_ilt_cron() {
+  // Send the email notifications for the upcoming instructor-led training.
+  /** @var \Drupal\Core\Mail\MailManagerInterface $mail_service */
+  $mail_service = \Drupal::service('plugin.manager.mail');
+
+  $timestamp = \Drupal::time()->getRequestTime();
+  $date_min = DrupalDateTime::createFromTimestamp($timestamp);
+  $date_max = clone $date_min;
+  $date_max->add(new DateInterval('P1D'));
+  $date_min_str = $date_min->format(DrupalDateTime::FORMAT);
+  $date_max_str = $date_max->format(DrupalDateTime::FORMAT);
+
+  $ilts_ids = \Drupal::entityTypeManager()
+    ->getStorage('opigno_ilt')
+    ->getQuery()
+    ->condition('date__value', [
+      $date_min_str,
+      $date_max_str,
+    ], 'BETWEEN')
+    ->execute();
+
+  /** @var \Drupal\opigno_ilt\ILTInterface[] $ilts */
+  $ilts = ILT::loadMultiple($ilts_ids);
+  foreach ($ilts as $ilt) {
+    $members = $ilt->getMembers();
+    if (empty($members)) {
+      $training = $ilt->getTraining();
+      if ($training !== NULL) {
+        $members = array_map(function ($member) {
+          /** @var \Drupal\group\GroupMembership $member */
+          return $member->getUser();
+        }, $training->getMembers());
+      }
+    }
+
+    $notified = $ilt->getNotifiedMembers();
+    /** @var \Drupal\user\UserInterface[] $not_notified */
+    $not_notified = array_udiff($members, $notified, function ($user1, $user2) {
+      /** @var \Drupal\user\UserInterface $user1 */
+      /** @var \Drupal\user\UserInterface $user2 */
+      return $user2->id() - $user1->id();
+    });
+
+    $params['subject'] = $params['message'] = t('The Instructor-Led Training %ilt starts in less than 24 hours', [
+      '%ilt' => $ilt->getTitle(),
+    ]);
+    if (\Drupal::hasService('opigno_calendar_event.iCal')) {
+      $params['attachments'] = opigno_ilt_ical_prepare($ilt);
+    }
+
+    $module = 'opigno_ilt';
+    $key = 'upcoming_ilt_notify';
+    foreach ($not_notified as $user) {
+      $to = $user->getEmail();
+      $langcode = $user->getPreferredLangcode();
+      $mail_service->mail($module, $key, $to, $langcode, $params, NULL, TRUE);
+
+      $ilt->addNotifiedMember($user->id());
+      $ilt->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * Removes the related training field in an instructor-led training.
+ */
+function opigno_ilt_group_content_delete(EntityInterface $entity) {
+  /** @var \Drupal\group\Entity\GroupContentInterface $entity */
+  $content = $entity->getEntity();
+  if (!isset($content)) {
+    // If related entity is already deleted.
+    return;
+  }
+
+  $type = $content->getEntityTypeId();
+  if ($type === 'opigno_ilt') {
+    /** @var \Drupal\opigno_ilt\ILTInterface $content */
+    $content->setTrainingId(NULL);
+    $content->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function opigno_ilt_group_content_insert(EntityInterface $entity) {
+  /** @var \Drupal\group\Entity\GroupContentInterface $entity */
+  $bundle = $entity->bundle();
+  $type = $entity->getEntity()->getEntityTypeId();
+  if ($bundle === 'learning_path-group_membership') {
+    // We need to update all ILTs in the group
+    // to show it in the calendar for a new member.
+    $group = $entity->getGroup();
+    $ilts = \Drupal::entityTypeManager()->getStorage('opigno_ilt')
+      ->loadByProperties(['training' => $group->id()]);
+    foreach ($ilts as $ilt) {
+      $ilt->save();
+    }
+  }
+  elseif ($type === 'opigno_ilt') {
+    // Updates the related training field in an instructor-led training.
+    /** @var \Drupal\opigno_ilt\ILTInterface $ilt */
+    $ilt = $entity->getEntity();
+    $training = $entity->getGroup();
+    $ilt->setTraining($training);
+    $ilt->save();
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function opigno_ilt_mail($key, &$message, $params) {
+  if ($key !== 'upcoming_ilt_notify') {
+    return;
+  }
+
+  $message['from'] = \Drupal::config('system.site')->get('mail');
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['message'];
+  $message['params']['attachments'][] = $params['attachments'];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * Updates a calendar event related to a instructor-led training.
+ */
+function opigno_ilt_opigno_ilt_insert(EntityInterface $entity) {
+  // Set instructor-led training reference on a related calendar event.
+  /** @var \Drupal\opigno_ilt\ILTInterface $entity */
+  $calendar_event = $entity->getCalendarEvent();
+  if (isset($calendar_event)) {
+    $calendar_event->set('field_ilt', $entity);
+    $calendar_event->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * Updates a calendar event related to a instructor-led training.
+ */
+function opigno_ilt_opigno_ilt_presave(EntityInterface $entity) {
+  /** @var \Drupal\opigno_ilt\ILTInterface $entity */
+  /** @var \Drupal\opigno_calendar_event\Entity\CalendarEvent $calendar_event */
+  $calendar_event = $entity->getCalendarEvent();
+  if (!isset($calendar_event)) {
+    $calendar_event = CalendarEvent::create([
+      'type' => 'ilt_calendar_event',
+    ]);
+  }
+
+  $calendar_event->set('title', $entity->getTitle());
+  $calendar_event->set('uid', $entity->getOwnerId());
+
+  // Set date.
+  $start_date = $entity->getStartDate();
+  $end_date = $entity->getEndDate();
+  $date = [
+    'value' => _opigno_ilt_datetime_to_iso($start_date),
+    'end_value' => _opigno_ilt_datetime_to_iso($end_date),
+  ];
+  $calendar_event->set('date_daterange', $date);
+
+  // Set members.
+  $members = $entity->getMembersIds();
+  if (empty($members)) {
+    $training = $entity->getTraining();
+    if (isset($training)) {
+      $members = array_map(function ($member) {
+        /** @var \Drupal\group\GroupMembership $member */
+        return $member->getUser()->id();
+      }, $training->getMembers());
+    }
+  }
+  $calendar_event->set('field_calendar_event_members', $members);
+  $calendar_event->save();
+
+  $entity->setCalendarEvent($calendar_event);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * Updates a calendar event related to a instructor-led training.
+ */
+function opigno_ilt_opigno_ilt_update(EntityInterface $entity) {
+  // Set instructor-led training reference on a related calendar event.
+  /** @var \Drupal\opigno_ilt\ILTInterface $entity */
+  $calendar_event = $entity->getCalendarEvent();
+  if (isset($calendar_event)) {
+    $calendar_event->set('field_ilt', $entity);
+    $calendar_event->save();
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_field().
+ *
+ * Replaces titles of a instructor-led training calendar event with links.
+ */
+function opigno_ilt_preprocess_views_view_field(&$vars) {
+  $id = $vars['view']->id();
+  $field = $vars['field']->field;
+  if ($id === 'opigno_calendar' && $field === 'title') {
+    /** @var \Drupal\opigno_calendar_event\CalendarEventInterface $entity */
+    $entity = $vars['row']->_entity;
+    $bundle = $entity->bundle();
+    if ($bundle === 'ilt_calendar_event') {
+      $title = $vars['field']->getValue($vars['row']);
+      /** @var \Drupal\opigno_ilt\ILTInterface $ilt */
+      $ilt = $entity->get('field_ilt')->entity;
+      if (isset($ilt)) {
+        $link = Link::createFromRoute($title, 'entity.opigno_ilt.canonical', [
+          'opigno_ilt' => $ilt->id(),
+        ]);
+        $vars['output'] = $link;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ *
+ * Adds upcoming instructor-led training banner to the training pages.
+ */
+function opigno_ilt_preprocess_page(&$variables) {
+  $training_routes = [
+    'entity.group.canonical',
+    'opigno_module.group.answer_form',
+    'opigno_module.module_result',
+  ];
+
+  $route = \Drupal::routeMatch();
+  $route_name = $route->getRouteName();
+  if (!in_array($route_name, $training_routes)) {
+    return;
+  }
+
+  /** @var \Drupal\group\Entity\GroupInterface $group */
+  $group = $route->getParameter('group');
+  if (!isset($group)) {
+    $group_id = OpignoGroupContext::getCurrentGroupId();
+    if (!isset($group_id)) {
+      return;
+    }
+
+    $group = Group::load($group_id);
+  }
+
+  $bundle = $group->bundle();
+  if ($bundle !== 'learning_path') {
+    return;
+  }
+
+  $user = \Drupal::currentUser();
+  $user_id = $user->id();
+
+  $steps = opigno_learning_path_get_steps($group->id(), $user_id);
+  $ilt_steps = array_filter($steps, function ($step) {
+    return $step['typology'] === 'ILT';
+  });
+  $ilt_ids = array_map(function ($step) {
+    return $step['id'];
+  }, $ilt_steps);
+  /** @var \Drupal\opigno_ilt\ILTInterface[] $ilts */
+  $ilts = ILT::loadMultiple($ilt_ids);
+  foreach ($ilts as $ilt) {
+    if (!$ilt->isMember($user_id)) {
+      continue;
+    }
+
+    $date_str = $ilt->getStartDate();
+    $date = DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $date_str);
+    $diff = $date->getTimestamp() - time();
+    // If instructor-led training is in two days.
+    if ($diff > 0 && $diff < 60 * 60 * 24 * 2) {
+      $title = $ilt->getTitle();
+      $link = Link::createFromRoute($title, 'entity.opigno_ilt.canonical', [
+        'opigno_ilt' => $ilt->id(),
+      ]);
+      $variables['page']['top'][] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['ilt-banner'],
+        ],
+        'content' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => [
+            'class' => ['ilt-banner-text'],
+          ],
+          '#value' => t('Up coming Instructor Led Training %training on %date !', [
+            '%training' => $link->toString(),
+            '%date' => $date->format('jS F Y - g:i A'),
+          ]),
+        ],
+        '#attached' => [
+          'library' => [
+            'opigno_ilt/banner',
+          ],
+        ],
+      ];
+      break;
+    }
+  }
+}
+
+/**
+ * Helper function to prepare iCal file for Instructor Led Training.
+ */
+function opigno_ilt_ical_prepare($ilt) {
+  $startDate = new DateTime($ilt->getStartDate());
+  $endDate = new DateTime($ilt->getEndDate());
+
+  $iCal = \Drupal::service('opigno_calendar_event.iCal')->buildICalEvent([
+    'summary' => $ilt->getTitle(),
+    'start' => $startDate->setTimezone(new DateTimeZone("UTC")),
+    'end' => $endDate->setTimezone(new DateTimeZone("UTC")),
+    'description' => t('The Instructor-Led Training %ilt starts in less than 24 hours', [
+      '%ilt' => $ilt->getTitle(),
+    ]),
+    'url' => $ilt->toUrl('canonical', ['absolute' => TRUE])->setAbsolute()->toString(),
+    'org' => \Drupal::config('system.site')->get('name'),
+    'location' => $ilt->getPlace(),
+  ]);
+  $attachments = [
+    'filecontent' => $iCal,
+    'filename' => $ilt->getTitle() . '.ical',
+    'filemime' => 'text/calendar',
+  ];
+
+  return $attachments;
+}

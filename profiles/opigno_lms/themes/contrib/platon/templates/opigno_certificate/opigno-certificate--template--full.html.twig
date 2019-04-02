@@ -1,0 +1,130 @@
+<style>
+  body {
+    padding: 0;
+    margin: 0;
+  }
+  article {
+    background-image: url("{{ theme_path ~ '/images/certificate-background.png' }}");
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 2rem;
+  }
+  .logo {
+    padding-top: 2rem;
+  }
+  .logo img {
+    max-height: 150px;
+  }
+  h1 {
+    font-size: 40px;
+    line-height: 1;
+    margin: 2rem 0 0;
+    padding: 0;
+  }
+  .completed {
+    font-size: 22px;
+    margin-bottom: 3rem;
+  }
+  .awarded {
+    margin-bottom: 2rem;
+  }
+  .awarded .title {
+    font-size: 22px;
+  }
+  .for {
+    margin-bottom: 1rem;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .extra,
+  .for-title {
+    font-size: 18px;
+  }
+  .picto-header {
+    right: 3rem;
+    top: 0;
+  }
+  .student {
+    font-size: 25px;
+  }
+  .p-relative {
+    position: relative;
+  }
+  .p-absolute {
+    position: absolute;
+  }
+  .color-blue {
+    color: #5bb4d8;
+  }
+  .color-grey {
+    color: #9d9d9c;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-uppercase {
+    text-transform: uppercase;
+  }
+  .bold {
+    font-weight: 700;
+  }
+  hr {
+    margin-top: 4rem;
+    margin-bottom: 3rem;
+    border: 0;
+    border-top: 2px solid #9faf5b;
+  }
+  .font-italic {
+    font-style: italic;
+    font-family: serif;
+  }
+</style>
+
+<article{{ attributes.addclass(['p-relative']) }}>
+
+  <div class="p-absolute picto-header">
+    <img src="{{ theme_path ~ '/images/picto-header-certificate.png' }}" alt="" width="70px" height="151px">
+  </div>
+
+  <div class="logo">
+    <img src="{{ logo_path }}" alt="">
+  </div>
+
+  <div{{ content_attributes }}>
+
+    <h1 class="text-uppercase color-blue">
+      {{ 'Certificate'|t }}
+      <br>
+      {{ 'of completion'|t }}
+    </h1>
+
+    <div class="completed text-uppercase color-grey">
+      {{ completed_on }}
+    </div>
+
+    <div class="text-center">
+      <div class="awarded">
+        <div class="title color-blue">{{ 'Awarded to'|t }}</div>
+        <div class="student bold font-italic color-grey">{{ awarded_to }}</div>
+      </div>
+
+      <div class="for">
+        <div class="title bold text-uppercase color-blue">{{ 'To certify completion of the training'|t }}</div>
+        <div class="for-title bold color-grey">{{ referencing_entity.label.0.value }}</div>
+      </div>
+
+      {% if extra %}
+        <div class="title bold extra-prefix text-uppercase color-blue">{{ 'Having passed all the following courses'|t }}</div>
+        <div class="extra bold color-grey">{{ extra }}</div>
+      {% endif %}
+
+      <hr>
+      <div class="approved">
+        <img src="{{ theme_path ~ '/images/picto-certificat-approved.png' }}" alt="" width="123px" height="149px">
+      </div>
+    </div>
+  </div>
+
+</article>

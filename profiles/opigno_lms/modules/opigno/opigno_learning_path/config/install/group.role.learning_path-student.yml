@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+id: learning_path-student
+label: Student
+weight: -10
+internal: false
+audience: member
+group_type: learning_path
+permissions_ui: true
+permissions:
+  - 'view group'
+  - 'update own group_membership content'
+  - 'leave group'
+  - 'view own results'

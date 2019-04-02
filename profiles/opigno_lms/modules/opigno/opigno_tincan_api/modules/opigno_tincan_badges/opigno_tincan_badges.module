@@ -1,0 +1,222 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tincan_modules.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\file\Entity\File;
+use Drupal\group\Entity\Group;
+use Drupal\opigno_group_manager\OpignoGroupContext;
+use Drupal\opigno_module\Entity\OpignoModule;
+use Drupal\opigno_tincan_api\OpignoTinCanApiStatements;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanActivityDefinitionTypes;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanVerbs;
+use Drupal\Core\Entity\EntityInterface;
+use TinCan\Context;
+use TinCan\Statement;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_badges_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_badges module.
+    case 'help.page.opigno_tincan_badges':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Functionality for sending tincan statements when user get badges.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * {@inheritdoc}
+ *
+ * Tincan statement will be send when user finish Course or Module.
+ */
+function opigno_tincan_badges_user_module_status_presave(EntityInterface $entity) {
+  /****
+   * - When user get a badge
+   * Actor: user
+   * Verb: openbadges/earned
+   * Object: activitystrea.ms/badge
+   * Result: extension
+   * Context: Course or Module
+   */
+
+  // Check if Tincan PHP library is installed.
+  $has_library = opigno_tincan_api_tincanphp_is_installed();
+  if (!$has_library) {
+    \Drupal::logger('opigno_tincan')
+      ->notice('Tincan statements can not be send. Tincan PHP library is not installed.');
+    return;
+  };
+
+  // Check if module is finished.
+  $is_finished = $entity->get('finished')->getValue()[0]['value'];
+  if (!$is_finished) {
+    return;
+  }
+
+  $user = \Drupal::currentUser();
+  $uid = $user->id();
+  $opigno_module = $entity->getModule();
+
+  // For module badges.
+  $module_badges = $opigno_module->get('badge_active')->value;
+  // Create and send statement for module.
+  if ($module_badges) {
+    _opigno_tincan_badges_create_and_send_statements($opigno_module);
+  }
+
+  // For Course badges.
+  // Get group context.
+  $gid = OpignoGroupContext::getCurrentGroupId();
+  $cid = OpignoGroupContext::getCurrentGroupContentId();
+  if (empty($gid) || empty($cid)) {
+    return;
+  }
+
+  // Get group steps.
+  $group_steps = opigno_learning_path_get_steps($gid, $uid);
+  foreach ($group_steps as $step) {
+    if ($step['typology'] === 'Course') {
+      // Get course steps.
+      $course_steps = opigno_learning_path_get_steps($step['id'], $uid);
+      foreach ($course_steps as $course_step) {
+        // Check if module is in course.
+        if ($course_step['id'] == $opigno_module->id()) {
+          $last_step = end($course_steps);
+          $is_last = $last_step['cid'] === $cid;
+          // If module is last course step means user finished course.
+          if ($is_last) {
+            $course_id = $step['id'];
+            break;
+          }
+        }
+      }
+
+    }
+  }
+
+  if (isset($course_id)) {
+    $course = Group::load($course_id);
+    $course_badges = $course->get('badge_active')->value;
+    if ($course_badges) {
+      // Create and send statement for course.
+      _opigno_tincan_badges_create_and_send_statements($course);
+    }
+  }
+}
+
+/**
+ * Function for creating and sending tincan statemens when user get a badge.
+ *
+ *  Can be send only for Course or Module.
+ *
+ * @param mixed $entity
+ *   Course or Module.
+ *
+ * @throws \Exception
+ */
+function _opigno_tincan_badges_create_and_send_statements($entity) {
+  // Get badge properties.
+  $badge_name = $entity->get('badge_name')->value;
+  $badge_description = $entity->get('badge_description')->value;
+  $badge_criteria = $entity->get('badge_criteria')->value;
+  $media_entity = $entity->get('badge_media_image')->entity;
+
+  // Image file url and id are required  for statement.
+  if (!$media_entity) {
+    return;
+  };
+
+  // Create statement.
+  $statement = new Statement();
+  // Set Actor.
+  OpignoTinCanApiStatements::setActor($statement);
+  // Set verb.
+  OpignoTinCanApiStatements::setVerb(
+    $statement,
+    OpignoTincanApiTinCanVerbs::$earned
+  );
+  $statement->stamp();
+
+  // Load image.
+  $badge_image_id = $media_entity->get('field_media_image')->target_id;
+  $badge_image = File::load($badge_image_id);
+  $image_url = file_create_url($badge_image->getFileUri());
+  // Add an extension in the result.
+  $statement->setResult([
+    'extensions' => [
+      'http://specification.openbadges.org/xapi/extensions/badgeassertion' => [
+        '@id' => $image_url,
+      ],
+    ],
+  ]);
+
+  // Add the object. This object contains an extension of the definition,
+  // a name, a description and a badge type.
+  $statement->setObject([
+    'id' => $image_url,
+    'objectType' => 'Activity',
+    'definition' => [
+      'extensions' => [
+        'http://specification.openbadges.org/xapi/extensions/badgeclass' => [
+          '@id' => $image_url,
+          'image' => $badge_image_id,
+          'criteria' => $badge_criteria,
+          // 'issuer' => $badge_data->issuer.
+        ],
+      ],
+      'name' => [
+        'en-US' => $badge_name ? $badge_name : '',
+      ],
+      'description' => [
+        'en-US' => $badge_description ? $badge_description : '',
+      ],
+      'type' => OpignoTincanApiTinCanActivityDefinitionTypes::$badge,
+    ],
+  ]);
+
+  // Context creation.
+  $context = new Context();
+
+  // Set parents.
+  if ($entity instanceof OpignoModule) {
+    // Set patents context to opigno_module entity.
+    $definition_type = OpignoTincanApiTinCanActivityDefinitionTypes::$module;
+    $url = Url::fromRoute('entity.opigno_module.canonical',
+      ['opigno_module' => $entity->id()],
+      ['absolute' => TRUE])
+      ->toString();
+    $parent['id'] = $url;
+    if (!empty($definition_type)) {
+      $parent['definition'] = ['type' => $definition_type];
+    }
+    if (!empty($parent)) {
+      $context->getContextActivities()->setParent([$parent]);
+    }
+  }
+  elseif ($entity instanceof Group) {
+    $definition_type = OpignoTincanApiTinCanActivityDefinitionTypes::$course;
+    OpignoTinCanApiStatements::contextSetParents(
+      $context,
+      [$entity->id()],
+      $definition_type
+    );
+  }
+
+  // Set statement context.
+  $statement->setContext($context);
+
+  // Sending statement.
+  OpignoTinCanApiStatements::sendStatement($statement);
+}

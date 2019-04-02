@@ -1,0 +1,12 @@
+body[class*="page-module-"][class*="-results-"] {
+  #edit-answers {
+    > legend {
+      display: none;
+
+      .fieldset-wrapper {
+        width: auto;
+        float: none;
+      }
+    }
+  }
+}

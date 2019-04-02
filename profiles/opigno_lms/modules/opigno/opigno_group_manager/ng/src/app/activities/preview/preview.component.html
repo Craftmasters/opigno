@@ -1,0 +1,11 @@
+<div class="info d-flex">
+  <div class="flex-1 text-uppercase">
+    <div>
+      <h2><span i18n>Preview of activity </span>"{{activity.name}}"</h2>
+    </div>
+  </div>
+  <button class="close" mat-icon-button color="basic" (click)="close()">
+    <mat-icon class="mat-24">close</mat-icon>
+  </button>
+</div>
+<iframe *ngIf="activityPreview" width="100%" height="100%" [src]="activityPreview"></iframe>

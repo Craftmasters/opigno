@@ -1,0 +1,27 @@
+tft:
+  version: 1.x
+  css:
+    theme:
+      css/tft.css: {}
+      css/tft.lightbox.css: {}
+  js:
+    js/jquery.tablesorter.min.js: {}
+    js/tft.js: {}
+    js/tft.lightbox.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - core/drupalSettings
+tft.select-folder:
+  version: 1.x
+  css:
+    theme:
+      css/tft.css: {}
+  js:
+    js/tft.select-folder.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - core/drupalSettings

@@ -1,0 +1,14 @@
+name: Opigno Calendar Event Group
+type: module
+description: Provides a way to attach calendar events to groups.
+dependencies:
+  - opigno_calendar_event:opigno_calendar_event
+  - group:group
+package: Opigno
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2019-01-18
+version: '8.x-1.1'
+core: '8.x'
+project: 'opigno_calendar_event'
+datestamp: 1547800103

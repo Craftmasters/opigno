@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+    - group.type.opigno_course
+id: group_content_type_af9d804582e19
+label: 'Learning Path: Subgroup (Course)'
+description: 'Adds <em class="placeholder">Course</em> groups to groups both publicly and privately.'
+group_type: learning_path
+content_plugin: 'subgroup:opigno_course'
+plugin_config:
+  group_cardinality: 0
+  entity_cardinality: 1
+  use_creation_wizard: true
+  parent_role_mapping:
+    learning_path-1eb7047a7: ''
+    learning_path-3e4ccc6a3: ''
+    learning_path-9b4c10f4d: ''
+    learning_path-a416e6833: ''
+    learning_path-admin: ''
+    learning_path-anonymous: ''
+    learning_path-b2b679d24: ''
+    learning_path-content_manager: ''
+    learning_path-member: opigno_course-member
+    learning_path-outsider: ''
+    learning_path-student: ''
+    learning_path-user_manager: ''
+  child_role_mapping:
+    opigno_course-1eb7047a7: ''
+    opigno_course-3e4ccc6a3: ''
+    opigno_course-9b4c10f4d: ''
+    opigno_course-a416e6833: ''
+    opigno_course-admin: ''
+    opigno_course-anonymous: ''
+    opigno_course-b2b679d24: ''
+    opigno_course-member: ''
+    opigno_course-outsider: ''

@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Main file for the "Opigno Calendar event group" module.
+ */
+
+use Drupal\opigno_calendar_event\CalendarEventInterface;
+use Drupal\opigno_calendar_event\CalendarEventEmbeddedWidget;
+use Drupal\opigno_calendar_event_group\GroupSelectorWidget;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
+/**
+ * Implements hook_form_alter().
+ *
+ * {@inheritdoc}
+ */
+function opigno_calendar_event_group_form_alter(array &$form, FormStateInterface $form_state) {
+  if (isset($form[CalendarEventEmbeddedWidget::ELEMENT_NAME])) {
+    \Drupal::service('class_resolver')
+      ->getInstanceFromDefinition(GroupSelectorWidget::class)
+      ->alterForm($form, $form_state);
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ *
+ * {@inheritdoc}
+ */
+function opigno_calendar_event_group_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+
+  if ($entity_type->id() === CalendarEventInterface::ENTITY_TYPE_ID) {
+    $fields['display_groups'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(new TranslatableMarkup('Calendar display groups'))
+      ->setDescription(new TranslatableMarkup('Associate the calendar event to related groups.'))
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'group')
+      ->setTranslatable(FALSE)
+      ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
+  }
+
+  return $fields;
+}

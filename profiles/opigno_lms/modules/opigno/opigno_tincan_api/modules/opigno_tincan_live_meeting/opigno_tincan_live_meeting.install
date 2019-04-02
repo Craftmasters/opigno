@@ -1,0 +1,39 @@
+<?php
+
+/**
+ * @file
+ * Module install/update functionality.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function opigno_tincan_live_meeting_schema() {
+  return [
+    'opigno_tincan_live_meeting' => [
+      'description' => 'Registry sending tincan statements for Live Meeting.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'uid' => [
+          'description' => 'User id (meeting participant).',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'meeting_id' => [
+          'description' => 'Meeting id.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+      'foreign keys' => [
+        'users' => ['uid' => 'uid'],
+      ],
+    ],
+  ];
+}

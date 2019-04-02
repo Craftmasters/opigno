@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+_core: {  }
+id: opigno_class
+label: Class
+description: 'A group of user. A class can be used in Opigno Learning Paths.'
+creator_membership: true
+creator_wizard: false
+creator_roles:
+  - opigno_class-admin

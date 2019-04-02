@@ -1,0 +1,173 @@
+opigno_statistics.dashboard:
+  path: 'statistics/dashboard'
+  defaults:
+    _title: 'Dashboard'
+    _form: '\Drupal\opigno_statistics\Form\DashboardForm'
+  requirements:
+    _custom_access: '\Drupal\opigno_statistics\Form\DashboardForm::access'
+  options:
+    no_cache: TRUE
+
+opigno_statistics.training:
+  path: 'statistics/training/{group}'
+  defaults:
+    _title: 'Training statistics'
+    _form: '\Drupal\opigno_statistics\Form\TrainingForm'
+  requirements:
+    _entity_access: 'group.view statistics'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_statistics.user:
+  path: 'statistics/user/{user}'
+  defaults:
+    _title: 'User profile'
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::index'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      account:
+       type: entity:user
+
+opigno_statistics.user.training_details:
+  path: 'statistics/user/{user}/training/{group}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::training'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_statistics.user.course_details:
+  path: 'statistics/user/{user}/training/{training}/course/{course}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::course'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      training:
+       type: entity:group
+      course:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_statistics.user.training_module_details:
+  path: 'statistics/user/{user}/training/{training}/module/{module}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::trainingModule'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      training:
+       type: entity:group
+      module:
+       type: entity:opigno_module
+      account:
+       type: entity:user
+
+opigno_statistics.user.course_module_details:
+  path: 'statistics/user/{user}/training/{training}/course/{course}/module/{module}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::courseModule'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      training:
+       type: entity:group
+      course:
+       type: entity:group
+      module:
+       type: entity:opigno_module
+      account:
+       type: entity:user
+
+opigno_statistics.user.training_details_ajax:
+  path: 'ajax/statistics/user/{user}/training/{group}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::ajaxLoadTrainingDetails'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_statistics.user.course_details_ajax:
+  path: 'ajax/statistics/user/{user}/training/{training}/course/{course}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::ajaxLoadCourseDetails'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      training:
+       type: entity:group
+      course:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_statistics.user.training_module_details_ajax:
+  path: 'ajax/statistics/user/{user}/training/{training}/module/{module}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::ajaxLoadTrainingModuleDetails'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      training:
+       type: entity:group
+      module:
+       type: entity:opigno_module
+      account:
+       type: entity:user
+
+opigno_statistics.user.course_module_details_ajax:
+  path: 'ajax/statistics/user/{user}/training/{training}/course/{course}/module/{module}'
+  defaults:
+    _controller: '\Drupal\opigno_statistics\Controller\UserController::ajaxLoadCourseModuleDetails'
+  requirements:
+    _entity_access: 'user.view statistics'
+  options:
+    parameters:
+      user:
+       type: entity:user
+      training:
+       type: entity:group
+      course:
+       type: entity:group
+      module:
+       type: entity:opigno_module
+      account:
+       type: entity:user

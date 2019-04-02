@@ -1,0 +1,5 @@
+services:
+  opigno_statistics.route_subscriber:
+    class: Drupal\opigno_statistics\EventSubscriber\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

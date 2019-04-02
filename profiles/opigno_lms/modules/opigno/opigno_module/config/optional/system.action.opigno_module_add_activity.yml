@@ -1,0 +1,8 @@
+# File system.action.opigno_module_add_activity.yml
+langcode: en
+status: true
+id: opigno_module_add_activity
+label: 'Add activities to Module'
+type: opigno_activity
+plugin: opigno_module_add_activity
+configuration: {  }

@@ -1,0 +1,751 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_module.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\group\Entity\Group;
+use Drupal\h5p\H5PDrupal\H5PDrupal;
+use Drupal\opigno_group_manager\OpignoGroupContext;
+use Drupal\opigno_module\Entity\OpignoModule;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+use Drupal\opigno_module\Controller\ExternalPackageController;
+use Drupal\Core\Access\AccessResultAllowed;
+use Drupal\opigno_module\Entity\OpignoActivity;
+
+define('OPIGNO_MODULE_PPT_TEMP_DIR', 'external_packages_ppt');
+
+/**
+ * Implements hook_help().
+ */
+function opigno_module_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_module module.
+    case 'help.page.opigno_module':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Opigno Modules functionality') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_module_theme() {
+  $theme = [];
+  $theme['opigno_activity'] = [
+    'render element' => 'elements',
+    'file' => 'opigno_module.theme.inc',
+    'template' => 'opigno_activity',
+  ];
+  $theme['opigno_activity_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'opigno_module.theme.inc',
+  ];
+  $theme['opigno_answer'] = [
+    'render element' => 'elements',
+    'file' => 'opigno_answer.page.inc',
+    'template' => 'opigno_answer',
+  ];
+  $theme['opigno_answer_content_add_list'] = [
+    'render element' => 'content',
+    'variables' => ['content' => NULL],
+    'file' => 'opigno_answer.page.inc',
+  ];
+  $theme['opigno_module_item_form'] = [
+    'variables' => [],
+  ];
+  $theme['opigno_user_result_item'] = [
+    'variables' => [
+      'opigno_answer' => NULL,
+      'opigno_answer_activity' => NULL,
+      'question_number' => NULL,
+      'answer_max_score' => NULL,
+    ],
+  ];
+  $theme['region__content__opigno_module__activity'] = [
+    'base hook' => 'region',
+    'progress' => NULL,
+    'home_link' => NULL,
+  ];
+  $theme['page__opigno_module__activity'] = [
+    'base hook' => 'page',
+    'progress' => NULL,
+    'home_link' => NULL,
+  ];
+  return $theme;
+}
+
+/**
+ * User result item preprocess template.
+ */
+function template_preprocess_opigno_user_result_item(&$variables) {
+  $route = \Drupal::routeMatch();
+  /** @var \Drupal\opigno_module\Entity\OpignoModule $opigno_module */
+  $opigno_module = $route->getParameter('opigno_module');
+  // Check if module allow display answer content for users.
+  $hide_results = $opigno_module->getHideResults();
+  /** @var \Drupal\opigno_module\Entity\OpignoAnswer $answer */
+  $answer = $variables['opigno_answer'];
+  /** @var Drupal\opigno_module\Entity\OpignoActivity $answer_activity */
+  $answer_activity = $variables['opigno_answer_activity'];
+  /* @var $answer_service \Drupal\opigno_module\ActivityAnswerManager */
+  $answer_service = \Drupal::service('plugin.manager.activity_answer');
+  $answer_activity_type = $answer_activity->getType();
+  if (!$hide_results) {
+    // Get the data about an answer.
+    if ($answer_service->hasDefinition($answer_activity_type)) {
+      $answer_instance = $answer_service->createInstance($answer_activity_type);
+      $headings = $answer_instance->getAnswerResultItemHeaders($answer);
+      $result_data = $answer_instance->getAnswerResultItemData($answer);
+      if (!empty($result_data)) {
+        $content = [
+          '#theme' => 'table',
+          '#header' => $headings,
+          '#rows' => $result_data,
+        ];
+        $variables['content'] = $content;
+      }
+    }
+    // Output question body field.
+    if ($answer_activity->hasField('opigno_body')) {
+      $viewBuilder = \Drupal::entityTypeManager()
+        ->getViewBuilder('opigno_activity');
+      $variables['question_body'] = $viewBuilder->viewField($answer_activity->get('opigno_body'), 'full');
+    }
+  }
+  // Output question number info.
+  if ($variables['question_number']) {
+    $activity_title = $answer_activity->getName();
+    $variables['label'] = $variables['question_number'] . '. ' . ucfirst($activity_title);
+  }
+
+  if (isset($variables['answer_max_score'])
+    && $variables['answer_max_score'] > 0) {
+    // Get the user score.
+    $variables['score'] = t('Score: %score of %max_score', [
+      '%score' => $answer->isEvaluated() ? $answer->getScore() : '?',
+      '%max_score' => $variables['answer_max_score'],
+    ]);
+  }
+  else {
+    $variables['score'] = t('No score retrieved');
+  }
+  $variables['#attached']['library'][] = 'opigno_module/module_results_page';
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function opigno_module_theme_suggestions_opigno_activity(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#opigno_activity'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'opigno_activity__' . $sanitized_view_mode;
+  $suggestions[] = 'opigno_activity__' . $entity->bundle();
+  $suggestions[] = 'opigno_activity__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'opigno_activity__' . $entity->id();
+  $suggestions[] = 'opigno_activity__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function opigno_module_theme_suggestions_opigno_answer(array $variables) {
+  $suggestions = [];
+  $entity = $variables['elements']['#opigno_answer'];
+  $sanitized_view_mode = strtr($variables['elements']['#view_mode'], '.', '_');
+
+  $suggestions[] = 'opigno_answer__' . $sanitized_view_mode;
+  $suggestions[] = 'opigno_answer__' . $entity->bundle();
+  $suggestions[] = 'opigno_answer__' . $entity->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'opigno_answer__' . $entity->id();
+  $suggestions[] = 'opigno_answer__' . $entity->id() . '__' . $sanitized_view_mode;
+  return $suggestions;
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function opigno_module_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  if (($route_name == 'opigno_module.manager.get_item_form'
+    || $route_name == 'opigno_module.add_external_package'
+    || $route_name == 'opigno_module.add_external_package_ppt')
+    && $hook == 'page') {
+    $suggestions[] = 'opigno_module_item_form';
+  }
+
+  if (opigno_module_is_activity_route()) {
+
+    if ($hook == 'region'
+      && in_array('region__content', $suggestions)
+    ) {
+      $suggestions[] = 'region__content__opigno_module__activity';
+    }
+
+    if ($hook == 'page') {
+      $suggestions[] = 'page__opigno_module__activity';
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function opigno_module_preprocess_html(&$variables) {
+  // Remove admin bar for item form (included in iframe)
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  if (($route_name == 'opigno_module.manager.get_item_form'
+    || $route_name == 'opigno_module.add_external_package'
+    || $route_name == 'opigno_module.add_external_package_ppt')) {
+    unset($variables['page_top']);
+  }
+
+  if ($route_name == 'opigno_module.group.answer_form') {
+    $variables['attributes']['class'][] = 'section-module';
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_module_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $build_info = $form_state->getBuildInfo();
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  if ($route_name == 'entity.opigno_activity.delete_form' && method_exists($build_info['callback_object'], 'getEntity')) {
+    // Attach js with autosubmit.
+    $form['#attached']['library'][] = 'opigno_module/activity';
+
+    $entity = $build_info['callback_object']->getEntity();
+    $answers = $entity->getAnswers();
+    if ($answers) {
+      // Disallow activity deleting if it has users answers.
+      $message = t('This activity has already be answered by one (or several) users and cannot be deleted');
+      $form['description'] = [];
+      $form['#title'] = $message;
+      $form_state->set('activity_answers', TRUE);
+      $form_state->set('activity_message', $message);
+      $form['#attributes']['class'][] = 'opigno-activity-with-answers';
+      $form['actions']['submit']['#attributes']['disabled'] = 'disabled';
+    }
+  }
+
+  // Change button value from "Save" to "Next".
+  if (in_array($route_name, ['opigno_module.manager.get_item_form', 'opigno_module.group.answer_form'])) {
+    $form['actions']['submit']['#value'] = t('Next');
+  };
+
+  // Improve module form display.
+  if ($route_name == 'opigno_module.manager.get_item_form') {
+    $form['uid']['#access'] = FALSE;
+    $form['created']['#access'] = FALSE;
+    if (isset($form['actions']['delete'])) {
+      unset($form['actions']['delete']);
+    }
+  }
+
+  // If the form has an entity, ajaxify it.
+  if ($route_name == 'opigno_module.manager.get_item_form'
+    && method_exists($build_info['callback_object'], 'getEntity')) {
+    // Get the entity.
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    $entity = $build_info['callback_object']->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
+    $id = $entity->id();
+
+    // Add form class for ajaxification.
+    // In case of add form, append "new" instead of the entity ID.
+    $ajax_id = "ajax-form-entity-$entity_type-$bundle-" . ($id ?: 'new');
+    $form['#attributes']['class'][] = $ajax_id;
+
+    // Ajaxification settings of the buttons.
+    $ajax_settings = [
+      'callback' => 'Drupal\opigno_module\Controller\OpignoModuleManagerController::ajaxFormEntityCallback',
+      'wrapper' => $ajax_id,
+      'effect' => 'fade',
+    ];
+
+    $form['#attached']['library'][] = 'opigno_module/ajax_form';
+
+    $form['actions']['submit']['#ajax'] = $ajax_settings;
+    $form['actions']['publish']['#ajax'] = $ajax_settings;
+    $form['actions']['unpublish']['#ajax'] = $ajax_settings;
+    $form['actions']['preview']['#access'] = FALSE;
+
+    unset($form['actions']['publish']['#dropbutton']);
+    unset($form['actions']['unpublish']['#dropbutton']);
+
+    // Ajaxify the buttons.
+    foreach (array_keys($form['actions']) as $action) {
+      if ($action != 'preview'
+        && isset($form['actions'][$action]['#type'])
+        && $form['actions'][$action]['#type'] === 'submit') {
+        $form['actions'][$action]['#submit'][] = 'Drupal\opigno_module\Controller\OpignoModuleManagerController::ajaxFormEntityFormSubmit';
+      }
+    }
+
+    // Handle case of entity edition : define the options.
+    if ($id) {
+      $current_path = \Drupal::service('path.current')->getPath();
+      $path_args = explode('/', $current_path);
+
+      if ($path_args[1] == 'ajax-form-entity') {
+        // Case of edit link.
+        $view_mode = $path_args[5];
+        $reload = FALSE;
+      }
+      else {
+        // Case of form inside the display of the entity.
+        $view_mode = 'default';
+        $reload = 'reload_entity';
+      }
+    }
+    else {
+      // Case of creation.
+      $view_mode = 'default';
+      $reload = TRUE;
+    }
+
+    // Add all configurations to the form to make it available everywhere.
+    $form['ajax_form_entity'] = [
+      '#type' => 'hidden',
+      '#value' => [
+        'view_mode' => $view_mode,
+        'reload' => $reload,
+        'content_selector' => ".$ajax_id",
+        'form_selector' => ".$ajax_id",
+      ],
+    ];
+  }
+
+  if ($form_id == 'opigno_module_form') {
+    $form['#attached']['library'][] = 'opigno_module/opigno_badges';
+    // Make field "name" required.
+    $form["name"]["widget"][0]["value"]["#required"] = TRUE;
+  }
+
+  if ($form_id == 'views_form_opigno_activities_bank_lp_interface_default') {
+    // Hide duplicate button and unnecessary fields.
+    $form['header']['#attributes']['hidden'] = 'hidden';
+    // Rename submit button.
+    $form['actions']['submit']['#value'] = t('Add selected activities to the module');
+
+    $form['#attached']['library'][] = 'opigno_module/activities_bank';
+
+    $route_name = \Drupal::routeMatch()->getRouteName();
+    if ($route_name == 'opigno_module.activities_bank_lpm') {
+      $form['#attached']['drupalSettings']['activities_bank']['page'] = 'group';
+
+      if (!empty($_SESSION['activities_bank']['checkboxes_ids'])) {
+        $form['#attached']['drupalSettings']['activities_bank']['checkboxes_ids'] = $_SESSION['activities_bank']['checkboxes_ids'];
+      }
+
+      $form_state->set('activities_bank_page', 'group');
+
+      if (!empty($_COOKIE['activities_bank_activities'])) {
+        unset($_COOKIE['activities_bank_activities']);
+        setcookie('activities_bank_activities', '', time() - 3600);
+      }
+      if (!empty($_COOKIE['activities_bank_checked'])) {
+        unset($_COOKIE['activities_bank_checked']);
+        setcookie('activities_bank_checked', '', time() - 3600);
+      }
+    }
+    elseif ($route_name == 'opigno_module.activities_bank') {
+      $form['#attached']['drupalSettings']['activities_bank']['page'] = 'module';
+    }
+
+    $form['#submit'][] = 'opigno_module_activities_bank_lp_form_submit';
+  }
+}
+
+/**
+ * Custom submit for view activities bank lp form.
+ *
+ * @throws \Exception
+ */
+function opigno_module_activities_bank_lp_form_submit(&$form, FormStateInterface $form_state) {
+  $activities = [];
+
+  $storage = $form_state->getStorage();
+  // Is group edit page flag.
+  $is_group_page = (!empty($storage['activities_bank_page']) && $storage['activities_bank_page'] == 'group') ? TRUE : FALSE;
+
+  if ($is_group_page && !empty($_SESSION['activities_bank']['activities_ids'])) {
+    // Get activities ids if group edit page.
+    $activities = $_SESSION['activities_bank']['activities_ids'];
+  }
+
+  if (!empty($_SESSION['activities_bank'])) {
+    unset($_SESSION['activities_bank']);
+  }
+
+  if (!empty($_COOKIE['activities_bank_activities'])) {
+    if (!$is_group_page) {
+      // Get activities ids if module edit page.
+      $activities = explode(',', $_COOKIE['activities_bank_activities']);
+    }
+
+    unset($_COOKIE['activities_bank_activities']);
+    setcookie('activities_bank_activities', '', time() - 3600);
+  }
+
+  if (!empty($_COOKIE['activities_bank_checked'])) {
+    unset($_COOKIE['activities_bank_checked']);
+    setcookie('activities_bank_checked', '', time() - 3600);
+  }
+
+  if (!empty($activities)) {
+    $activities = OpignoActivity::loadMultiple($activities);
+
+    // Get URL parameters.
+    $opigno_module = \Drupal::routeMatch()->getParameter('opigno_module');
+    if ($opigno_module) {
+      /* @var \Drupal\opigno_module\Controller\OpignoModuleController $opigno_module_obj*/
+      $opigno_module_obj = \Drupal::service('opigno_module.opigno_module');
+
+      // Get activities that already added to module.
+      $added_activities = $opigno_module->getModuleActivities();
+      $added_activities = array_map(function ($activity) {
+        return $activity->id;
+      }, $added_activities);
+      // Filter activities that are added to a Module.
+      $activities = array_filter($activities, function ($activity) use ($added_activities) {
+        /* @var \Drupal\opigno_module\Entity\OpignoActivity $activity */
+        return !in_array($activity->id(), $added_activities);
+      });
+
+      // Add activities to a Module.
+      if ($activities) {
+        $save_acitivities = $opigno_module_obj->activitiesToModule($activities, $opigno_module);
+        \Drupal::messenger()->addMessage(t('Added @num activities', ['@num' => count($activities)]));
+      }
+    }
+
+  }
+}
+
+/**
+ * Helper function.
+ *
+ * Get Activities related to specific module.
+ */
+function opigno_module_get_activities($module_id, $module_vid = NULL) {
+  /* @todo join table with activity revisions */
+  $questions = [];
+  /* @var $db_connection \Drupal\Core\Database\Connection */
+  $db_connection = \Drupal::service('database');
+  $query = $db_connection->select('opigno_activity', 'oa');
+  $query->fields('oafd', ['id', 'type', 'name']);
+  $query->fields('omr', [
+    'activity_status',
+    'weight', 'max_score',
+    'auto_update_max_score',
+    'omr_id',
+    'omr_pid',
+    'child_id',
+    'child_vid',
+  ]);
+  $query->addJoin('inner', 'opigno_activity_field_data', 'oafd', 'oa.id = oafd.id');
+  $query->addJoin('inner', 'opigno_module_relationship', 'omr', 'oa.id = omr.child_vid');
+  $query->condition('oafd.status', 1);
+  $query->condition('omr.parent_id', $module_id);
+  if ($module_vid) {
+    $query->condition('omr.parent_vid', $module_vid);
+  }
+  $query->condition('omr_pid', NULL, 'IS');
+  $query->orderBy('omr.weight');
+  $result = $query->execute();
+  foreach ($result as $question) {
+    $questions[] = $question;
+  }
+
+  return $questions;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function opigno_module_preprocess_page(&$variables) {
+  if (opigno_module_is_activity_route()) {
+    $user = \Drupal::currentUser();
+
+    if ($gid = OpignoGroupContext::getCurrentGroupId()) {
+      if ($group = \Drupal::entityTypeManager()->getStorage('group')->load($gid)) {
+        $home_link = Link::createFromRoute(t('home'), 'entity.group.canonical', ['group' => $group->id()], ['attributes' => ['class' => ['w-100']]])->toRenderable();
+        $variables['home_link'] = render($home_link);
+      }
+    }
+
+    if ($user && isset($group)) {
+      $variables['progress'] = round(opigno_learning_path_progress($group->id(), $user->id()) * 100);
+    }
+    $variables['attributes']['class'][] = 'section-module';
+  }
+
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if (!empty($_SESSION['activities_bank']) && $route_name != 'opigno_module.activities_bank_lpm') {
+    unset($_SESSION['activities_bank']);
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function opigno_module_page_attachments(array &$page) {
+  if (opigno_module_is_activity_route()) {
+    $page['#attached']['library'][] = 'opigno_module/activity';
+  }
+}
+
+/**
+ * Helper function.
+ *
+ * Is activity route.
+ */
+function opigno_module_is_activity_route() {
+  return in_array(\Drupal::routeMatch()->getRouteName(), ['opigno_module.group.answer_form']);
+}
+
+/**
+ * Implements hook_h5p_styles_alter().
+ */
+function opigno_module_h5p_styles_alter(&$styles, $libraries, $mode) {
+  if (isset($mode) && in_array($mode, ['iframe', 'editor'])) {
+    if (!empty($libraries)) {
+      foreach ($libraries as $library) {
+        if (!is_array($library) && strpos($library, 'h5p/h5p.coursepresentation-') !== FALSE) {
+          $styles[] = (object) [
+            'path' => drupal_get_path('module', 'opigno_module') . '/css/h5p_course_presentation.css',
+            'version' => '?ver=1.0.0',
+          ];
+          break;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_page_top().
+ */
+function opigno_module_page_top(array &$page_top) {
+  // Install h5p libraries.
+  $interface = H5PDrupal::getInstance();
+  if (empty($interface->loadLibraries())) {
+    $h5p_default_path = $interface->getOption('default_path', 'h5p');
+    $temporary_file_path = 'public://' . $h5p_default_path . '/temp/' . uniqid('h5p-');
+    file_prepare_directory($temporary_file_path, FILE_CREATE_DIRECTORY);
+    // Load libraries.h5p.
+    $file_content = file_get_contents(drupal_get_path("profile", "opigno_lms") . "/h5plib/libraries.h5p");
+    $file = file_save_data($file_content, $temporary_file_path . '.h5p', FILE_EXISTS_REPLACE);
+    $uri = $file->getFileUri();
+    $interface->getUploadedH5pPath(\Drupal::service('file_system')->realpath($uri));
+    $interface->getUploadedH5pFolderPath(\Drupal::service('file_system')->realpath($temporary_file_path));
+    // Validate libraries.
+    $upgradeOnly = FALSE;
+    $validator = H5PDrupal::getInstance('validator');
+    $validator->isValidPackage(TRUE, $upgradeOnly);
+    // Save libraries.
+    $storage = H5PDrupal::getInstance('storage');
+    $storage->savePackage(NULL, NULL, TRUE);
+  };
+}
+
+/**
+ * Function for loading all users by role.
+ */
+function opigno_module_get_users_by_role($role) {
+  if (!is_string($role)) {
+    return FALSE;
+  };
+  $user_storage = \Drupal::service('entity_type.manager')->getStorage('user');
+  $ids = $user_storage->getQuery()
+    ->condition('status', 1)
+    ->condition('roles', $role)
+    ->execute();
+  return $user_storage->loadMultiple($ids);
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function opigno_module_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  // Filter not evaluated modules.
+  if ($view->id() === 'opigno_score_modules') {
+    $user = \Drupal::currentUser();
+    $roles = $user->getRoles();
+
+    if (in_array('administrator', $roles)
+      || in_array('user_manager', $roles)) {
+      // If current user is an admin and global user manager.
+      return;
+    }
+
+    // Get trainings where the current user is a student manager.
+    /** @var \Drupal\group\GroupMembershipLoaderInterface $membership_service */
+    $membership_service = \Drupal::service('group.membership_loader');
+    $memberships = $membership_service->loadByUser($user, [
+      'learning_path-user_manager',
+    ]);
+    $groups_ids = array_map(function ($membership) {
+      /** @var \Drupal\group\GroupMembership $membership */
+      return $membership->getGroup()->id();
+    }, $memberships);
+
+    // Get modules.
+    $modules_ids = [];
+    if (!empty($groups_ids)) {
+      foreach ($groups_ids as $id) {
+        $group = Group::load($id);
+        $mids = opigno_learning_path_get_modules_ids_by_group($group);
+        $modules_ids = array_merge($modules_ids, $mids);
+      }
+    };
+    // Filter listed modules by them.
+    if (!empty($modules_ids)) {
+      $query->where[] = [
+        'conditions' => [
+          [
+            'field' => 'user_module_status.module',
+            'value' => $modules_ids,
+            'operator' => 'IN',
+          ],
+        ],
+        'type' => 'AND',
+      ];
+    }
+    else {
+      $query->where[] = [
+        'conditions' => [
+          [
+            'field' => 'FALSE',
+            'value' => [],
+            'operator' => 'formula',
+          ],
+        ],
+        'type' => 'AND',
+      ];
+    }
+  }
+
+  if ($view->id() === 'opigno_activities_bank_lp_interface') {
+    $route = \Drupal::routeMatch();
+    if (in_array($route->getRouteName(), [
+      'opigno_module.activities_bank',
+      'opigno_module.activities_bank_lpm',
+    ])) {
+      /* @var \Drupal\opigno_module\Entity\OpignoModule $module */
+      $module = $route->getParameter('opigno_module');
+      $activities = $module->getModuleActivities();
+      // Get all activities ids.
+      $aids = array_keys($activities);
+
+      // Filter activities which are already added to module.
+      if (!empty($aids)) {
+        $query->where[] = [
+          'conditions' => [
+            [
+              'field' => 'opigno_activity_field_data.id',
+              'value' => $aids,
+              'operator' => 'NOT IN',
+            ],
+          ],
+          'type' => 'AND',
+        ];
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function opigno_module_form_system_file_system_settings_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['file_libreoffice_configs_path'] = [
+    '#type' => 'textfield',
+    '#title' => t('Libreoffice configs path'),
+    '#description' => t('Libreoffice package used for converting media-files. Depending to hosting sometimes necessary to change the location of Libreoffice configs directory.<br />Can be used environment variables, for example - $HOME, $USER.'),
+    '#default_value' => ExternalPackageController::getLibreofficeConfigsDir(),
+  ];
+  $form['#submit'][] = 'opigno_module_form_system_file_system_settings_submit';
+}
+
+/**
+ * Implements additional submit for the file system settings form.
+ */
+function opigno_module_form_system_file_system_settings_submit($form, FormStateInterface $form_state) {
+  $config = \Drupal::configFactory()->getEditable('opigno_module.settings');
+  if ($form_state->hasValue('file_libreoffice_configs_path')) {
+    $config->set('libreoffice_configs_path', $form_state->getValue('file_libreoffice_configs_path'));
+  }
+  $config->save();
+}
+
+/**
+ * Implements opigno_module_get_user_module_score().
+ *
+ * @param \Drupal\opigno_module\Entity\OpignoModule $opigno_module
+ *   Module object.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   User account object.
+ *
+ * @return int
+ *   Score in percents depends of OpignoModule keep_results option.
+ */
+function opigno_module_get_user_module_score(OpignoModule $opigno_module, AccountInterface $account) {
+  $which_score_keep = $opigno_module->getKeepResultsOption();
+  $attempts = $opigno_module->getModuleAttempts($account);
+  if (!$attempts) {
+    return 0;
+  }
+  /* @var \Drupal\opigno_module\Entity\UserModuleStatus $last_attempt */
+  $last_attempt = end($attempts);
+  $score = 0;
+  switch ($which_score_keep) {
+    // The newest score always saved in last attempt.
+    case 'newest':
+      $score = (int) $last_attempt->getScore();
+      break;
+
+    // For these options get best score.
+    case 'best':
+    case 'all':
+      $score = (int) $last_attempt->calculateBestScore();
+      break;
+
+  }
+  // Clamp score.
+  $score = max(0, $score);
+  $score = min(100, $score);
+  return $score;
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function opigno_module_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  if ($entity->getEntityTypeId() == 'user_module_status') {
+    if ($entity->getOwnerId() == $account->id()) {
+      return AccessResultAllowed::allowedIf((int) $account->id() === 0)->mergeCacheMaxAge(0);
+    }
+  }
+}

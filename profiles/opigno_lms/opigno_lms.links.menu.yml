@@ -1,0 +1,69 @@
+# Dashboard menu
+opigno_lms.home:
+  title: Home
+  route_name: '<front>'
+  menu_name: 'main'
+  weight: -10
+  description: 'Home'
+#
+opigno_lms.catalogue:
+  title: Catalogue
+  route_name: view.opigno_training_catalog.training_catalogue
+  menu_name: 'main'
+  weight: -9
+  description: 'Catalogue'
+
+opigno_lms.messages:
+  title: Messages
+  route_name: private_message.private_message_page
+  menu_name: 'main'
+  weight: -8
+  description: 'Private messages'
+
+opigno_lms.calendar:
+  title: Calendar
+  route_name: view.opigno_calendar.page_month
+  menu_name: 'main'
+  weight: -7
+  description: 'Calendar'
+
+opigno_lms.achievements:
+  title: Achievements
+  route_name: opigno_learning_path.achievements
+  menu_name: 'main'
+  weight: -6
+  description: 'Achievements'
+
+opigno_lms.statistics:
+  title: Statistics
+  route_name: opigno_statistics.dashboard
+  menu_name: 'main'
+  weight: -5
+  description: 'Statistics'
+
+# Opigno-admin menu
+opigno_admin.manage_dashboard:
+  title: Manage dashboard
+  description: 'Manage dashboard'
+  route_name: opigno_dashboard.dashboard_admin_settings_form
+  parent: opigno_admin.global_settings
+  menu_name: opigno-admin
+  weight: -49
+
+opigno_admin.manage_menu:
+  title: Manage menu
+  description: 'Manage menu'
+  route_name: entity.menu.collection
+  parent: opigno_admin.global_settings
+  menu_name: opigno-admin
+  weight: -48
+
+opigno_admin.graphical_settings:
+  title: 'Graphical settings'
+  description: 'Graphical settings'
+  route_name: system.theme_settings_theme
+  route_parameters: { theme: 'platon' }
+  parent: opigno_admin.global_settings
+  menu_name: opigno-admin
+  weight: -47
+

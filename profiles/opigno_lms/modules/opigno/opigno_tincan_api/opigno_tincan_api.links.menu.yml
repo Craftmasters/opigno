@@ -1,0 +1,14 @@
+opigno_tincan_api.settings_form:
+  title: 'TinCan LRS'
+  route_name: opigno_tincan_api.settings_form
+  parent: opigno_learning_path.opigno_admin_index
+  description: 'Configure the LRS connection settings.'
+
+# Opigno-admin menu
+opigno_admin.lrs_configuration:
+  title: LRS configuration
+  description: 'LRS configuration'
+  route_name: opigno_tincan_api.settings_form
+  parent: opigno_admin.global_settings
+  menu_name: opigno-admin
+  weight: -46

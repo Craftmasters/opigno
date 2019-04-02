@@ -1,0 +1,39 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_answer.opigno_true_false.field_true_false
+    - opigno_module.opigno_answer_type.opigno_true_false
+  module:
+    - opigno_module
+    - user
+id: opigno_answer.opigno_true_false.default
+targetEntityType: opigno_answer
+bundle: opigno_true_false
+mode: default
+content:
+  field_true_false:
+    weight: 1
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: opigno_true_false_formatter_type
+    region: content
+  name:
+    label: above
+    type: string
+    weight: -4
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  user_id:
+    label: hidden
+    type: author
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  activity: true
+  module: true

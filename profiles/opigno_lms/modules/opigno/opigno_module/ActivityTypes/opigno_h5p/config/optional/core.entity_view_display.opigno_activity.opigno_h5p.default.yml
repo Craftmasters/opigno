@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_activity.opigno_h5p.opigno_h5p
+    - opigno_module.opigno_activity_type.opigno_h5p
+  module:
+    - h5p
+id: opigno_activity.opigno_h5p.default
+targetEntityType: opigno_activity
+bundle: opigno_h5p
+mode: default
+content:
+  opigno_h5p:
+    weight: 0
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: h5p_default
+    region: content
+hidden:
+  name: true
+  uid: true

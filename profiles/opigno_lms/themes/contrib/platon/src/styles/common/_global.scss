@@ -1,0 +1,112 @@
+// .alert.alert-danger {
+//   display: none;
+// }
+
+pre {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  white-space: pre-wrap;
+}
+
+img {
+  max-width: 100%;
+  min-height: 1px;
+  height: auto;
+}
+
+.multiselect-wrapper {
+  @extend .clearfix;
+}
+
+.color-white {
+  color: #fff;
+
+  &.btn-success {
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.btn-danger {
+  color: #fff;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.p-static {
+  position: static!important;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.bg-faded {
+  background-color: $light-gray;
+
+  &.border-top-blue {
+    border-top: 5px solid $blue;
+  }
+}
+
+.dialog-off-canvas-main-canvas {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  body.toolbar-fixed & {
+    min-height: calc(100vh - 39px);
+  }
+
+  body.toolbar-fixed.toolbar-horizontal.toolbar-tray-open & {
+    min-height: calc(100vh - 79px);
+  }
+}
+
+.filter-guidelines {
+  display: none;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.btn-back {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: inherit;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 12px;
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkNhbHF1ZV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMTUuMiAyNi4yIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAxNS4yIDI2LjI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDpub25lO3N0cm9rZTojRkZGRkZGO3N0cm9rZS13aWR0aDozO3N0cm9rZS1taXRlcmxpbWl0OjEwO30KPC9zdHlsZT4KPHRpdGxlPnBpY3RvLXN0YXJ0LWhvdmVyPC90aXRsZT4KPGcgaWQ9IkNhbHF1ZV8yXzFfIj4KCTxnIGlkPSJDYWxxdWVfMS0yIj4KCQk8cG9seWxpbmUgY2xhc3M9InN0MCIgcG9pbnRzPSIxMy4xLDEuMSAxLjEsMTMuMSAxMy4xLDI1LjIgCQkiLz4KCTwvZz4KPC9nPgo8L3N2Zz4K');
+  }
+
+  &:hover::after {
+    display: none;
+  }
+}
+
+article[typeof="schema:Person"] a[href*="/masquerade?"] {
+  display: none;
+}
+
+div#ilts-wrapper-empty,
+div#live-meetings-wrapper-empty {
+    padding: 0rem 2rem .5rem;
+}

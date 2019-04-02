@@ -1,0 +1,9 @@
+services:
+  opigno_group_manager.content_types.manager:
+    class: Drupal\opigno_group_manager\OpignoGroupContentTypesManager
+    parent: default_plugin_manager
+  # remove  X-Frame-Options: SAMEORIGIN for angular dev
+  remove_x_frame_options_subscriber:
+    class: Drupal\opigno_group_manager\EventSubscriber\RemoveXFrameOptionsSubscriber
+    tags:
+      - { name: event_subscriber }

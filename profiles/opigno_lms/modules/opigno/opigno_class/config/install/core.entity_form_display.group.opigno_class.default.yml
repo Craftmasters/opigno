@@ -1,0 +1,50 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group.opigno_class.field_class_description
+    - field.field.group.opigno_class.field_class_media_image
+    - group.type.opigno_class
+  module:
+    - entity_browser
+    - text
+_core: {  }
+id: group.opigno_class.default
+targetEntityType: group
+bundle: opigno_class
+mode: default
+content:
+  field_class_description:
+    weight: 1
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_class_media_image:
+    weight: 2
+    settings:
+      entity_browser: media_entity_browser_groups
+      field_widget_display: rendered_entity
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: image_only
+      field_widget_edit: false
+      field_widget_replace: false
+    third_party_settings: {  }
+    type: entity_browser_entity_reference
+    region: content
+  label:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  path: true
+  uid: true

@@ -1,0 +1,704 @@
+<?php
+
+/**
+ * @file
+ * Contains tft.module.
+ */
+
+use Drupal\image\Entity\ImageStyle;
+use Drupal\file\Entity\File;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
+use Drupal\group\Entity\Group;
+use Drupal\media\Entity\Media;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
+
+const TFT_ACCESS_FULL_TREE = 'tft access file tree';
+const TFT_ADMIN = 'administer tft';
+const TFT_REORDER_TERMS = 'tft reorder terms';
+const TFT_ADD_FILE = 'tft add a file to any term';
+const TFT_ADD_TERMS = 'tft add child terms';
+const TFT_DELETE_TERMS = 'tft delete child terms';
+const TFT_ARCHIVE_TERMS = 'tft archive child terms';
+
+/**
+ * Check if the current term is part of a Group and return the Group id.
+ *
+ * If no id is found, return FALSE.
+ *
+ * @param int $tid
+ *   The tid (and its ancestor tree) to check against.
+ *
+ * @return int|bool
+ *   The Group id if found, else FALSE.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _tft_get_group_gid($tid) {
+  static $cache = [];
+
+  if (is_array($tid)) {
+    $tid = reset($tid);
+  }
+
+  $tid = (int) $tid;
+
+  if (!$tid) {
+    return FALSE;
+  }
+
+  if (isset($cache[$tid])) {
+    return $cache[$tid];
+  }
+
+  $param_tid = $tid;
+  // Get $gid for $tid.
+  $gids = \Drupal::entityQuery('group')
+    ->condition('type', 'learning_path')
+    ->condition('field_learning_path_folder.target_id', $tid)
+    ->execute();
+  $gid = reset($gids);
+
+  while ($tid && !$gid) {
+    // Get parent $tid.
+    /** @var \Drupal\taxonomy\TermStorage $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $result = $storage->loadParents($tid);
+    $result = reset($result);
+    $tid = empty($result) ? FALSE : $result->id();
+
+    // Get $gid for $tid.
+    $gids = \Drupal::entityQuery('group')
+      ->condition('type', 'learning_path')
+      ->condition('field_learning_path_folder.target_id', $tid)
+      ->execute();
+    $gid = reset($gids);
+  }
+
+  if ($gid) {
+    $cache[$param_tid] = (int) $gid;
+  }
+  else {
+    $cache[$param_tid] = FALSE;
+  }
+
+  return $cache[$param_tid];
+}
+
+/**
+ * Get the term tid associated with the Group.
+ *
+ * @param int $gid
+ *   The Group id.
+ *
+ * @return int|null
+ *   The term tid.
+ */
+function _tft_get_group_tid($gid) {
+  $group = Group::load($gid);
+
+  if ($group->hasField('field_learning_path_folder')) {
+    $value = $group->get('field_learning_path_folder')->getValue();
+    $tid = reset($value)['target_id'];
+    return $tid;
+  }
+
+  return NULL;
+}
+
+/**
+ * Get the parent tid based on a tid.
+ *
+ * @param int $tid
+ *   The taxonomy term tid.
+ *
+ * @return int
+ *   The parent tid or 0 if there's no parent.
+ *   Will return -1 if the tid is null or 0.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _tft_get_parent_tid($tid, $gid = NULL) {
+  static $cache = [];
+
+  if (!(int) $tid) {
+    return -1;
+  }
+
+  if (isset($cache[$tid])) {
+    return $cache[$tid];
+  }
+
+  /** @var \Drupal\taxonomy\TermStorage $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $result = $storage->loadParents($tid);
+  $result = reset($result);
+  $cache[$tid] = empty($result) ? -1 : $result->id();
+
+  return (int) $cache[$tid];
+}
+
+/**
+ * Get the depth of the term.
+ *
+ * @param int $tid
+ *   The taxonomy term tid.
+ *
+ * @return int
+ *   The depth of the term, or 0 if no valid term tid was given.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _tft_get_depth($tid) {
+  static $cache = [];
+
+  if (!$tid) {
+    return 0;
+  }
+
+  if (isset($cache[$tid])) {
+    return $cache[$tid];
+  }
+
+  $term = Term::load($tid);
+
+  if (!$term) {
+    return 0;
+  }
+
+  $depth = -1;
+  $pid = $tid;
+
+  /** @var \Drupal\taxonomy\TermStorage $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+
+  while ($pid) {
+    $depth++;
+    $result = $storage->loadParents($pid);
+    $result = reset($result);
+    $pid = empty($result) ? FALSE : $result->id();
+  }
+
+  $cache[$tid] = $depth;
+  return $depth;
+}
+
+/**
+ * Check if the user has access to the term.
+ *
+ * @param int $tid
+ *   The term tid.
+ * @param null|mixed $account
+ *   The user account to check against. If no account is given, the
+ *   current user will be used.
+ *
+ * @return bool
+ *   TRUE if the user has access to this term. FALSE otherwise.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _tft_term_access($tid, $account = NULL) {
+  if (!$tid && $tid != 0) {
+    return FALSE;
+  }
+
+  if (!$account) {
+    $account = \Drupal::currentUser();
+  }
+
+  if ($account->id() === 1
+    || $account->hasPermission(TFT_ACCESS_FULL_TREE)
+    || $account->hasPermission(TFT_ADMIN)
+    || $account->hasPermission('administer taxonomy')) {
+    return TRUE;
+  }
+
+  // Is this part of a Group?
+  if ($gid = _tft_get_group_gid($tid)) {
+    // Check against Group.
+    return Group::load($gid)->access('view', $account);
+  }
+
+  return FALSE;
+}
+
+/**
+ * Returns folder content.
+ *
+ * @param int $tid
+ *   The taxonomy term tid.
+ *
+ * @return array
+ *   The folder content
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _tft_folder_content($tid, $only_terms = FALSE, $gid = NULL) {
+  $content = [];
+  /** @var \Drupal\taxonomy\TermStorage $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $result = $storage->loadTree('tft_tree', $tid, 1);
+
+  array_walk($result, function ($term) use (&$content) {
+    $content[] = [
+      'id' => $term->tid,
+      'type' => 'term',
+      'name' => $term->name,
+      'weight' => $term->weight,
+    ];
+  });
+
+  if ($only_terms) {
+    return $content;
+  }
+
+  // Get the files.
+  $fids = \Drupal::entityQuery('media')
+    ->condition('bundle', 'tft_file')
+    ->condition('tft_folder.target_id', $tid)
+    ->execute();
+
+  $files = Media::loadMultiple($fids);
+
+  $user = \Drupal::currentUser();
+  $user_id = $user->id();
+  array_walk($files, function ($file) use ($user_id, &$content) {
+    /** @var \Drupal\media\Entity\Media $file */
+    if ($file->hasField('tft_members')) {
+      $members = $file->get('tft_members')->getValue();
+      if (!empty($members)) {
+        $members = array_map(function ($member) {
+          return $member['target_id'];
+        }, $members);
+
+        if (!in_array($user_id, $members)) {
+          return;
+        }
+      }
+    }
+
+    $content[] = [
+      'id' => $file->id(),
+      'type' => 'file',
+      'name' => $file->getName(),
+    ];
+  });
+
+  return $content;
+}
+
+/**
+ * Returns TFT folder tree.
+ */
+function _tft_folder_tree($tid = 0, $inclusive = FALSE) {
+  $folders = [];
+  $content = _tft_folder_content($tid);
+
+  foreach ($content as $item) {
+    if ($item['type'] == 'term' && _tft_term_access($item['id'])) {
+      $folders[$item['id']]['weight'] = isset($item['weight']) ? $item['weight'] : 0;
+      $folders[$item['id']]['parent'] = $tid ? $tid : 0;
+      $folders[$item['id']]['type'] = $item['type'];
+      $folders[$item['id']]['tid'] = $item['id'];
+      $folders[$item['id']]['name'] = $item['name'];
+
+      if ($child_terms = _tft_folder_tree($item['id'])) {
+        $folders[$item['id']]['children'] = $child_terms;
+      }
+    }
+  }
+
+  if ($inclusive) {
+    if ($tid == 0) {
+      $name = t("Root");
+    }
+    else {
+      $name = Term::load($tid)->getName();
+    }
+
+    $folders = [
+      $tid => [
+        'name' => $name,
+        'tid' => $tid,
+        'weight' => 0,
+        'parent' => 0,
+        'type' => 'term',
+        'children' => $folders,
+      ],
+    ];
+  }
+
+  return $folders;
+}
+
+/**
+ * Format an <li> tag for the file explorer.
+ *
+ * @param string $name
+ *   The folder name.
+ * @param int $tid
+ *   The taxonomy term tid.
+ * @param string $li_class
+ *   CSS classes for the <li>.
+ * @param string $span_class
+ *   CSS classes for the child <span>.
+ *
+ * @return array
+ *   The render array <li> tag
+ */
+function _tft_li($name, $tid, $li_class, $span_class) {
+  return [
+    '#wrapper_attributes' => [
+      'id' => 'tid-' . $tid,
+      'class' => 'folder' . $li_class,
+    ],
+    [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#attributes' => [
+        'class' => 'icon' . $span_class,
+      ],
+    ],
+    [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#attributes' => [
+        'class' => 'link-wrapper',
+      ],
+      [
+        '#type' => 'link',
+        '#attributes' => [
+          'class' => 'folder-link',
+        ],
+        '#title' => $name,
+        '#url' => Url::fromUri('internal:#term/' . $tid),
+      ],
+    ],
+  ];
+}
+
+/**
+ * Return the sub-tree as an unordered list.
+ *
+ * @param array $tree
+ *   The folder tree.
+ * @param bool $root
+ *   = FALSE
+ *   A flag for setting this <ul> as the root <ul>.
+ *
+ * @return array
+ *   The HTML
+ */
+function _tft_output_children(array $tree, $root = FALSE) {
+  $data = [
+    '#theme' => 'item_list',
+    '#list_type' => 'ul',
+    '#attributes' => [
+      'class' => $root ? 'root-folder' : 'sub-folder',
+    ],
+    '#items' => [],
+  ];
+
+  $first = TRUE;
+  $odd = TRUE;
+  $count = count($tree);
+  $i = 1;
+
+  foreach ($tree as $tid => $item) {
+    $span_class = '';
+
+    if ($odd) {
+      $odd = FALSE;
+      $class = ' odd';
+    }
+    else {
+      $odd = TRUE;
+      $class = ' even';
+    }
+
+    if ($first) {
+      $class .= ' first';
+      $first = FALSE;
+    }
+
+    if ($i == $count) {
+      $class .= ' last';
+    }
+
+    if (isset($item['children'])) {
+      $class .= ' parent-folder closed';
+      $span_class = ' closed-icon';
+    }
+
+    $list_item = _tft_li($item['name'], $tid, $class, $span_class);
+
+    if (isset($item['children'])) {
+      $list_item[] = _tft_output_children($item['children']);
+    }
+
+    $data['#items'][] = $list_item;
+    $i++;
+  }
+
+  return $data;
+}
+
+/**
+ * Output the tree as an HTML unordered list.
+ *
+ * @param array $tree
+ *   The folder tree.
+ *
+ * @return array
+ *   The HTML
+ */
+function _tft_output_tree(array $tree) {
+  return _tft_output_children($tree, TRUE);
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function tft_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id === 'media_tft_file_add_form'
+    || $form_id === 'media_tft_file_edit_form') {
+    $tid = \Drupal::request()->query->get('tid');
+
+    if (!$tid) {
+      $tid = 0;
+    }
+
+    $term = Term::load($tid);
+
+    if ($term) {
+      // Set the default folder based off the tid query param.
+      $form['tft_folder']['widget']['#default_value'] = $tid;
+    }
+
+    $form['tft_folder']['#attributes']['class'][] = 'tft-hide-element';
+
+    $form['tft_select_folder'] = [
+      '#type' => 'fieldset',
+      '#title' => t("Select folder"),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#weight' => $form['tft_folder']['#weight'],
+    ];
+
+    $form['tft_select_folder']['tft_js_folder'] = [
+      '#type' => 'container',
+      '#attributes' => [
+        'id' => 'folder-explorer-container',
+        'class' => 'tft-node-form',
+      ],
+      _tft_output_tree(_tft_folder_tree($tid, TRUE)),
+    ];
+
+    $form['#attached']['library'][] = 'tft/tft.select-folder';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function tft_theme() {
+  return [
+    'tft_folder_explorer' => [
+      'variables' => [
+        'folders' => NULL,
+        'link' => NULL,
+      ],
+    ],
+    'tft_folder_menu' => [
+      'variables' => [
+        'name' => NULL,
+        'ops_links' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements entity_presave().
+ */
+function tft_entity_presave(EntityInterface $entity) {
+  // Create folder for new learning path.
+  if ($entity->getEntityTypeId() === 'group'
+    && $entity->bundle() === 'learning_path'
+    && $entity->isNew()) {
+    /** @var \Drupal\group\Entity\Group $entity */
+    if ($entity->get('field_learning_path_folder')->isEmpty()) {
+      $folder = Term::create([
+        'vid' => 'tft_tree',
+        'name' => $entity->label(),
+        'parent' => 0,
+      ]);
+      $folder->save();
+
+      $entity->set('field_learning_path_folder', [
+        'target_id' => $folder->id(),
+      ]);
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_create_access().
+ */
+function tft_taxonomy_term_create_access(
+  AccountInterface $account,
+  array $context,
+  $entity_bundle
+) {
+  if ($account->hasPermission(TFT_ADD_TERMS)) {
+    // Allow platform-level content managers to create folders.
+    return AccessResult::allowed();
+  }
+
+  $parent = \Drupal::request()->query->get('parent');
+  if (isset($parent) && _tft_term_access($parent)) {
+    $gid = _tft_get_group_gid($parent);
+    $group = Group::load($gid);
+    if (isset($group)
+      && $group->hasPermission(TFT_ADD_TERMS, $account)) {
+      // Allow group-level content managers to create folders in groups.
+      return AccessResult::allowed();
+    }
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function tft_taxonomy_term_access(
+  TermInterface $entity,
+  $operation,
+  AccountInterface $account
+) {
+  if ($entity->bundle() !== 'tft_tree') {
+    return AccessResult::neutral();
+  }
+
+  $tid = $entity->id();
+  $gid = _tft_get_group_gid($tid);
+  $group = Group::load($gid);
+
+  switch ($operation) {
+    case 'view':
+      return AccessResult::allowedIf(_tft_term_access($tid, $account));
+
+    case 'update':
+      if ($account->hasPermission(TFT_ADD_TERMS)) {
+        return AccessResult::allowed();
+      }
+
+      if (isset($group)
+        && $group->hasPermission(TFT_ADD_TERMS, $account)) {
+        return AccessResult::allowed();
+      }
+
+      return AccessResult::neutral();
+
+    case 'delete':
+      if ($account->hasPermission(TFT_DELETE_TERMS)) {
+        return AccessResult::allowed();
+      }
+
+      if (isset($group)
+        && $group->hasPermission(TFT_DELETE_TERMS, $account)) {
+        return AccessResult::allowed();
+      }
+
+      return AccessResult::neutral();
+
+    case 'reorder':
+      if ($account->hasPermission(TFT_REORDER_TERMS)) {
+        return AccessResult::allowed();
+      }
+
+      if (isset($group)
+        && $group->hasPermission(TFT_REORDER_TERMS, $account)) {
+        return AccessResult::allowed();
+      }
+
+      return AccessResult::neutral();
+
+    default:
+      return AccessResult::neutral();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function tft_file_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  // Check that user has an access to the group.
+  $fid = $entity->get('fid')->getValue();
+  $query = Drupal::service('entity.query')
+    ->get('media')
+    ->condition('tft_file', $fid[0]['value']);
+  $entity_id = array_values($query->execute());
+  if (isset($entity_id[0])) {
+    $media = entity_load('media', $entity_id[0]);
+  }
+
+  if (!empty($media)) {
+    $folder = $media->get('tft_folder')->getValue();
+    $tid = reset($folder)['target_id'];
+    if (empty($gid = _tft_get_group_gid($tid))) {
+      return AccessResult::forbidden();
+    }
+    $group = Group::load($gid);
+    if (!$group->access('view')) {
+      return AccessResult::forbidden();
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_preprocess_field().
+ */
+function tft_preprocess_field(&$variables) {
+  if ('tft_file' == $variables['field_name']) {
+    $fids = $variables['element']['#object']->get('tft_file')->getValue();
+
+    if (empty($fids)) {
+      return;
+    }
+
+    $fid = reset($fids)['target_id'];
+    $file = File::load($fid);
+
+    if (strpos($file->getMimeType(), 'image') !== FALSE) {
+      $image_url = ImageStyle::load('large')->buildUrl($file->getFileUri());
+    }
+
+    if (!isset($image_url)) {
+      return;
+    }
+
+    // Clean jquery ui attributes & add data src.
+    foreach ($variables['items'] as &$items) {
+      if (isset($items['content'])) {
+        foreach ($items['content'] as &$item) {
+          foreach ($item as &$value) {
+            if (isset($value['#options'])) {
+              $value['#options']['attributes'] = [];
+              $value['#options']['attributes']['data-src'] = $image_url;
+            }
+          }
+        }
+      }
+    }
+  }
+}

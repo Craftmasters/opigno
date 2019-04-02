@@ -1,0 +1,65 @@
+body[class*="page-user-"][class*="-edit"] {
+  div#main-content {
+    form {
+      $image-width: 200px;
+      position: relative;
+
+      @include media-breakpoint-up(md) {
+        padding-right: calc(#{$image-width} + #{$grid-gutter-width});
+      }
+
+      .field--name-user-picture {
+        margin-bottom: 1rem;
+
+        @include media-breakpoint-up(md) {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: $image-width;
+        }
+
+        label {
+          @include media-breakpoint-up(md) {
+            display: none;
+          }
+        }
+
+        .form-element-wrapper {
+          @include media-breakpoint-up(md) {
+            width: auto;
+          }
+        }
+
+        .opigno-file-widget-wrapper.not-empty {
+          @include media-breakpoint-up(md) {
+            padding: 0;
+            background-color: transparent;
+          }
+
+          // background-color: #eee;
+
+          .image-widget img {
+            @include media-breakpoint-up(md) {
+              width: $image-width;
+              float: none;
+              margin-right: 0;
+            }
+          }
+
+          .file--mime-image-jpeg,
+          .file-size {
+            @include media-breakpoint-up(md) {
+              display: none;
+            }
+          }
+        }
+      }
+
+      .form-actions {
+        @include media-breakpoint-up(md) {
+          margin-right: calc(-#{$image-width} - #{$grid-gutter-width} - 3rem);
+        }
+      }
+    }
+  }
+}

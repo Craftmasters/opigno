@@ -1,0 +1,20 @@
+'tft access file tree':
+  title: 'Access full file tree'
+
+'administer tft':
+  title: 'Administer Taxonomy file tree'
+
+'tft reorder terms':
+  title: 'Reorder terms'
+
+'tft add a file to any term':
+  title: 'Add file'
+
+'tft add child terms':
+  title: 'Add new folders'
+
+'tft delete child terms':
+  title: 'Remove folders'
+
+'tft archive child terms':
+  title: 'Archive folders'

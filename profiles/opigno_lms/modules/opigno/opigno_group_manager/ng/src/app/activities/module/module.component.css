@@ -1,0 +1,25 @@
+.delete-activity {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+#delete-panel-content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem;
+  background-color: #fff;
+  box-shadow: 0 0 5px 2px #ddd;
+  width: 400px;
+  max-width: calc(100% - 2rem);
+}
+
+activity {
+  display: table-row;
+}

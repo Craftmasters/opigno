@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.opigno_calendar
+  module:
+    - system
+    - views
+  theme:
+    - platon
+id: views_block__opigno_calendar_month_block
+theme: platon
+region: content
+weight: 3
+provider: null
+plugin: 'views_block:opigno_calendar-month_block'
+settings:
+  id: 'views_block:opigno_calendar-month_block'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility:
+  request_path:
+    id: request_path
+    pages: '*'
+    negate: true
+    context_mapping: {  }

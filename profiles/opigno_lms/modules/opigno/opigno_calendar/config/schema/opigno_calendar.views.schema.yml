@@ -1,0 +1,166 @@
+views.pager.calendar:
+  type: mapping
+  mapping:
+    exclude_display:
+      type: integer
+
+views.style.calendar:
+  type: opigno_calendar_calendar_display_options
+  label: 'Calendar'
+
+
+opigno_calendar_calendar_display_options:
+  type: views_style
+  mapping:
+    calendar_type:
+      type: string
+      label: 'Calendar type'
+    mini:
+      type: string
+      label: 'Mini'
+    month_name_size:
+      type: string
+      label: 'Month name size'
+    name_size:
+      type: string
+      label: 'Name size'
+    with_weekno:
+      type: string
+      label: 'With weekno'
+    max_items:
+      type: string
+      label: 'Max items'
+    max_items_behavior:
+      type: string
+      label: 'Max items behavior'
+    groupby_times:
+      type: string
+      label: 'Group by times'
+    groupby_times_custom:
+      type: string
+      label: 'Group by times custom'
+    theme_style:
+      type: string
+      label: 'Theme style'
+    groupby_field:
+      type: string
+      label: 'Group by field'
+    multiday_theme:
+      type: string
+      label: 'Multiday theme'
+    multiday_hidden:
+      type: sequence
+      label: 'Hide multiday'
+    granularity_links:
+      type: mapping
+      label: 'Granularity links'
+      mapping:
+        day:
+          type: string
+          label: 'Day'
+        week:
+          type: string
+          label: 'Week'
+
+views.row.calendar_row:
+  type: views_row
+  label: 'Calendar row'
+  mapping:
+    colors:
+      type: mapping
+      label: 'Colors'
+      mapping:
+        legend:
+          type: string
+          label: 'Legend'
+        calendar_colors_type:
+          type: mapping
+          label: 'Calendar colors type'
+          mapping:
+            article:
+              type: color_hex
+              label: 'Article'
+            page:
+              type: color_hex
+              label: 'Page'
+        taxonomy_field:
+          type: string
+          label: 'Taxonomy field'
+        calendar_colors_vocabulary:
+          type: sequence
+          label: 'Calendar colors vocabulary'
+
+views.area.calendar_header:
+  type: opigno_calendar_header_calendar_options
+  label: 'Calendar header'
+
+views.area.calendar_header_1:
+  type: opigno_calendar_header_calendar_options
+  label: 'Calendar header 1'
+
+opigno_calendar_header_calendar_options:
+  type: views_area
+  mapping:
+    tokenize:
+      type: integer
+      label: 'Tokenize'
+    content:
+      type: text
+      label: 'Content'
+    pager_embed:
+      type: integer
+      label: 'Pager embed'
+
+field.formatter.settings.opigno_calendar_time_range:
+  type: mapping
+  label: 'Date daterange'
+  mapping:
+    timezone_override:
+      type: string
+      label: 'Timezone override'
+    date_format:
+      type: string
+      label: 'Date format'
+    separator:
+      type: string
+      label: 'Separator'
+    time_separator:
+      type: string
+      label: 'Time separator'
+
+
+views.argument.datetime_year_month:
+  type: opigno_calendar_views_display_options_argument
+
+views.argument.datetime_full_date:
+  type: opigno_calendar_views_display_options_argument
+
+views.argument.datetime_year_week:
+  type: opigno_calendar_views_display_options_argument
+
+views.argument.datetime_year:
+  type: opigno_calendar_views_display_options_argument
+
+views.argument.datetime_range_year_month:
+  type: opigno_calendar_views_display_options_argument
+
+opigno_calendar_views_display_options_argument:
+  type: views_argument
+  mapping:
+    operator:
+      type: string
+      label: 'Operator'
+    formula:
+      type: mapping
+      label: 'Formula'
+      mapping:
+        operator:
+          type: string
+          label: 'Operator'
+
+views.argument_validator.calendar:
+  type: mapping
+  mapping:
+    replacement_format:
+      type: string
+      label: 'Replacement format'

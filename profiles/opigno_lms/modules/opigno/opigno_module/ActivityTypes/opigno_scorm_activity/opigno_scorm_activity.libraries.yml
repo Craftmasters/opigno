@@ -1,0 +1,6 @@
+opigno_scorm_activity.main:
+  version: 1.x
+  js:
+    js/opigno_scorm_activity.js: {}
+  dependencies:
+    - core/jquery

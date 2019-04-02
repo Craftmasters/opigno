@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+  module:
+    - opigno_ilt
+id: learning_path-opigno_ilt_group
+label: 'Learning Path: Instructor-Led Training Group'
+description: 'Adds Instructor-Led Training entity to groups.'
+group_type: learning_path
+content_plugin: opigno_ilt_group
+plugin_config:
+  group_cardinality: 1
+  entity_cardinality: 1
+  use_creation_wizard: true

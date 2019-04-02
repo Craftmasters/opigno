@@ -1,0 +1,9 @@
+ng_app:
+  version: VERSION
+  css:
+    theme:
+      ng/dist/styles.bundle.css: {}
+  js:
+    ng/dist/inline.bundle.js: {}
+    ng/dist/polyfills.bundle.js: {}
+    ng/dist/main.bundle.js: {}

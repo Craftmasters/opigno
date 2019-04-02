@@ -1,0 +1,18 @@
+name: Private Message
+description: A private message system for users to send messages to each other
+# core: 8.x
+type: module
+package: Private Message
+
+dependencies:
+  - drupal:text
+  - drupal:message
+  - drupal:message_notify
+
+configure: private_message.admin_config.config
+
+# Information added by Drupal.org packaging script on 2018-06-25
+version: '8.x-2.0-beta15'
+core: '8.x'
+project: 'private_message'
+datestamp: 1529893446

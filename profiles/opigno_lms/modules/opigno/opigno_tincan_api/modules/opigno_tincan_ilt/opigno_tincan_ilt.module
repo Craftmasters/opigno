@@ -1,0 +1,134 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tincan_ilt.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\opigno_tincan_api\OpignoTinCanApiStatements;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanActivityDefinitionTypes;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanVerbs;
+use Drupal\Core\Entity\EntityInterface;
+use TinCan\Context;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_ilt_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_ilt module.
+    case 'help.page.opigno_tincan_ilt':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Functionality for sending tincan statements for opigno Instructor-Led Training (ILT).') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * {@inheritdoc}
+ *
+ * Here tincan statement sends when teacher update the meeting score.
+ */
+function opigno_tincan_ilt_opigno_ilt_result_presave(EntityInterface $entity) {
+  // Check if Tincan PHP library is installed.
+  $has_library = opigno_tincan_api_tincanphp_is_installed();
+  if (!$has_library) {
+    \Drupal::logger('opigno_tincan')
+      ->notice('Tincan statements can not be send. Tincan PHP library is not installed.');
+    return;
+  };
+  // Prevent to send results without changes.
+  $current_result = $entity;
+  $db_connection = \Drupal::service('database');
+  $query = $db_connection->select('opigno_ilt_result', 'oir')
+    ->fields('oir', ['status', 'score'])
+    ->condition('id', $current_result->id())
+    ->execute();
+  $previous_result = $query->fetchAssoc();
+  if ($previous_result) {
+    if ($current_result->getStatus() == $previous_result['status']
+      && $current_result->getScore() == $previous_result['score']
+    ) {
+      // Result are the same as previous. Return.
+      return;
+    };
+  };
+
+  // Create and sent tincan statements.
+  _opigno_tincan_ilt_create_and_send_tincan_statement($entity);
+
+  return $entity;
+}
+
+/**
+ * Creates and sends tincan statement.
+ */
+function _opigno_tincan_ilt_create_and_send_tincan_statement($entity) {
+  /****
+   * - When user attempted Instructor-Led Training
+   * Actor: user
+   * Verb: xAPI/attended
+   * Object: xAPI/meeting
+   * Context: Training
+   */
+
+  /* @var Drupal\opigno_ilt\Entity\ILTResult $opigno_ilt_result*/
+  $opigno_ilt_result = $entity;
+  /* @var Drupal\opigno_ilt\Entity\ILT $opigno_ilt*/
+  $opigno_ilt = $opigno_ilt_result->getILT();
+
+  // Statement creation.
+  $user = $opigno_ilt_result->getUser();
+  $statement = OpignoTinCanApiStatements::statementBaseCreation(
+    OpignoTincanApiTinCanVerbs::$attended,
+    OpignoTincanApiTinCanActivityDefinitionTypes::$meeting,
+    $opigno_ilt,
+    $user
+  );
+
+  if ($statement === FALSE) {
+    return;
+  }
+
+  // Context creation.
+  $context = new Context();
+
+  // Get group id.
+  $parent_id = $opigno_ilt->getTrainingId();
+  OpignoTinCanApiStatements::contextSetGrouping($context, [$parent_id]);
+
+  // Set language in context.
+  OpignoTinCanApiStatements::contextSetLanguage(
+    $context,
+    $opigno_ilt->language()->getId()
+  );
+
+  // Get duration.
+  $start_date = $opigno_ilt->getStartDate();
+  $end_date = $opigno_ilt->getEndDate();
+  $duration_s = strtotime($end_date) - strtotime($start_date);
+
+  $attended = $opigno_ilt_result->getStatus();
+  $user_score = $opigno_ilt_result->getScore();
+  // Set result.
+  OpignoTinCanApiStatements::setResult(
+    $statement,
+    $user_score,
+    100,
+    NULL,
+    $attended,
+    NULL,
+    abs($duration_s)
+  );
+  // Set statement context.
+  $statement->setContext($context);
+
+  // Sending statement.
+  OpignoTinCanApiStatements::sendStatement($statement);
+}

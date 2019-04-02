@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_answer.field_response
+    - opigno_module.opigno_answer_type.opigno_h5p
+id: opigno_answer.opigno_h5p.field_response
+field_name: field_response
+entity_type: opigno_answer
+bundle: opigno_h5p
+label: 'User response'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

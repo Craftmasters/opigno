@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_learning_path_visibility
+    - group.type.learning_path
+  module:
+    - options
+id: group.learning_path.field_learning_path_visibility
+field_name: field_learning_path_visibility
+entity_type: group
+bundle: learning_path
+label: Visibility
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: semiprivate
+default_value_callback: ''
+settings: {  }
+field_type: list_string

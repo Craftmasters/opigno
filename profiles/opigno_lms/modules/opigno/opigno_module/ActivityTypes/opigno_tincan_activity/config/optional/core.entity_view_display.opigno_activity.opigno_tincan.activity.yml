@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.opigno_activity.activity
+    - field.field.opigno_activity.opigno_tincan.opigno_tincan_package
+    - opigno_module.opigno_activity_type.opigno_tincan
+  module:
+    - opigno_tincan_api
+id: opigno_activity.opigno_tincan.activity
+targetEntityType: opigno_activity
+bundle: opigno_tincan
+mode: activity
+content:
+  opigno_tincan_package:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: opigno_tincan_field_formatter
+    region: content
+hidden:
+  name: true
+  uid: true

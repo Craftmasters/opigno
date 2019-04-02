@@ -1,0 +1,11 @@
+<div id="folder-explorer-container">
+    {% if folders %}
+        {{ folders }}
+    {% else %}
+        <div class="messages notice">
+            {% trans %}
+                You must first <a href="{{ link|raw }}">create some taxonomy terms</a> before you can see any folders.
+            {% endtrans %}
+        </div>
+    {% endif %}
+</div>

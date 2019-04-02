@@ -1,0 +1,23 @@
+platon_home_page_settings:
+  platon_use_home_page_markup:         true
+  platon_home_page_slides:
+    1:
+      platon_home_page_markup_wrapper:
+        value:                         '<h2>Welcome to Opigno 2.XX demo platform</h2><p>User accounts available are:</p><p>- teacher<br>- student<br>- administrator (limited rights for this demo)</p><p>All have the same password: 1234</p><p>Please note that this plaform is reinitialized every day, every data you will create will be lost.</p>'
+        format:                        'full_html'
+      platon_home_page_image_path:     '../../../../../../themes/platon/images/homepage-background-1.jpg'
+    2:
+      platon_home_page_markup_wrapper:
+        value:                         '<h2>Welcome to Opigno 2.XX demo platform</h2><p>User accounts available are:</p><p>- teacher<br>- student<br>- administrator (limited rights for this demo)</p><p>All have the same password: 1234</p><p>Please note that this plaform is reinitialized every day, every data you will create will be lost.</p>'
+        format:                        'full_html'
+      platon_home_page_image_path:     '../../../../../../themes/platon/images/homepage-background-2.jpg'
+    3:
+      platon_home_page_markup_wrapper:
+        value:                         '<h2>Welcome to Opigno 2.XX demo platform</h2><p>User accounts available are:</p><p>- teacher<br>- student<br>- administrator (limited rights for this demo)</p><p>All have the same password: 1234</p><p>Please note that this plaform is reinitialized every day, every data you will create will be lost.</p>'
+        format:                        'full_html'
+      platon_home_page_image_path:     '../../../../../../themes/platon/images/homepage-background-3.jpg'
+platon_menu_source:                    'main'
+platon_menu_show_for_anonymous:        true
+logo:
+  path: 'themes/platon/logo.png'
+  use_default: false

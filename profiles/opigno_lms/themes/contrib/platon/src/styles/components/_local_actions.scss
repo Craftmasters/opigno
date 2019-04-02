@@ -1,0 +1,20 @@
+.block-local_actions_block {
+  margin: 1em 0;
+
+  nav {
+    li {
+      a {
+        display: block;
+        padding: 0.3em 2em;
+        color: #fff;
+        background-color: $leaf-green;
+        text-decoration: none;
+
+        &.is-active,
+        &:hover {
+          background-color: darken($leaf-green, 9%);
+        }
+      }
+    }
+  }
+}

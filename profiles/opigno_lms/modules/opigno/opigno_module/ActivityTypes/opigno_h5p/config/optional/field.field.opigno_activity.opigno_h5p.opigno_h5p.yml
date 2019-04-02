@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_h5p
+    - opigno_module.opigno_activity_type.opigno_h5p
+  module:
+    - h5p
+id: opigno_activity.opigno_h5p.opigno_h5p
+field_name: opigno_h5p
+entity_type: opigno_activity
+bundle: opigno_h5p
+label: Question
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    h5p_content_id: null
+default_value_callback: ''
+settings: {  }
+field_type: h5p

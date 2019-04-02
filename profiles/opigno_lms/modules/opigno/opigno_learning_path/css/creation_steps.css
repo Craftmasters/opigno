@@ -1,0 +1,17 @@
+.lp_step_explanation {
+  background: #f6f6f6 url('../img/icon_info.png') no-repeat 25px 50%;
+  background-size: 44px;
+  color: #3d3d3c;
+  margin: 12px 0 24px;
+  padding: 25px 90px;
+}
+
+@media (max-width: 768px) {
+  .lp_step_explanation {
+    padding: 25px 15px 25px 90px;
+  }
+}
+
+.lp_step_explanation p {
+  margin: 0;
+}

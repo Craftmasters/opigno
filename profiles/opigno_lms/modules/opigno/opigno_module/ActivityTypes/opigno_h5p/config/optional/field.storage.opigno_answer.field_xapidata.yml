@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_module
+id: opigno_answer.field_xapidata
+field_name: field_xapidata
+entity_type: opigno_answer
+type: string_long
+settings:
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

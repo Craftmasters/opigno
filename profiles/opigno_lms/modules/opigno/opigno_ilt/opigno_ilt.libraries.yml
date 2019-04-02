@@ -1,0 +1,15 @@
+banner:
+  version: VERSION
+  css:
+    theme:
+      css/banner.css: {}
+
+form:
+  version: VERSION
+  css:
+    theme:
+      css/form.css: {}
+  js:
+    js/form.js: {}
+  dependencies:
+    - core/jquery

@@ -1,0 +1,24 @@
+id: opigno_pm_thread
+label: Opigno PM Threads
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_pm_thread
+process:
+  id: thread_id
+  members: recipients
+  field_pm_subject: subject
+  private_messages: mids
+  last_delete_time: last_delete_time_ids
+  last_access_time: last_access_time_ids
+destination:
+  plugin: entity:private_message_thread
+migration_dependencies:
+  required:
+    - opigno_users
+    - opigno_pm_message
+    - opigno_pm_thread_delete_time
+    - opigno_pm_thread_access_time

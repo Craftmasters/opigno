@@ -1,0 +1,170 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_forum.module.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
+
+/**
+ * Implements hook_entity_presave().
+ */
+function opigno_forum_entity_presave(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() === 'group'
+    && $entity->bundle() === 'learning_path') {
+    /** @var \Drupal\group\Entity\Group $entity */
+    // Create a forum for the training
+    // if it is enabled and not already exists.
+    $enable_forum = $entity->get('field_learning_path_enable_forum')->getValue();
+    $has_forum = !$entity->get('field_learning_path_forum')->isEmpty();
+    if ($enable_forum && !$has_forum) {
+      $forum = Term::create([
+        'vid' => 'forums',
+        'name' => $entity->label(),
+        'parent' => 0,
+      ]);
+      $forum->save();
+
+      $entity->set('field_learning_path_forum', [
+        'target_id' => $forum->id(),
+      ]);
+    }
+  }
+}
+
+/**
+ * Checks user access to the forum.
+ *
+ * @param int $tid
+ *   Forum tid.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   User to check.
+ *
+ * @return bool
+ *   Forum access.
+ */
+function _opigno_forum_access($tid, AccountInterface $account) {
+  if ($account->hasPermission('manage group content in any group')
+    || $account->hasPermission('manage group members in any group')) {
+    // Allow access if user is admin or platform-level manager.
+    return TRUE;
+  }
+
+  // Get user groups.
+  $membership_service = \Drupal::service('group.membership_loader');
+  $memberships = $membership_service->loadByUser($account);
+  /** @var \Drupal\group\Entity\GroupInterface[] $groups */
+  $groups = array_map(function ($membership) {
+    /** @var \Drupal\group\GroupMembership $membership */
+    return $membership->getGroup();
+  }, $memberships);
+
+  // Allow access to the forum if it is attached to the group
+  // that user belongs to.
+  foreach ($groups as $group) {
+    if ($group->hasField('field_learning_path_enable_forum')
+      && $group->hasField('field_learning_path_forum')) {
+      $enable_forum_field = $group->get('field_learning_path_enable_forum')->getValue();
+      $forum_field = $group->get('field_learning_path_forum')->getValue();
+      if (!empty($enable_forum_field)
+        && !empty($forum_field)) {
+        $is_forum_enabled = $enable_forum_field[0]['value'];
+        $forum_tid = $forum_field[0]['target_id'];
+        if ($is_forum_enabled
+          && (int) $forum_tid === (int) $tid) {
+          return TRUE;
+        }
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function opigno_forum_taxonomy_term_access(TermInterface $entity, $operation, AccountInterface $account) {
+  if ($entity->bundle() === 'forums') {
+    // Check current user access to the forum taxonomy term.
+    $tid = $entity->id();
+    return AccessResult::forbiddenIf(!_opigno_forum_access($tid, $account));
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_node_access().
+ */
+function opigno_forum_node_access(NodeInterface $node, $op, AccountInterface $account) {
+  if ($node->bundle() === 'forum'
+    && $node->hasField('taxonomy_forums')) {
+    // Check current user access to the forum topic node.
+    $tid = $node->get('taxonomy_forums')->getValue()[0]['target_id'];
+    return AccessResult::forbiddenIf(!_opigno_forum_access($tid, $account));
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function opigno_forum_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form['taxonomy_forums'])) {
+    // Hide forums that current user can't access from the forum fields.
+    $account = \Drupal::currentUser();
+    $widget =& $form['taxonomy_forums']['widget'];
+    $options = $widget['#options'];
+    foreach ($options as $tid => $title) {
+      if (!is_numeric($tid)) {
+        continue;
+      }
+
+      if (!_opigno_forum_access($tid, $account)) {
+        unset($widget['#options'][$tid]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_forum_preprocess_forum_list(&$variables) {
+  // Hide forums that current user can't access from the forum listings.
+  $account = \Drupal::currentUser();
+  $forums = $variables['forums'];
+  foreach ($forums as $tid => $forum) {
+    if (!_opigno_forum_access($tid, $account)) {
+      unset($variables['forums'][$tid]);
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_forum_preprocess_node(&$variables) {
+  if ($variables['node']->getType() == 'forum' && $variables['view_mode'] == 'full') {
+    $node = $variables['node'];
+    $topics_list_link = $node->taxonomy_forums->getValue();
+    if (!empty($topics_list_link)) {
+      $variables['topics_list_link'] = Link::createFromRoute(
+        t('To the topics list'),
+        'forum.page',
+        ['taxonomy_term' => $topics_list_link['0']['target_id']],
+        ['attributes' => ['class' => 'btn btn-success color-white text-uppercase btn-back']]
+      );
+    }
+  }
+}

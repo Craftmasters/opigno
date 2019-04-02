@@ -1,0 +1,8 @@
+opigno_h5p_activities:
+  version: VERSION
+  js:
+    js/opigno_h5p_activities.js: {}
+  dependencies:
+  - core/jquery
+  - core/jquery.once
+  - core/drupalSettings

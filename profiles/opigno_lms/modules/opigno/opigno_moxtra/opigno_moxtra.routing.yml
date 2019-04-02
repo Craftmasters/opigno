@@ -1,0 +1,254 @@
+opigno_moxtra.settings:
+  path: '/admin/config/opigno/moxtra'
+  defaults:
+    _title: 'Collaborative workspaces and Live meetings configuration'
+    _form: '\Drupal\opigno_moxtra\Form\SettingsForm'
+  requirements:
+    _permission: 'configure moxtra'
+  options:
+    _admin_route: TRUE
+
+opigno_moxtra.meeting:
+  path: '/moxtra/meeting/{opigno_moxtra_meeting}/index'
+  defaults:
+    _title: 'Live Meeting'
+    _controller: '\Drupal\opigno_moxtra\Controller\MeetingController::index'
+  requirements:
+    _entity_access: opigno_moxtra_meeting.view
+  options:
+    parameters:
+      opigno_moxtra_meeting:
+        type: entity:opigno_moxtra_meeting
+
+opigno_moxtra.score_meeting:
+  path: '/moxtra/meeting/{opigno_moxtra_meeting}/score'
+  defaults:
+    _title: 'Score Live Meeting'
+    _form: '\Drupal\opigno_moxtra\Form\MeetingScoreForm'
+  requirements:
+    _access: 'TRUE'
+    _permission: 'score meeting'
+  options:
+    parameters:
+      opigno_moxtra_meeting:
+        type: entity:opigno_moxtra_meeting
+
+opigno_moxtra.meeting_members_autocomplete:
+  path: '/moxtra/meeting/{group}/members/autocomplete'
+  defaults:
+    _controller: '\Drupal\opigno_moxtra\Controller\MeetingController::membersAutocomplete'
+  requirements:
+    _access: 'TRUE'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+entity.opigno_moxtra_meeting.canonical:
+  path: '/moxtra/meeting/{opigno_moxtra_meeting}'
+  defaults:
+    _entity_view: opigno_moxtra_meeting
+    _title: 'Live Meeting'
+  requirements:
+    _entity_access: opigno_moxtra_meeting.view
+
+entity.opigno_moxtra_meeting.collection:
+  path: '/admin/content/moxtra/meeting'
+  defaults:
+    _entity_list: opigno_moxtra_meeting
+    _title: 'Live Meetings List'
+  requirements:
+    _permission: 'administer meeting entities'
+  options:
+    _admin_route: TRUE
+
+entity.opigno_moxtra_meeting.create_form:
+  path: '/moxtra/meeting/add'
+  defaults:
+    _entity_form: opigno_moxtra_meeting.add
+    _title: 'Create Live Meeting'
+  requirements:
+    _entity_create_access: opigno_moxtra_meeting
+
+entity.opigno_moxtra_meeting.edit_form:
+  path: '/moxtra/meeting/{opigno_moxtra_meeting}/edit'
+  defaults:
+    _entity_form: opigno_moxtra_meeting.edit
+    _title: 'Edit Live Meeting'
+  requirements:
+    _entity_access: opigno_moxtra_meeting.edit
+
+entity.opigno_moxtra_meeting.delete_form:
+  path: '/moxtra/meeting/{opigno_moxtra_meeting}/delete'
+  defaults:
+    _entity_form: opigno_moxtra_meeting.delete
+    _title: 'Delete Live Meeting'
+  requirements:
+    _entity_access: opigno_moxtra_meeting.delete
+
+entity.opigno_moxtra_meeting_result.canonical:
+  path: '/moxtra/meeting_result/{opigno_moxtra_meeting_result}'
+  defaults:
+    _entity_view: opigno_moxtra_meeting_result
+    _title: 'Live Meeting Result'
+  requirements:
+    _entity_access: opigno_moxtra_meeting_result.view
+
+entity.opigno_moxtra_meeting_result.collection:
+  path: '/admin/content/moxtra/meeting_result'
+  defaults:
+    _entity_list: opigno_moxtra_meeting_result
+    _title: 'Live Meetings Result List'
+  requirements:
+    _permission: 'administer meeting result entities'
+  options:
+    _admin_route: TRUE
+
+entity.opigno_moxtra_meeting_result.create_form:
+  path: '/moxtra/meeting_result/add'
+  defaults:
+    _entity_form: opigno_moxtra_meeting_result.add
+    _title: 'Create Live Meeting Result'
+  requirements:
+    _entity_create_access: opigno_moxtra_meeting_result
+
+entity.opigno_moxtra_meeting_result.edit_form:
+  path: '/moxtra/meeting_result/{opigno_moxtra_meeting_result}/edit'
+  defaults:
+    _entity_form: opigno_moxtra_meeting_result.edit
+    _title: 'Edit Live Meeting Result'
+  requirements:
+    _entity_access: opigno_moxtra_meeting_result.edit
+
+entity.opigno_moxtra_meeting_result.delete_form:
+  path: '/moxtra/meeting_result/{opigno_moxtra_meeting_result}/delete'
+  defaults:
+    _entity_form: opigno_moxtra_meeting_result.delete
+    _title: 'Delete Live Meeting Result'
+  requirements:
+    _entity_access: opigno_moxtra_meeting_result.delete
+
+opigno_moxtra.workspace:
+  path: '/moxtra/workspace/{opigno_moxtra_workspace}/index'
+  defaults:
+    _title: 'Collaborative Workspace'
+    _controller: '\Drupal\opigno_moxtra\Controller\WorkspaceController::index'
+  requirements:
+    _entity_access: opigno_moxtra_workspace.view
+  options:
+    parameters:
+      opigno_moxtra_workspace:
+        type: entity:opigno_moxtra_workspace
+
+opigno_moxtra.workspace_list:
+  path: '/moxtra/workspace/list'
+  defaults:
+    _title: 'Collaborative Workspaces List'
+    _controller: '\Drupal\opigno_moxtra\Controller\WorkspaceController::workspaceList'
+  requirements:
+    _permission: 'view workspace entities'
+
+entity.opigno_moxtra_workspace.canonical:
+  path: '/moxtra/workspace/{opigno_moxtra_workspace}'
+  defaults:
+    _entity_view: opigno_moxtra_workspace
+    _title: 'Collaborative Workspace'
+  requirements:
+    _entity_access: opigno_moxtra_workspace.view
+
+entity.opigno_moxtra_workspace.collection:
+  path: '/admin/content/moxtra/workspace'
+  defaults:
+    _entity_list: opigno_moxtra_workspace
+    _title: 'Collaborative Workspaces List'
+  requirements:
+    _permission: 'administer workspace entities'
+  options:
+    _admin_route: TRUE
+
+entity.opigno_moxtra_workspace.create_form:
+  path: '/moxtra/workspace/add'
+  defaults:
+    _entity_form: opigno_moxtra_workspace.add
+    _title: 'Create Collaborative Workspace'
+  requirements:
+    _entity_create_access: opigno_moxtra_workspace
+
+entity.opigno_moxtra_workspace.group.create_form:
+  path: '/moxtra/workspace/{training}/add'
+  defaults:
+    _entity_form: opigno_moxtra_workspace.add
+    _title: 'Create Collaborative Workspace'
+  requirements:
+    _entity_create_access: opigno_moxtra_workspace
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+entity.opigno_moxtra_workspace.edit_form:
+  path: '/moxtra/workspace/{opigno_moxtra_workspace}/edit'
+  defaults:
+    _entity_form: opigno_moxtra_workspace.edit
+    _title: 'Edit Collaborative Workspace'
+  requirements:
+    _entity_access: opigno_moxtra_workspace.edit
+
+entity.opigno_moxtra_workspace.delete_form:
+  path: '/moxtra/workspace/{opigno_moxtra_workspace}/delete'
+  defaults:
+    _entity_form: opigno_moxtra_workspace.delete
+    _title: 'Delete Collaborative Workspace'
+  requirements:
+    _entity_access: opigno_moxtra_workspace.delete
+
+opigno_moxtra.workspace.iframe:
+  path: '/moxtra/workspace/{opigno_moxtra_workspace}/learning-path'
+  defaults:
+    _title: 'Collaborative Workspace'
+    _controller: '\Drupal\opigno_moxtra\Controller\WorkspaceController::learningPath'
+  requirements:
+    _entity_access: opigno_moxtra_workspace.view
+  options:
+    parameters:
+      opigno_moxtra_workspace:
+        type: entity:opigno_moxtra_workspace
+
+opigno_moxtra.membership.add_user_to_group_collaborative_workspace:
+  path: '/group/{group}/collaborative_workspace/{workspace}/add-user-to-workspace-autocomplete'
+  defaults:
+    _controller: '\Drupal\opigno_moxtra\Controller\MoxtraMembershipController::addToGroupWorkspaceUserAutocomplete'
+  requirements:
+    _permission: 'administer workspace entities'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      workspace:
+        type: entity:opigno_moxtra_workspace
+
+opigno_moxtra.membership.add_user_to_all_collaborative_workspace:
+  path: '/collaborative_workspace/{workspace}/add-user-to-workspace-autocomplete'
+  defaults:
+    _controller: '\Drupal\opigno_moxtra\Controller\MoxtraMembershipController::addToAllWorkspaceUserAutocomplete'
+  requirements:
+    _permission: 'administer workspace entities'
+  options:
+    parameters:
+      workspace:
+        type: entity:opigno_moxtra_workspace
+
+opigno_moxtra.live_meeting.settings:
+  path: '/admin/structure/opigno_moxtra_meeting'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Live Meetings'
+  requirements:
+    _permission: 'administer meeting entities'
+  options:
+    _admin_route: TRUE
+    parameters:
+      account:
+        type: entity:user

@@ -1,0 +1,93 @@
+# Schema for the configuration files of the "Calendar event" module.
+
+opigno_calendar_event.type.*:
+  type: config_entity
+  label: 'Calendar event type'
+  mapping:
+    label:
+      type: label
+      label: 'Label'
+    id:
+      type: string
+      label: 'Machine-readable name'
+    description:
+      type: text
+      label: 'Description'
+    date_field_type:
+      type: string
+      label: 'Date Range'
+
+field.field.*.*.*.third_party.opigno_calendar_event:
+  type: mapping
+  label: "Opigno Calendar Event settings"
+  mapping:
+    embedded_widget:
+      type: integer
+      label: "Embedded widget option"
+
+field_group.field_group_formatter_plugin.popup:
+  type: field_group.field_group_formatter_plugin.base
+  mapping:
+    popup_link:
+      type: mapping
+      label: "Popup link"
+      mapping:
+        show:
+          type: integer
+          label: "Show"
+        text:
+          type: string
+          label: "Text"
+        classes:
+          type: string
+          label: "Classes"
+    popup_labels:
+      type: mapping
+      label: "Popup labels"
+      mapping:
+        title:
+          type: string
+          label: "Title"
+        close_text:
+          type: string
+          label: "Close text"
+    popup_settings:
+      type: mapping
+      label: "Popup settings"
+      mapping:
+        modal:
+          type: string
+          label: "Modal"
+        dialog_class:
+          type: string
+          label: "Dialog class"
+        close_on_escape:
+          type: integer
+          label: "Close on escape"
+        height:
+          type: string
+          label: "Height"
+        min_height:
+          type: string
+          label: "Min height"
+        max_height:
+          type: string
+          label: "Max height"
+        width:
+          type: string
+          label: "Width"
+        min_width:
+          type: string
+          label: "Min width"
+        max_width:
+          type: string
+          label: "Max width"
+        position_horizontal:
+          type: string
+          label: "Position horizontal"
+        position_vertical:
+          type: string
+          label: "Position vertical"
+    extra_css:
+      type: string
+      label: "Extra css"

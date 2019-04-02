@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_search.module.
+ */
+
+use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Views;
+
+/**
+ * Get exposed filterers from search view.
+ */
+function opigno_search_block_form() {
+  $view = Views::getView('search_content');
+  if (!empty($view)) {
+    $view->initHandlers();
+    $form_state = new FormState();
+    $form_state->setFormState([
+      'view' => $view,
+      'display' => [
+        'id' => 'page_1',
+      ],
+      'exposed_form_plugin' => $view->display_handler->getPlugin('exposed_form'),
+      'method' => 'get',
+      'rerender' => TRUE,
+      'no_redirect' => FALSE,
+      'always_process' => TRUE,
+    ]);
+
+    $form = \Drupal::formBuilder()->buildForm('Drupal\views\Form\ViewsExposedForm', $form_state);
+
+    return drupal_render($form);
+  }
+  else {
+    return 'Could not find view "Search Content"';
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_search_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  switch ($form['#id']) {
+    case 'views-exposed-form-search-content-page-1':
+      unset($form['#info']['filter-search_api_fulltext']['label']);
+      $form['keys']['#type'] = 'search';
+      $form['#attached']['library'][] = 'opigno_search/search_form';
+      $form['#method'] = 'get';
+      break;
+  }
+}

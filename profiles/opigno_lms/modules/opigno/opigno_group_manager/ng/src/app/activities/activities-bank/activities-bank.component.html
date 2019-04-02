@@ -1,0 +1,13 @@
+<div class="activities-bank-add lateral-panel">
+    <div class="info d-flex">
+        <div class="flex-1 text-uppercase">
+            <div>
+                <h2><span i18n>Add activities to the module </span>"{{module.name}}"</h2>
+            </div>
+        </div>
+        <button class="close" mat-icon-button color="basic" (click)="close()">
+            <mat-icon class="mat-24">close</mat-icon>
+        </button>
+    </div>
+    <iframe *ngIf="activitiesBank" width="100%" height="100%" [src]="activitiesBank"></iframe>
+</div>

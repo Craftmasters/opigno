@@ -1,0 +1,41 @@
+views.filter.opigno_group_membership_status:
+  type: views.filter.in_operator
+  label: 'Group Membership Status'
+
+#views.view.opigno_training_catalog.display.default.default_options.fields.field_learning_path_description:
+#  type: views.display.default
+#    mapping:
+
+#views.field.field_learning_path_description:
+##  type: views.field.field
+#  type: views_field
+#  mapping:
+#    set_precision:
+#      type: boolen
+#    precision:
+#      type: integer
+#    decimal:
+#      type: string
+#    format_plural:
+#      type: boolen
+#    format_plural_string:
+#      type: string
+#    prefix:
+#      type: string
+#    suffix:
+#      type: string
+
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.set_precision:
+#  type: boolen
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.precision:
+#  type: integer
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.decimal:
+#  type: string
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.format_plural:
+#  type: boolen
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.format_plural_string:
+#  type: string
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.prefix:
+#  type: string
+#views.view.opigno_training_catalog:display.default.display_options.fields.field_learning_path_description.suffix:
+#  type: string

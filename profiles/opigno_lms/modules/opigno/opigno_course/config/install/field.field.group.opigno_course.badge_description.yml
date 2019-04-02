@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.badge_description
+    - group.type.opigno_course
+id: group.opigno_course.badge_description
+field_name: badge_description
+entity_type: group
+bundle: opigno_course
+label: 'Badge description'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

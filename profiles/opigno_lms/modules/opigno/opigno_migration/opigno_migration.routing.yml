@@ -1,0 +1,9 @@
+opigno_migration.upgrade_review:
+  path: '/admin/opigno/upgrade'
+  defaults:
+    _form: '\Drupal\opigno_migration\Form\OpignoUpgradeReviewForm'
+    _title: 'Upgrade to Opigno 2'
+  requirements:
+    _custom_access: '\Drupal\migrate_drupal_ui\MigrateAccessCheck::checkAccess'
+  options:
+    _admin_route: TRUE

@@ -1,0 +1,16 @@
+config_rewrite: replace
+langcode: en
+status: true
+dependencies: {  }
+id: anonymous
+label: 'Anonymous user'
+weight: -10
+is_admin: false
+permissions:
+  - 'access comments'
+  - 'access content'
+  - 'access site-wide contact form'
+  - 'search content'
+  - 'take modules'
+  - 'use text format restricted_html'
+  - 'view media'

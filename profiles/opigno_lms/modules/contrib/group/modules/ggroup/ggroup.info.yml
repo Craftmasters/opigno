@@ -1,0 +1,7 @@
+name: 'Subgroup'
+description: 'Allows a group to belong to another group'
+package: 'Group'
+type: 'module'
+core: '8.x'
+dependencies:
+  - 'group'

@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_calendar_event
+id: opigno_calendar_event.embedded_widget
+label: 'Show on calendar'
+targetEntityType: opigno_calendar_event
+cache: true

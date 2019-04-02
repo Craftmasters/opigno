@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Calendar module.
+ */
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Config\FileStorage;
+
+/**
+ * Creates the members field in the opigno calendar event type.
+ */
+function opigno_calendar_update_8001() {
+  $config_path = drupal_get_path('module', 'opigno_calendar')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.opigno_calendar_event.field_calendar_event_members');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.opigno_calendar_event.opigno_calendar_event.field_calendar_event_members');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}

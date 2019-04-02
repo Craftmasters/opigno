@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_answer.opigno_file_upload.opigno_file
+    - opigno_module.opigno_answer_type.opigno_file_upload
+  module:
+    - file
+id: opigno_answer.opigno_file_upload.default
+targetEntityType: opigno_answer
+bundle: opigno_file_upload
+mode: default
+content:
+  opigno_file:
+    weight: -3
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: file_default
+    region: content
+hidden:
+  activity: true
+  module: true

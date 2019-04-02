@@ -1,0 +1,15 @@
+platon_home_page_settings:
+  platon_use_home_page_markup: 1
+  platon_home_page_slides:
+    1:
+      platon_home_page_markup_wrapper:
+        value: "<h2><br />\r\n<span><span>Welcome to your Opigno&nbsp;LMS 2.2 platform !<br />\r\nThe Drupal 8 LMS</span></span></h2>\r\n"
+        format: full_html
+      platon_home_page_image_path: Opigno_Image_connexion_1600-829_2.jpg
+      platon_home_page_image_upload: {  }
+    actions: {  }
+platon_menu_source: main
+platon_menu_show_for_anonymous: 1
+logo:
+  path: profiles/opigno_lms/themes/platon/logo.png
+  use_default: 0

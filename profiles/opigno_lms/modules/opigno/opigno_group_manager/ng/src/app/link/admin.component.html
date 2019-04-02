@@ -1,0 +1,27 @@
+<div id="link-panel-content" (clickOutside)="close()" [exclude]="'.link-path'">
+  <div [hidden]="confirmCreateOrphan">
+    <h2 i18n>Minimum previous step score</h2>
+    <mat-form-field>
+      <input matInput placeholder="score" [(ngModel)]="minScore" name="score">
+    </mat-form-field>
+    <div [hidden]="!errorMessage&&!scoreMessage" class="alert alert-danger">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+      <div [hidden]="!errorMessage" [class.mb-2]="errorMessage&&scoreMessage">{{errorMessage}}</div>
+      <div [hidden]="!scoreMessage">{{scoreMessage}}</div>
+    </div>
+    <div>
+      <button mat-button (click)="close()" i18n>cancel</button>
+      <button mat-raised-button color="primary" (click)="confirm()" i18n>confirm</button>
+      <button mat-raised-button color="warn" (click)="delete()" i18n>delete link</button>
+    </div>
+  </div>
+  <div [hidden]="!confirmCreateOrphan">
+    <h5 i18n>This action create an orphan, confirm:</h5>
+    <div>
+      <button mat-button (click)="close()" i18n>cancel</button>
+      <button mat-raised-button color="warn" (click)="delete()" i18n>confirm</button>
+    </div>
+  </div>
+</div>

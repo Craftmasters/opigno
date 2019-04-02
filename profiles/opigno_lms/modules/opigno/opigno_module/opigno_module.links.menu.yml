@@ -1,0 +1,85 @@
+# Main Opigno Module links parent
+opigno_module.settings:
+  title: 'Opigno module'
+  route_name: opigno_module.opigno_settings
+  description: 'Opigno Module'
+  parent: system.admin
+  weight: 100
+
+# Module menu items definition
+opigno_module.admin.structure.settings:
+  title: 'Module settings'
+  description: 'Configure Module entity'
+  route_name: opigno_module.settings
+  parent: opigno_module.settings
+  weight: 1
+
+entity.opigno_module.collection:
+  title: 'Modules list'
+  route_name: entity.opigno_module.collection
+  description: 'List Module entities'
+  parent: opigno_module.settings
+  weight: 2
+
+# Activity type menu items definition
+entity.opigno_activity_type.collection:
+  title: 'Activity types'
+  route_name: entity.opigno_activity_type.collection
+  description: 'List Activity type (bundles)'
+  parent: opigno_module.settings
+  weight: 3
+
+# Activity menu items definition
+entity.opigno_activity.collection:
+  title: 'Activities list'
+  route_name: entity.opigno_activity.collection
+  description: 'List Activity entities'
+  parent: opigno_module.settings
+  weight: 4
+
+# Answer type menu items definition
+entity.opigno_answer_type.collection:
+  title: 'Answer types'
+  route_name: entity.opigno_answer_type.collection
+  description: 'List Answer types'
+  parent: opigno_module.settings
+  weight: 5
+
+# Answer menu items definition
+entity.opigno_answer.collection:
+  title: 'Answers list'
+  route_name: entity.opigno_answer.collection
+  description: 'List Answer entities'
+  parent: opigno_module.settings
+  weight: 6
+
+# User module status menu items definition
+entity.user_module_status.collection:
+  title: 'User module status list'
+  route_name: entity.user_module_status.collection
+  description: 'List User module status entities'
+  parent: opigno_module.settings
+  weight: 7
+
+user_module_status.admin.structure.settings:
+  title: User module status settings
+  description: 'Configure User module status entities'
+  route_name: user_module_status.settings
+  parent: opigno_module.settings
+  weight: 8
+
+entity.module.notevaluated:
+  title: Score modules
+  description: 'Score not evaluated modules'
+  route_name: view.opigno_score_modules.opigno_not_evaluated
+  parent: opigno_module.settings
+  weight: 9
+
+# Opigno-admin menu
+opigno_admin.manually_score_activities:
+  title: Manually score activities
+  description: 'Manually score activities'
+  route_name: view.opigno_score_modules.opigno_not_evaluated
+  parent: opigno_admin.user_and_class_managments
+  menu_name: opigno-admin
+  weight: -34

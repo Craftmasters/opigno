@@ -1,0 +1,20 @@
+opigno_module.opigno_answer_type.*:
+  type: config_entity
+  label: 'Answer type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    description:
+      type: text
+      label: 'Description'
+    summary:
+      type: text
+      label: 'Summary'
+    image:
+      type: uri

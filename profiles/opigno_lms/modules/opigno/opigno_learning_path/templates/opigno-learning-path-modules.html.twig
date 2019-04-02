@@ -1,0 +1,33 @@
+<!-- group/{group}/inner-modules -->
+
+<base href="{{ base_path ~ base_href }}">
+
+<script type="text/javascript">
+  window.appConfig = {
+    formSubmitBtn: false,
+    groupId: {{ learning_path_id }},
+    apiBaseUrl: '{{ base_path }}',
+    moduleContext: {{ module_context }},
+    viewType: 'activities',
+    userHasInfoCard: '{{ user_has_info_card }}',
+    hideInfocardUrl: '/opigno-group-manager/hide-info-card',
+    getEntitiesUrl: '/group/%groupId/get-items',
+    getEntitiesPositionsUrl: '/group/%groupId/get-positions',
+    getModulesUrl: '/group/%groupId/modules/get-items',
+    getActivitiesUrl: '/group/%moduleId/get-activities',
+    getExtPackageFormUrl: '/module/%opigno_module/add-external-package',
+    getExtPackagePptFormUrl: '/module/%opigno_module/add-external-package/ppt',
+    updateActivityUrl: '/group/%moduleId/update-activity',
+    deleteActivityUrl: '/group/%moduleId/delete-activity',
+    getActivityTypesUrl: '/module/manager/get-activity-types',
+    getActivityFormUrl: '/module/%opigno_module/item-form/%type/%item',
+    getActivityPreviewUrl: '/module/manager/activity-preview/%opigno_activity',
+    getActivityListUrl: '/module/manager/get-activities-list',
+    addActivityUrl: '/module/%opigno_module/add-activity/%opigno_activity',
+    addActivitiesBankUrl: '/opigno_module/%opigno_module/activities-bank-lpm',
+    updateWeightUrl: '/module/manager/update-weight',
+    nextLink: '{{ next_link }}',
+  };
+</script>
+
+<app-root class="d-block">Loading app...</app-root>

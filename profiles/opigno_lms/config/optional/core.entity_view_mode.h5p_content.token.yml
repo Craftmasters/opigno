@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - h5p
+id: h5p_content.token
+label: Token
+targetEntityType: h5p_content
+cache: true

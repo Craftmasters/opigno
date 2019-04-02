@@ -1,0 +1,29 @@
+id: opigno_activity_tincan
+label: 'Opigno Group activity TinCan (source: tincan)'
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - opigno_migration
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+- 'Drupal 7'
+migration_group: opigno_migration
+source:
+  plugin: opigno_activity_tincan
+  node_type: opigno_tincan_question_type
+process:
+  type:
+    plugin: default_value
+    default_value: opigno_tincan
+  id: nid
+  vid: nid
+  name: title
+  uid: node_uid
+  opigno_tincan_package: opigno_tincan_package
+destination:
+  plugin: 'entity:opigno_activity'
+migration_dependencies: null

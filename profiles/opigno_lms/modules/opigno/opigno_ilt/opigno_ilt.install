@@ -1,0 +1,81 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno ILT module.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\group\Entity\GroupRole;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
+
+/**
+ * Implements hook_install().
+ */
+function opigno_ilt_install() {
+  // Allow users to view ILT entities.
+  $role = Role::load(RoleInterface::AUTHENTICATED_ID);
+  $role->grantPermission('view ilt entities');
+  $role->save();
+
+  // Allow platform-level student managers to score ILT entities.
+  $role = Role::load('user_manager');
+  $role->grantPermission('score ilt entities');
+  $role->save();
+
+  // Allow group-level student managers to score ILT entities.
+  $role = GroupRole::load('learning_path-user_manager');
+  $role->grantPermission('score ilt entities');
+  $role->save();
+}
+
+/**
+ * Creates the ILT calendar event type.
+ */
+function opigno_ilt_update_8001() {
+  $config_path = drupal_get_path('module', 'opigno_ilt')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  $config_storage = \Drupal::service('config.storage');
+  $data = $storage->read('opigno_calendar_event.type.ilt_calendar_event');
+  $config_storage->write('opigno_calendar_event.type.ilt_calendar_event', $data);
+
+  $data = $storage->read('field.storage.opigno_calendar_event.field_ilt');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.opigno_calendar_event.ilt_calendar_event.field_ilt');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.opigno_calendar_event.ilt_calendar_event.field_calendar_event_members');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}
+
+/**
+ * Setup permissions.
+ */
+function opigno_ilt_update_8002() {
+  // Allow users to view ILT entities.
+  $role = Role::load(RoleInterface::AUTHENTICATED_ID);
+  $role->grantPermission('view ilt entities');
+  $role->save();
+
+  // Allow platform-level student managers to score ILT entities.
+  $role = Role::load('user_manager');
+  $role->grantPermission('score ilt entities');
+  $role->save();
+
+  // Allow group-level student managers to score ILT entities.
+  $role = GroupRole::load('learning_path-user_manager');
+  $role->grantPermission('score ilt entities');
+  $role->save();
+}

@@ -1,0 +1,37 @@
+#opigno-ilt-create-form #members-available,
+#opigno-ilt-create-form #members {
+  background: #fff;
+  height: 280px;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+#opigno-ilt-create-form .multiselect-btns ul {
+  display: block;
+  position: static;
+  margin: 10px 20px 0 20px !important;
+}
+
+#opigno-ilt-create-form .multiselect-add,
+#opigno-ilt-create-form .multiselect-remove {
+  display: block;
+  height: 23px !important;
+  margin: 0 auto;
+  padding: 0;
+  width: 32px !important;
+}
+
+#opigno-ilt-create-form .multiselect-add:hover,
+#opigno-ilt-create-form .multiselect-remove:hover {
+  background-position: unset !important;
+}
+
+#opigno-ilt-create-form .multiselect-add {
+  margin-top: 120px !important;
+  background-image: url('../img/add_member.png') !important;
+}
+
+#opigno-ilt-create-form .multiselect-remove {
+  margin-top: 10px !important;
+  background-image: url('../img/remove_member.png') !important;
+}

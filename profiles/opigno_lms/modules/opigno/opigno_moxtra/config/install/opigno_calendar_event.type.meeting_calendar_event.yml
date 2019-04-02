@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: meeting_calendar_event
+label: 'Live meeting calendar event'
+description: ''
+date_field_type: daterange

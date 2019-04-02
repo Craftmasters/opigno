@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_video
+label: Video
+description: 'Opigno video (either external or internal) activity type'
+summary: ''
+image: {  }

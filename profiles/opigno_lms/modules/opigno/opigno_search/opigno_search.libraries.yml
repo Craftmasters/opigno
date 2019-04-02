@@ -1,0 +1,5 @@
+search_form:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_search_form.css: {}

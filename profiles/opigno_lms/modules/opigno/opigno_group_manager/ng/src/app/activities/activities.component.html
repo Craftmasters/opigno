@@ -1,0 +1,57 @@
+<div class="mb-3" *ngIf="!moduleContext">
+  <select class="form-control" (change)="updateModules()" [(ngModel)]="activityFilter">
+    <option value="" i18n>All</option>
+    <ng-container *ngFor="let entity of entities">
+      <option value="{{entity.entityId}}" *ngIf="entity.contentType=='ContentTypeCourse'">{{entity.title}}</option>
+    </ng-container>
+  </select>
+</div>
+
+<ng-container *ngIf="!moduleContext">
+  <div *ngFor="let module of modules">
+    <div *ngIf="module.editable" class="activities-wrapper" [attr.data-id]="module.entity_id">
+        <div class="module-item mb-4">
+          <div class="bg-light px-3 px-md-5 pt-4">
+            <div class="title-wrapper d-flex mb-4">
+              <h2 class="module-title mb-0">{{module.name}}</h2>
+              <button class="ml-auto btn btn-success" (click)="addActivitiesBank(module)" i18n>Activities bank</button>
+              <button class="ml-4 btn btn-success" (click)="addActivity(module)" i18n>Add activity</button>
+            </div>
+            <div class="content-wrapper bg-white px-3 px-md-5 py-4">
+              <div class="activity-count" *ngIf="module.activity_count||module.activity_count===0">
+                {{module.activity_count}}
+                <ng-container *ngIf="module.activity_count==1" i18n>activity</ng-container>
+                <ng-container *ngIf="module.activity_count!=1" i18n>activities</ng-container>
+              </div>
+              <div class="tree-view my-5" *ngIf="module.treeViewOpened">
+                <module [module]="module" (updateEvent)="updateModules()"></module>
+              </div>
+            </div>
+          </div>
+          <div class="tree-view-toggler">
+            <button class="w-100 text-right pr-5 py-3 bg-secondary"
+                    (click)="module.treeViewOpened = module.treeViewOpened ? false : true;"
+                    [class.open]="module.treeViewOpened"
+                    i18n>Show activities</button>
+          </div>
+        </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="moduleContext">
+  <div class="activities-wrapper">
+    <div class="module-item mb-4" [ngClass]="'cid-' + module.cid">
+      <div class="bg-light px-3 px-md-5 pt-4">
+        <div class="title-wrapper d-flex mb-4">
+          <button class="ml-auto btn btn-success" (click)="addActivity(module);" i18n>Add activity</button>
+        </div>
+        <div class="content-wrapper bg-white px-3 px-md-5 py-4">
+          <div class="tree-view my-5">
+            <module [module]="module"></module>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,9 @@
+services:
+  opigno_tincan_live_meeting.default:
+    class: Drupal\opigno_tincan_live_meeting\EventSubscriber\OpignoTincanLiveMeeting
+    arguments:
+      - '@current_user'
+      - '@current_route_match'
+      - '@opigno_moxtra.moxtra_api'
+    tags:
+      - { name: event_subscriber }

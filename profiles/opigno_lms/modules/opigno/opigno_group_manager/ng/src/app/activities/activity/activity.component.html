@@ -1,0 +1,18 @@
+<td class="move">
+  <span class="handle ic-drag-handle-black-24px" i18n>move</span>
+</td>
+<td class="name"><a href="javascript:void(0);" (click)="activity.showPreview=true" title="Preview">{{activity.name}}</a></td>
+<td class="max-score"><input type="text" placeholder="MAX SCORE" [(ngModel)]="activity.max_score" (change)="updateActivity()"></td>
+<td class="edit"><button class="btn btn-success" (click)="activity.showUpdate=true" i18n>edit</button></td>
+<td class="delete"><button class="btn btn-danger delete-link" (click)="showDelete()" i18n>delete</button></td>
+
+<update-activity class="activity-update lateral-panel"
+                 [module]="module"
+                 [activity]="activity"
+                 (closeEvent)="activity.showUpdate=false"
+                 *ngIf="activity.showUpdate"></update-activity>
+
+<preview-activity class="activity-preview lateral-panel"
+                 [activity]="activity"
+                 (closeEvent)="activity.showPreview=false"
+                 *ngIf="activity.showPreview"></preview-activity>

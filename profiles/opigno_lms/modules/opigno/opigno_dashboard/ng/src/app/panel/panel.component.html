@@ -1,0 +1,27 @@
+<div>
+  <button type="button" class="close-dashboard" (click)="appService.managePanel=false">{{locales.close}}</button>
+  <h3>{{locales.manageYourDashboard}}</h3>
+</div>
+
+<section class="layout">
+  <p>{{locales.layout}}</p>
+  <button class="radio" id="layout-1" name="layout" (click)="appService.columns=1" [class.active]="appService.columns==1">{{locales.oneColumn}}</button>
+  <button class="radio" id="layout-2" name="layout" (click)="appService.columns=2" [class.active]="appService.columns==2">{{locales.twoColumns}}</button>
+  <button class="radio" id="layout-3" name="layout" (click)="appService.columns=3" [class.active]="appService.columns==3">{{locales.asymColumns}}</button>
+  <button class="radio" id="layout-4" name="layout" (click)="appService.columns=4" [class.active]="appService.columns==4">{{locales.threeColumns}}</button>
+</section>
+
+<section class="add-blocks">
+  <p>{{locales.addBlocks}}</p>
+  <div class="blocks panel" [dragula]='"nested-bag"' [dragulaModel]="appService.positions[0]">
+    <div *ngFor="let block of appService.positions[0]" class="dashboard-block">
+      <span class="handle ic-drag-handle-black-24px" [class.hidden]="!appService.managePanel"></span>
+      <div class="title" [innerHtml]="block.admin_label"></div>
+    </div>
+  </div>
+</section>
+
+<section class="reinit">
+  <p>{{locales.restoreYourDashboard}}</p>
+  <button type="button" name="button" class="btn-danger" (click)="appService.reinit()">{{locales.restoreToDefault}}</button>
+</section>

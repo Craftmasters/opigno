@@ -1,0 +1,7 @@
+oc_library:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_commerce.css: {}
+  js:
+    js/opigno_commerce.js: {}

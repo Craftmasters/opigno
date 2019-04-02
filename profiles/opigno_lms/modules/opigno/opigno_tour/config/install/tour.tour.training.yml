@@ -1,0 +1,35 @@
+langcode: en
+status: true
+id: training
+label: 'Training tour'
+module: opigno_tour
+routes:
+  - route_name: entity.group.canonical
+tips:
+  training-start-admin:
+    id: training-start-admin
+    plugin: text
+    label: 'Start training'
+    body: 'You can click here to start the training, and see it as a student.'
+    weight: 1
+    attributes:
+      data-class: lp_progress_admin_continue
+    location: bottom
+  training-start:
+    id: training-start
+    plugin: text
+    label: 'Start training'
+    body: 'You can click here to start or resume this training.'
+    weight: 1
+    attributes:
+      data-class: lp_progress_continue
+    location: bottom
+  training-edit-admin:
+    id: training-edit-admin
+    plugin: text
+    label: 'Edit training'
+    body: 'You can click here to manage the settings, the contents, and the users of that training.'
+    weight: 2
+    attributes:
+      data-class: lp_progress_admin_edit
+    location: bottom

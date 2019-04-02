@@ -1,0 +1,4 @@
+opigno_group_manager.manager.index:
+  route_name: opigno_group_manager.manager.index
+  title: 'Manager'
+  base_route: entity.group.canonical

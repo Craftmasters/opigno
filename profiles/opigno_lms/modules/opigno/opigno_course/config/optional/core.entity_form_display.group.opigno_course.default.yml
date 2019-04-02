@@ -1,0 +1,137 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group.opigno_course.badge_active
+    - field.field.group.opigno_course.badge_criteria
+    - field.field.group.opigno_course.badge_description
+    - field.field.group.opigno_course.badge_name
+    - field.field.group.opigno_course.badge_media_image
+    - field.field.group.opigno_course.field_course_description
+    - field.field.group.opigno_course.field_course_media_image
+    - group.type.opigno_course
+  module:
+    - entity_browser
+    - field_group
+    - text
+third_party_settings:
+  field_group:
+    group_badges_settings:
+      children:
+        - badge_active
+        - group_badges_params
+      parent_name: ''
+      weight: 5
+      format_type: details
+      format_settings:
+        id: ''
+        classes: ''
+        open: true
+        required_fields: true
+      label: 'Badges settings'
+    group_badges_params:
+      children:
+        - badge_name
+        - badge_description
+        - badge_criteria
+        - badge_media_image
+      parent_name: group_badges_settings
+      weight: 1
+      format_type: fieldset
+      format_settings:
+        label: 'Badge params'
+        description: ''
+        required_fields: true
+        id: edit-opigno-badges-settings-group
+        classes: ''
+      label: 'Badge params'
+id: group.opigno_course.default
+targetEntityType: group
+bundle: opigno_course
+mode: default
+content:
+  badge_active:
+    weight: 0
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  badge_criteria:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  badge_description:
+    weight: 1
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textarea
+    region: content
+  badge_name:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  badge_media_image:
+    weight: 3
+    settings:
+      entity_browser: media_entity_browser_badge_images
+      field_widget_display: rendered_entity
+      field_widget_remove: true
+      open: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: image_only
+      field_widget_edit: false
+      field_widget_replace: false
+    third_party_settings: {  }
+    type: entity_browser_entity_reference
+    region: content
+  field_course_description:
+    weight: 1
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_course_media_image:
+    weight: 2
+    settings:
+      entity_browser: media_entity_browser_groups
+      field_widget_display: rendered_entity
+      field_widget_remove: true
+      selection_mode: selection_append
+      field_widget_display_settings:
+        view_mode: image_only
+      field_widget_edit: false
+      field_widget_replace: false
+      open: false
+    third_party_settings: {  }
+    type: entity_browser_entity_reference
+    region: content
+  label:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+hidden:
+  path: true
+  uid: true

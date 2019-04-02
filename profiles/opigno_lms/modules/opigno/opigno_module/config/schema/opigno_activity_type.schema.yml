@@ -1,0 +1,20 @@
+opigno_module.opigno_activity_type.*:
+  type: config_entity
+  label: 'Activity type config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    uuid:
+      type: string
+    description:
+      type: text
+      label: 'Description'
+    summary:
+      type: text
+      label: 'Summary'
+    image:
+      type: uri

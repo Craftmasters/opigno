@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Course module.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Import Opigno Course configs for adding badges fields.
+ *
+ * Implements hook_update_N().
+ */
+function opigno_course_update_8001() {
+  \Drupal::service('config.installer')->installDefaultConfig('module', 'opigno_course');
+}
+
+/**
+ * Update configs in opigno_course.
+ */
+function opigno_course_update_8002() {
+
+  $config_path = drupal_get_path('module', 'opigno_course')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  // Install new field.
+  $data = $storage->read('field.storage.group.field_course_media_image');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.group.opigno_course.field_course_media_image');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+
+  $configs = [
+    'core.entity_form_display.group.opigno_course.default',
+    'core.entity_view_display.group.opigno_course.default',
+  ];
+
+  $config_storage = \Drupal::service('config.storage');
+  foreach ($configs as $item) {
+    $data = $storage->read($item);
+    $config_storage->write($item, $data);
+  }
+
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Replace badge_image field with badge_media_image field.
+ * Update configs in opigno_course. Create new media type - Image (png).
+ */
+function opigno_course_update_8003() {
+
+  $config_path = drupal_get_path('module', 'opigno_course')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  // Install new field.
+  $data = $storage->read('field.storage.group.badge_media_image');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.group.opigno_course.badge_media_image');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+
+  $config_storage = \Drupal::service('config.storage');
+  $data = $storage->read('media.type.image_png');
+  $config_storage->write('media.type.image_png', $data);
+
+  // Install configs from optional folder.
+  $config_optional_path = drupal_get_path('module', 'opigno_course')
+    . '/config/optional';
+  $storage = new FileStorage($config_optional_path);
+
+  $configs = [
+    'core.entity_form_display.group.opigno_course.default',
+    'core.entity_view_display.group.opigno_course.default',
+    'core.entity_form_display.media.image_png.default',
+    'core.entity_view_display.media.image_png.default',
+    'core.entity_view_display.media.image_png.image_only',
+    'field.field.media.image_png.field_media_image',
+    'views.view.media_browser_images_png',
+    'entity_browser.browser.media_entity_browser_badge_images',
+  ];
+
+  $config_storage = \Drupal::service('config.storage');
+  foreach ($configs as $item) {
+    $data = $storage->read($item);
+    $config_storage->write($item, $data);
+  }
+}

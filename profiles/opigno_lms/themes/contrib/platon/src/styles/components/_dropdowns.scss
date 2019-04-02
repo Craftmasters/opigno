@@ -1,0 +1,23 @@
+.btn-group.actions {
+  .dropdown-menu {
+    border-color: transparent;
+    min-width: 100%;
+
+    .form-submit {
+      width: 100%;
+    }
+  }
+}
+
+.btn-group.operations {
+  > a {
+    @extend .btn;
+    @extend .btn-light;
+  }
+
+  .dropdown-menu {
+    > a {
+      @extend .dropdown-item;
+    }
+  }
+}

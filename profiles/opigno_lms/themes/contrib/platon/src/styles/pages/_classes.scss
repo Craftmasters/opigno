@@ -1,0 +1,14 @@
+#block-addclassaction .list-inline-item {
+  display: block;
+  margin-top: 3rem;
+
+  a.button.button-action {
+    display: block;
+    padding: 1rem;
+    background-color: $green;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+}

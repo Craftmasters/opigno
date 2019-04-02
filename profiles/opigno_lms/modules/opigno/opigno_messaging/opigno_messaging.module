@@ -1,0 +1,558 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_messaging.module.
+ */
+
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\group\Entity\Group;
+use Drupal\private_message\Entity\PrivateMessageThread;
+use Drupal\private_message\Mapper\PrivateMessageMapper;
+use Drupal\user\Entity\User;
+use Drupal\opigno_messaging\OpignoMessageThread;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_messaging_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_messaging module.
+    case 'help.page.opigno_messaging':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Opigno app for messaging') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_messaging_theme() {
+  return [
+    'opigno_messaging' => [
+      'render element' => 'children',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_messaging_form_private_message_add_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $thread_members = $form_state->get('thread_members');
+  // Only add the select if we are in the context
+  // of a new message (not in a tread context).
+  if (!isset($thread_members)) {
+    $current_user = \Drupal::currentUser();
+
+    // Add the subject.
+    $form['subject'] = [
+      '#type' => 'textfield',
+      '#title' => 'Subject',
+      '#placeholder' => t('Choose a name'),
+      '#default_value' => "",
+      '#size' => 60,
+      '#maxlength' => 128,
+      '#required' => FALSE,
+      '#weight' => -3,
+    ];
+
+    // Hide the default messaging to field.
+    $form['members']['#type'] = 'hidden';
+
+    // Get the groups, this allows to filter the available users.
+    $classes = opigno_messaging_get_groups('opigno_class');
+    $learning_paths = opigno_messaging_get_groups('learning_path');
+
+    $form['filters'] = [
+      '#type' => 'container',
+      '#weight' => -2,
+    ];
+
+    $form['filters']['title'] = [
+      '#type' => 'label',
+      '#title' => t('Participants'),
+    ];
+
+    $form['filters']['class'] = [
+      '#type' => 'select',
+      '#options' => [
+        'All' => t('Filter by class'),
+      ],
+      '#default_value' => t('All'),
+      '#ajax' => [
+        'callback' => 'messaging_user_update_callback',
+        'event' => 'change',
+        'wrapper' => 'users-to-send',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Verifying entry...'),
+        ],
+      ],
+    ];
+
+    $form['filters']['learning_path'] = [
+      '#type' => 'select',
+      '#wrapper_attributes' => [
+        'class' => ['col-6'],
+      ],
+      '#options' => [
+        'All' => t('Filter by training'),
+      ],
+      '#default_value' => t('All'),
+      '#ajax' => [
+        'callback' => 'messaging_user_update_callback',
+        'event' => 'change',
+        'wrapper' => 'users-to-send',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Verifying entry...'),
+        ],
+      ],
+    ];
+
+    $options = [];
+
+    foreach ($classes as $class) {
+      $id = $class['entity_id'];
+      $options[$id] = $class['title'];
+    }
+
+    uasort($options, 'strcasecmp');
+    $form['filters']['class']['#options'] += $options;
+
+    $options = [];
+
+    foreach ($learning_paths as $learning_path) {
+      $id = $learning_path['entity_id'];
+      $options[$id] = $learning_path['title'];
+    }
+
+    uasort($options, 'strcasecmp');
+    $form['filters']['learning_path']['#options'] += $options;
+
+    // Get the users for the specific group.
+    $users = opigno_messaging_get_all_users();
+    $options = [];
+
+    foreach ($users as $user) {
+      $options[$user->id()] = $user->getDisplayName();
+    }
+
+    // Remove the current users from the list of users
+    // that once can send a message to.
+    if (isset($options[$current_user->id()])) {
+      unset($options[$current_user->id()]);
+    }
+
+    // Sort the users by name.
+    uasort($options, 'strcasecmp');
+
+    $form['users_to_send'] = [
+      '#title' => 'Select the users you want to send a message to',
+      '#type' => 'multiselect',
+      '#options' => $options,
+      '#weight' => -1,
+      '#prefix' => '<div id="users-to-send">',
+      '#suffix' => '</div>',
+      // Fixes multiselect issue 2852654.
+      '#process' => [
+        ['Drupal\multiselect\Element\MultiSelect', 'processSelect'],
+      ],
+    ];
+
+    unset($form['message']['widget']['#title']);
+    unset($form['message']['widget'][0]['#title']);
+
+    $form['message']['widget']['#placeholder'] = t('your message');
+    $form['actions']['submit']['#value'] = t('Send');
+
+    // Validation function so we can move the values of the users_to_send
+    // to the default messaging module field.
+    $form['#validate'][] = 'opigno_messaging_private_message_add_form_validate_replace_to';
+  }
+
+  // Remove default & set custom submit handler.
+  $form['#submit'] = ['opigno_messaging_private_message_add_form_submit'];
+  $form['actions']['submit']['#submit'] = ['opigno_messaging_private_message_add_form_submit'];
+  $form['actions']['submit']['#value'] = t('Send');
+
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name == 'private_message.private_message_page') {
+    // Save current thread id in form storage.
+    // For "private_messages" page (not PM thread page).
+    $user = \Drupal::currentUser();
+    $db_connection = \Drupal::service('database');
+    $pm_mapper = new PrivateMessageMapper($db_connection, $user);
+    $user = User::load($user->id());
+    $thread_id = $pm_mapper->getFirstThreadIdForUser($user);
+
+    $form_state->set('thread_id', $thread_id);
+  }
+}
+
+/**
+ * Helper function to get users for group.
+ *
+ * @param int $group_id
+ *   Group.
+ *
+ * @return \Drupal\user\UserInterface[]
+ *   User ID.
+ */
+function opigno_messaging_get_user_for_group($group_id = NULL) {
+  if ($group_id === NULL
+    || $group_id === 0) {
+    return opigno_messaging_get_all_users();
+  }
+
+  $group = Group::load($group_id);
+  $members = $group->getMembers();
+  $users = array_map(function ($member) {
+    /** @var \Drupal\group\GroupMembership $member */
+    return $member->getUser();
+  }, $members);
+
+  return array_filter($users, function ($user) {
+    /** @var \Drupal\user\UserInterface $user */
+    return $user->id() > 0;
+  });
+}
+
+/**
+ * Helper function to get all users that current user can message to.
+ */
+function opigno_messaging_get_all_users() {
+  $current_user = \Drupal::currentUser();
+
+  if ($current_user->hasPermission('message anyone regardless of groups')) {
+    return array_filter(User::loadMultiple(), function ($user) {
+      /** @var \Drupal\user\UserInterface $user */
+      return $user->id() > 0;
+    });
+  }
+
+  $users = [];
+  $groups = opigno_messaging_get_groups('opigno_class')
+    + opigno_messaging_get_groups('learning_path');
+
+  /** @var \Drupal\group\Entity\GroupInterface $group */
+  foreach ($groups as $group_info) {
+    $group = Group::load($group_info['entity_id']);
+    $members = $group->getMembers();
+
+    foreach ($members as $member) {
+      $user = $member->getUser();
+      if ($user) {
+        $users[$user->id()] = $member->getUser();
+      }
+    }
+  }
+
+  unset($users[0]);
+  return array_values($users);
+}
+
+/**
+ * Helper function to get all groups that current user can message to.
+ */
+function opigno_messaging_get_groups($group_type) {
+  $current_user = \Drupal::currentUser();
+  $query = \Drupal::entityQuery('group');
+  $query->condition('type', $group_type);
+  $ids = $query->execute();
+  $groups = Group::loadMultiple($ids);
+
+  if (!$current_user->hasPermission('message all groups')) {
+    $groups = array_filter($groups, function ($group) use ($current_user) {
+      /** @var \Drupal\group\Entity\GroupInterface $group */
+      return $group->getMember($current_user) !== FALSE;
+    });
+  }
+
+  return array_map(function ($group) {
+    /** @var \Drupal\group\Entity\Group $group */
+    return [
+      'entity_id' => $group->id(),
+      'title' => $group->label(),
+    ];
+  }, $groups);
+}
+
+/**
+ * For validation.
+ *
+ * Sets the values of the default messaging "to" field with the
+ * values of our multiselect.
+ */
+function opigno_messaging_private_message_add_form_validate_replace_to(&$form, FormStateInterface $form_state) {
+  $selected_users = $form_state->getValue('users_to_send');
+  $selected_members = $form_state->getValue('members');
+  // The select member should be empty at this point,
+  // fill it with the users to send.
+  $i = 0;
+  foreach ($selected_users as $selected_user) {
+    $selected_members[$i]['target_id'] = $selected_user;
+    $selected_members[$i]['_weight'] = $i;
+    $i++;
+  }
+  // Update the form state with the values we want.
+  $form_state->setValue('members', $selected_members);
+  // Send error message if fields are empty.
+  $message = $form_state->getValue('message');
+  if (empty($selected_members['0']['target_id'])) {
+    $form_state->setErrorByName('members', t("Please select user for sending message!"));
+  };
+  if (empty($message[0]['value'])) {
+    $form_state->setErrorByName('message', t("Please enter a message!"));
+  }
+}
+
+/**
+ * Add private message form custom submit handler.
+ */
+function opigno_messaging_private_message_add_form_submit(array $form, FormStateInterface $form_state) {
+  /** @var \Drupal\Core\Entity\ContentEntityFormInterface $form_obj */
+  $form_obj = $form_state->getFormObject();
+
+  $current_user = \Drupal::currentUser();
+  /** @var \Drupal\user\UserDataInterface $user_data */
+  $user_data = \Drupal::service('user.data');
+
+  $pm_config = \Drupal::config('private_message.settings');
+  /** @var \Drupal\private_message\Service\PrivateMessageServiceInterface $pm_service */
+  $pm_service = \Drupal::service('private_message.service');
+
+  $form_state->cleanValues();
+  /** @var \Drupal\private_message\Entity\PrivateMessageInterface $entity */
+  $entity = $form_obj->buildEntity($form, $form_state);
+  $entity->save();
+
+  /** @var \Drupal\user\UserInterface[] $members */
+  $members = $form_state->get('thread_members');
+  if (!$members) {
+    // Generate an array containing the members of the thread.
+    $members = [$current_user];
+    foreach ($form_state->getValue('members') as $info) {
+      $user = User::load($info['target_id']);
+      if ($user) {
+        $members[] = $user;
+      }
+    }
+  }
+
+  $subject = $form_state->getValue('subject');
+  // If subject is set, create new thread.
+  if ($subject) {
+    $private_message_thread = PrivateMessageThread::create();
+    foreach ($members as $member) {
+      $private_message_thread->addMember($member);
+    }
+
+    $private_message_thread->set('field_pm_subject', $subject);
+    $private_message_thread->save();
+  }
+  else {
+    // Try get thread from path.
+    $parameters = \Drupal::routeMatch()->getParameters();
+    $private_message_thread = $parameters->get('private_message_thread');
+
+    if ($private_message_thread === NULL) {
+      $storage = $form_state->getStorage();
+      if (isset($storage['thread_id'])) {
+        // Get current thread for "private_messages" page (not PM thread page).
+        $private_message_thread = PrivateMessageThread::load($storage['thread_id']);
+      }
+      else {
+        $private_message_thread = $pm_service->getThreadForMembers($members);
+      }
+    }
+  }
+
+  // Add the new message to the thread and save.
+  /** @var \Drupal\private_message\Entity\PrivateMessageThreadInterface $private_message_thread */
+  $private_message_thread->addMessage($entity);
+  $private_message_thread->save();
+
+  $mailManager = \Drupal::service('plugin.manager.mail');
+  $params = [
+    'private_message' => $entity,
+    'private_message_thread' => $private_message_thread,
+  ];
+
+  foreach ($members as $member) {
+    if ($member->id() != $current_user->id()) {
+      $params['member'] = $member;
+      $send = $user_data->get('private_message', $member->id(), 'email_notification');
+      $send = is_numeric($send) ? (bool) $send : ($pm_config->get('enable_email_notifications') && $pm_config->get('send_by_default'));
+      if ($send) {
+        $mailManager->mail('private_message', 'message_notification', $member->getEmail(), $member->getPreferredLangcode(), $params);
+      }
+    }
+  }
+
+  // Send the user to the private message page. As this thread is the newest,
+  // it wll be at the top of the list.
+  $form_state->setRedirect('entity.private_message_thread.canonical', ['private_message_thread' => $private_message_thread->id()]);
+}
+
+/**
+ * Custom ajax callback.
+ *
+ * Updates the list of available users to send message to
+ * once the group is changed.
+ */
+function messaging_user_update_callback(array $form, FormStateInterface $form_state) {
+  $current_user = \Drupal::currentUser();
+  // Get the current values that are selected.
+  $current_selected_users = $form_state->getValue('users_to_send');
+
+  // Keep the users that were previously selected as selected.
+  foreach ($current_selected_users as $uid) {
+    $form['users_to_send']['#default_value'][$uid] = $uid;
+  }
+
+  // Remove from the list of option users the ones that are not selected.
+  foreach ($form['users_to_send']['#options'] as $uid => $name) {
+    if (!in_array($uid, $form['users_to_send']['#default_value'])) {
+      unset($form['users_to_send']['#options'][$uid]);
+    }
+  }
+
+  // Add to the users of the new group to the options.
+  $class_id = $form_state->getValue('class');
+  $learning_path_id = $form_state->getValue('learning_path');
+
+  if (!is_numeric($class_id)) {
+    $class_id = 0;
+  }
+
+  if (!is_numeric($learning_path_id)) {
+    $learning_path_id = 0;
+  }
+
+  $class_users = opigno_messaging_get_user_for_group($class_id);
+  $learning_path_users = opigno_messaging_get_user_for_group($learning_path_id);
+
+  $users = array_uintersect($class_users, $learning_path_users, function ($user1, $user2) {
+    /** @var \Drupal\user\UserInterface $user1 */
+    /** @var \Drupal\user\UserInterface $user2 */
+    return $user2->id() - $user1->id();
+  });
+
+  foreach ($users as $user) {
+    /** @var \Drupal\user\UserInterface $user */
+    $form['users_to_send']['#options'][$user->id()] = $user->getDisplayName();
+  }
+
+  // Remove the current users from the list of users
+  // that once can send a message to.
+  if (isset($form['users_to_send']['#options'][$current_user->id()])) {
+    unset($form['users_to_send']['#options'][$current_user->id()]);
+  }
+
+  uasort($form['users_to_send']['#options'], 'strcasecmp');
+  return $form['users_to_send'];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter().
+ *
+ * Changes 'last_message' view mode to 'thread_preview'
+ * if 'private_message_thread' view mode is 'preview'.
+ *
+ * @see private_message_private_message_thread_view()
+ */
+function opigno_messaging_private_message_thread_view_alter(
+  array &$build,
+  EntityInterface $entity,
+  EntityViewDisplayInterface $display
+) {
+  if (isset($build['last_message'])
+    && $build['#view_mode'] === 'preview') {
+    /** @var \Drupal\private_message\Entity\PrivateMessageThreadInterface $entity */
+    $messages = $entity->getMessages();
+    $last_message = array_pop($messages);
+    $view_builder = \Drupal::entityTypeManager()
+      ->getViewBuilder('private_message');
+    $build['last_message'] = $view_builder
+      ->view($last_message, 'thread_preview');
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view().
+ */
+function opigno_messaging_preprocess_views_view(&$vars) {
+  // Attach js & css to view.
+  if (isset($vars['view_array']['#name'])
+    && $vars['view_array']['#name'] === 'private_message') {
+    $vars['#attached']['library'][] = 'opigno_messaging/view_private_message';
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function opigno_messaging_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  if ($view->id() == 'private_message' && in_array($view->current_display, ['block_all', 'block_last'])) {
+    // Get all message treads of current user.
+    $uid = \Drupal::currentUser()->id();
+    $threads = OpignoMessageThread::getUserThreads($uid);
+
+    if ($threads) {
+      // Get threads delete/access time
+      // for whenever deleted threads of current user.
+      $db_connection = \Drupal::service('database');
+      $query_thread = $db_connection->select('pm_thread_delete_time', 'tdt');
+      $query_thread->join('private_message_thread__last_delete_time', 'ldt', 'ldt.last_delete_time_target_id = tdt.id');
+      $query_thread->join('pm_thread_access_time', 'tat', 'tat.id = tdt.id');
+      $query_thread->fields('ldt', ['entity_id']);
+      $query_thread->fields('tat', ['access_time']);
+      $query_thread->fields('tdt', ['delete_time'])
+        ->condition('tdt.owner', $uid)
+        ->condition('tdt.delete_time', 0, '>');
+      $threads_times = $query_thread->execute()->fetchAllAssoc('entity_id');
+
+      if ($threads_times) {
+        // Get deleted threads for current user.
+        $deleted_threads = [];
+        foreach ($threads_times as $key => $thread) {
+          if ($thread->delete_time > $thread->access_time) {
+            $deleted_threads[] = $key;
+          }
+        }
+
+        if ($deleted_threads) {
+          // Remove deleted threads from threads array.
+          $threads = array_diff($threads, $deleted_threads);
+        }
+      }
+
+      if ($threads) {
+        // Add allowed threads to query.
+        $query->addWhere('', 'private_message_threads.id', $threads, 'IN');
+      }
+      else {
+        $query->addWhere('', 'private_message_threads.id', [0], 'IN');
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_menu_local_actions_alter().
+ */
+function opigno_messaging_menu_local_actions_alter(&$local_actions) {
+  // Remove default 'Create private message' button.
+  unset($local_actions['private_message.private_message_add']);
+}

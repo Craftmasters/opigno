@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the TFT module.
+ */
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Config\FileStorage;
+
+/**
+ * Creates the opigno_moxtra_recording_link field in the tft_file.
+ */
+function tft_update_8001() {
+  $config_path = drupal_get_path('module', 'tft') . '/config/optional';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.media.opigno_moxtra_recording_link');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.media.tft_file.opigno_moxtra_recording_link');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}
+
+/**
+ * Creates the tft_members field in the tft_file.
+ */
+function tft_update_8002() {
+  $config_path = drupal_get_path('module', 'tft') . '/config/optional';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.media.tft_members');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.media.tft_file.tft_members');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}

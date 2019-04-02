@@ -1,0 +1,29 @@
+id: opigno_activity_slide
+label: 'Opigno Group activity Slide (source: slide)'
+langcode: en
+status: true
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+- 'Drupal 7'
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_activity_slide
+  node_type: quiz_directions
+process:
+  type:
+    plugin: default_value
+    default_value: opigno_slide
+  id: nid
+  vid: nid
+  name: title
+  uid: node_uid
+  opigno_slide_pdf: opigno_slide_pdf
+destination:
+  plugin: 'entity:opigno_activity'
+migration_dependencies: null

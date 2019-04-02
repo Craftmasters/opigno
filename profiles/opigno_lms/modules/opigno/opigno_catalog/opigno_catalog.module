@@ -1,0 +1,136 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_catalog.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\ViewExecutable;
+use Drupal\views\Views;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_catalog_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_catalog module.
+    case 'help.page.opigno_catalog':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Add features to opigno catalogue') . '</p>';
+      return $output;
+
+    default:
+      return '';
+  }
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function opigno_catalog_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  if ($view->id() !== 'opigno_training_catalog') {
+    return;
+  }
+
+  // If the user is admin, bypass the additional checks.
+  $user = \Drupal::currentUser();
+  if ($user->hasPermission('manage group members in any group')
+    || $user->hasPermission('manage group content in any group')) {
+    // Allow platform-level managers to access any training.
+    return;
+  }
+
+  /** @var \Drupal\views\Plugin\views\query\Sql $query */
+  $query->addField('group_content_field_data_groups_field_data', 'entity_id', '', [
+    'function' => 'group',
+    'aggregate' => TRUE,
+  ]);
+  $query->addField('group__field_learning_path_visibility', 'field_learning_path_visibility_value', '', [
+    'function' => 'group',
+    'aggregate' => TRUE,
+  ]);
+
+  $group_or = $query->setWhereGroup('OR');
+  // Show the group if the user is a member.
+  $query->addWhere($group_or, 'group_content_field_data_groups_field_data.entity_id', $user->id());
+  // Filter by type.
+  $group_and = $query->setWhereGroup('AND');
+  $query->addWhere($group_and, 'group_content_field_data_groups_field_data.type', 'learning_path-group_membership');
+  // Or if the group is not private.
+  $query->addWhere($group_or, 'group__field_learning_path_visibility.field_learning_path_visibility_value', [
+    'public',
+    'semiprivate',
+  ], 'IN');
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function opigno_catalog_views_pre_render(ViewExecutable $view) {
+  if ($view->id() !== 'opigno_training_catalog') {
+    return;
+  }
+
+  $user = \Drupal::currentUser();
+  if ($user->hasPermission('manage group members in any group')
+    || $user->hasPermission('manage group content in any group')) {
+    // Allow platform-level managers to access any training.
+    return;
+  }
+}
+
+/**
+ * Adds assets to view.
+ *
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_catalog_preprocess_views_view(&$variables) {
+  if ($variables['id'] == 'opigno_training_catalog') {
+    $style = \Drupal::service('opigno_catalog.get_style')->getStyle();
+
+    // Add style class to view.
+    $variables['attributes']['class'][] = ($style == 'line') ? 'style-line' : 'style-block';
+
+    // Add library.
+    $variables['view']->element['#attached']['library'][] = 'opigno_catalog/view_style';
+
+    // Add switcher.
+    $variables['header']['view-style'] = [
+      '#markup' => '<div class="view-style">
+                            <ul class="list-unstyled d-flex justify-content-end">
+                              <li><a href="#line" class="btn line">line</a></li>
+                              <li class="ml-3"><a href="#block" class="btn block">block</a></li>
+                            </ul>
+                          </div>',
+      '#weight' => 0,
+    ];
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_catalog_preprocess_views_exposed_form__opigno_training_catalog__training_catalogue(&$variables) {
+  foreach ($variables['form']['#info'] as $input) {
+    $args = $_GET;
+    $input_argument = $input['value'];
+
+    // Remove form_argument from url_arguments.
+    unset($args[$input_argument], $args['sort_by']);
+
+    foreach ($variables['form'][$input['value']] as $key => &$value) {
+      if (is_int($key)) {
+        $args[$input['value']] = strval($value['#return_value']);
+
+        $view = Views::getView('opigno_training_catalog');
+        $view->setExposedInput($args);
+        $view->execute();
+
+        $value['#title'] .= ' (' . $view->total_rows . ')';
+      }
+    }
+  }
+}

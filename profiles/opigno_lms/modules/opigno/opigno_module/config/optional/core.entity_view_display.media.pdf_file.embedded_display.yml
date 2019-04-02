@@ -1,0 +1,36 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.embedded_display
+    - field.field.media.pdf_file.field_media_file
+    - media.type.pdf_file
+  module:
+    - pdf
+id: media.pdf_file.embedded_display
+targetEntityType: media
+bundle: pdf_file
+mode: embedded_display
+content:
+  field_media_file:
+    weight: 0
+    label: hidden
+    settings:
+      keep_pdfjs: '1'
+      width: 100%
+      height: 600px
+      page: ''
+      zoom: ''
+      custom_zoom: ''
+      pagemode: ''
+    third_party_settings: {  }
+    type: pdf_default
+    region: content
+hidden:
+  created: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  name: true
+  thumbnail: true
+  uid: true

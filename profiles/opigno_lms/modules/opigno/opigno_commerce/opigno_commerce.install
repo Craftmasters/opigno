@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_commerce.install.
+ */
+
+use Drupal\commerce_store\Entity\Store;
+
+/**
+ * Implements hook_install().
+ */
+function opigno_commerce_install() {
+  // Load the site name and mail out of configuration.
+  $config = \Drupal::config('system.site');
+  $site_name = $config->get('name');
+  $site_mail = $config->get('mail');
+  // The currency code.
+  $currency = 'USD';
+  // If needed, this will import the currency.
+  $currency_importer = \Drupal::service('commerce_price.currency_importer');
+  $currency_importer->import($currency);
+  $default_store = \Drupal::service('commerce_store.default_store_resolver')->resolve();
+  if (empty($default_store)) {
+    // Create default store.
+    $store = Store::create([
+      'type' => 'online',
+      'uid' => 1,
+      'name' => $site_name,
+      'mail' => $site_mail,
+      'address' => [''],
+      'default_currency' => $currency,
+      'billing_countries' => [''],
+    ]);
+    $store->save();
+    // If needed, this sets the store as the default store.
+    $store_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_store');
+    $store_storage->markAsDefault($store);
+  }
+
+}

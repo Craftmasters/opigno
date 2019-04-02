@@ -1,0 +1,27 @@
+.js .view-opigno-calendar[class*="month"] .view-content {
+  position: relative;
+}
+
+.js .view-opigno-calendar[class*="month"] .view-content.single-day-active {
+  padding-bottom: 11.5em;
+}
+
+.js .view-opigno-calendar[class*="month"] .month-view .full tr.single-day td.single-day {
+  height: 0 !important;
+  padding: 0;
+}
+
+.js .view-opigno-calendar[class*="month"] table td.single-day .inner {
+  display: none;
+}
+
+.js .view-opigno-calendar[class*="month"] table td.single-day.single-day-active .inner {
+  bottom: 1.5em;
+  display: block;
+  height: 10em !important;
+  left: 0;
+  overflow: auto;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}

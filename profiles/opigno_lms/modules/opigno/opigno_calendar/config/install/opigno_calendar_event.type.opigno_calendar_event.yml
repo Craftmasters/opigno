@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_calendar_event
+label: 'Opigno calendar event'
+description: 'A generic event for the Opigno calendar.'
+date_field_type: daterange

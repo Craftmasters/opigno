@@ -1,0 +1,224 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the module.
+ */
+
+use Drupal\Core\Database\Database;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Config\FileStorage;
+
+/**
+ * Implements hook_schema().
+ */
+function opigno_h5p_schema() {
+  return [
+    'opigno_h5p_user_answer_results' => [
+      'description' => 'Table storing user H5P answer results.',
+      'fields' => [
+        'id' => [
+          'description' => 'Primary Key: The identifier of the user result per H5P',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'parent_id' => [
+          'description' => 'If h5p content has parent content.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+        ],
+        'question_id' => [
+          'description' => 'Opigno activity id.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'question_vid' => [
+          'description' => 'Opigno activity vid.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'answer_id' => [
+          'description' => 'Opigno answer id.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'answer_vid' => [
+          'description' => 'Opigno answer vid.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+        ],
+        'score_scaled' => [
+          'type' => 'float',
+          'size' => 'medium',
+        ],
+        'score_raw' => [
+          'type' => 'float',
+          'size' => 'medium',
+        ],
+        'score_min' => [
+          'type' => 'float',
+          'size' => 'medium',
+        ],
+        'score_max' => [
+          'type' => 'float',
+          'size' => 'medium',
+        ],
+        'interaction_type' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'description' => [
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+        'correct_responses_pattern' => [
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+        'response' => [
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+        'additionals' => [
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'answer_id' => ['answer_id'],
+        'answer_vid' => ['answer_vid'],
+        'question_id' => ['question_id'],
+        'question_vid' => ['question_vid'],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Create field for storing xAPIData.
+ *
+ * Implements hook_update_N().
+ */
+function opigno_h5p_update_8002(&$sandbox) {
+
+  $config_path = drupal_get_path('module', 'opigno_h5p')
+    . '/config/optional';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.opigno_answer.field_xapidata');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.opigno_answer.opigno_h5p.field_xapidata');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}
+
+/**
+ * Installs the "opigno_h5p_user_answer_results" table.
+ */
+function opigno_h5p_update_8003() {
+  $table = [
+    'description' => 'Table storing user H5P answer results.',
+    'fields' => [
+      'id' => [
+        'description' => 'Primary Key: The identifier of the user result per H5P',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'parent_id' => [
+        'description' => 'If h5p content has parent content.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ],
+      'question_id' => [
+        'description' => 'Opigno activity id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'question_vid' => [
+        'description' => 'Opigno activity vid.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'answer_id' => [
+        'description' => 'Opigno answer id.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'answer_vid' => [
+        'description' => 'Opigno answer vid.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ],
+      'score_scaled' => [
+        'type' => 'float',
+        'size' => 'medium',
+      ],
+      'score_raw' => [
+        'type' => 'float',
+        'size' => 'medium',
+      ],
+      'score_min' => [
+        'type' => 'float',
+        'size' => 'medium',
+      ],
+      'score_max' => [
+        'type' => 'float',
+        'size' => 'medium',
+      ],
+      'interaction_type' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'description' => [
+        'type' => 'text',
+        'size' => 'medium',
+      ],
+      'correct_responses_pattern' => [
+        'type' => 'text',
+        'size' => 'medium',
+      ],
+      'response' => [
+        'type' => 'text',
+        'size' => 'medium',
+      ],
+      'additionals' => [
+        'type' => 'text',
+        'size' => 'medium',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'answer_id' => ['answer_id'],
+      'answer_vid' => ['answer_vid'],
+      'question_id' => ['question_id'],
+      'question_vid' => ['question_vid'],
+    ],
+  ];
+
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_h5p_user_answer_results')) {
+    $schema->createTable('opigno_h5p_user_answer_results', $table);
+  }
+}

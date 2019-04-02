@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_learning_path_folder
+    - group.type.learning_path
+    - taxonomy.vocabulary.tft_tree
+id: group.learning_path.field_learning_path_folder
+field_name: field_learning_path_folder
+entity_type: group
+bundle: learning_path
+label: Folder
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      tft_tree: tft_tree
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

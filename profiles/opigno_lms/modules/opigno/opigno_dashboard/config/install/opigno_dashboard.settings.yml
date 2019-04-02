@@ -1,0 +1,25 @@
+blocks:
+  'views_block:opigno_group_members-block_pending':
+    available: 1
+    mandatory: 0
+  'views_block:comments_recent-block_1':
+    available: 1
+    mandatory: 0
+  'views_block:latest_active_trainings-block':
+    available: 1
+    mandatory: 0
+  'views_block:opigno_calendar-month_block':
+    available: 1
+    mandatory: 0
+  'views_block:opigno_notifications-block_unread_dashboard':
+    available: 1
+    mandatory: 0
+  'views_block:private_message-block_dashboard':
+    available: 1
+    mandatory: 0
+  'views_block:who_s_new-block_1':
+    available: 1
+    mandatory: 0
+  'views_block:who_s_online-who_s_online_block':
+    available: 1
+    mandatory: 0

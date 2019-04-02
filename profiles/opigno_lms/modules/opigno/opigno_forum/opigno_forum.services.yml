@@ -1,0 +1,10 @@
+services:
+  opigno_forum.access_checker:
+    class: Drupal\opigno_forum\Access\ForumAccessCheck
+    arguments: ['@current_user']
+    tags:
+      - { name: access_check, applies_to: _forum_access_check }
+  opigno_forum.route_subscriber:
+    class: Drupal\opigno_forum\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

@@ -1,0 +1,7 @@
+
+opigno_catalog.default_controller_set_style:
+  path: '/opigno-catalog/set-style/{style}'
+  defaults:
+    _controller: '\Drupal\opigno_catalog\Controller\DefaultController::setStyle'
+  requirements:
+    _permission: 'access content'

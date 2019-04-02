@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_calendar_event.field_ilt
+    - opigno_calendar_event.type.ilt_calendar_event
+  module:
+    - opigno_calendar_event
+third_party_settings:
+  opigno_calendar_event:
+    embedded_widget: 0
+id: opigno_calendar_event.ilt_calendar_event.field_ilt
+field_name: field_ilt
+entity_type: opigno_calendar_event
+bundle: ilt_calendar_event
+label: 'Instructor-led training'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:opigno_ilt'
+  handler_settings:
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: entity_reference

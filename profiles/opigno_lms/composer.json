@@ -1,0 +1,12 @@
+{
+	"name": "opigno/opigno_lms",
+	"description": "Opigno LMS profile",
+	"type": "drupal-profile",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "",
+			"role": ""
+		}
+	]
+}

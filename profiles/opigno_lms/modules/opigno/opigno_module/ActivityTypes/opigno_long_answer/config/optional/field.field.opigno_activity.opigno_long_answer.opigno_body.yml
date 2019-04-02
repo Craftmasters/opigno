@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_body
+    - opigno_module.opigno_activity_type.opigno_long_answer
+  module:
+    - text
+id: opigno_activity.opigno_long_answer.opigno_body
+field_name: opigno_body
+entity_type: opigno_activity
+bundle: opigno_long_answer
+label: Question
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: false
+field_type: text_with_summary

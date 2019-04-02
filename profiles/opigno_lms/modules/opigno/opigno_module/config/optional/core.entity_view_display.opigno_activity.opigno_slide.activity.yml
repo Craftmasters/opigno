@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.opigno_activity.activity
+    - field.field.opigno_activity.opigno_slide.opigno_body
+    - field.field.opigno_activity.opigno_slide.opigno_slide_pdf
+    - opigno_module.opigno_activity_type.opigno_slide
+id: opigno_activity.opigno_slide.activity
+targetEntityType: opigno_activity
+bundle: opigno_slide
+mode: activity
+content:
+  opigno_slide_pdf:
+    type: entity_reference_entity_view
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      view_mode: embedded_display
+      link: false
+    third_party_settings: {  }
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  name: true
+  opigno_body: true
+  uid: true

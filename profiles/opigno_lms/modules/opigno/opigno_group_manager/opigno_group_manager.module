@@ -1,0 +1,179 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_group_manager.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_group_manager_theme() {
+  return [
+    'opigno_group_manager' => [
+      'variables' => [
+        'base_path' => NULL,
+        'base_href' => NULL,
+        'group_id' => NULL,
+        'next_link' => NULL,
+        'user_has_info_card' => NULL,
+      ],
+    ],
+    'opigno_group_item_form' => [
+      'variables' => [],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function opigno_group_manager_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  if (\Drupal::routeMatch()->getRouteName() == 'opigno_group_manager.manager.get_item_form'
+      && $hook == 'page'
+  ) {
+    $suggestions[] = 'opigno_group_item_form';
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function opigno_group_manager_preprocess_html(&$variables) {
+  // Remove admin bar for item form (included in iframe)
+  if (\Drupal::routeMatch()->getRouteName() == 'opigno_group_manager.manager.get_item_form') {
+    unset($variables['page_top']);
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_group_manager_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $lib_type = isset($_REQUEST["library"]) ? urldecode($_REQUEST["library"]) : NULL;
+
+  if ($lib_type && $form_id == 'opigno_activity_opigno_h5p_form' && !empty($lib_type)) {
+    $query = \Drupal::database()->select('h5p_events', 'e');
+    $query->addField('e', 'library_version');
+    $query->condition('e.library_name', $lib_type);
+    $version = $query->execute()->fetchField();
+
+    $default_value = $lib_type;
+
+    if (!empty($version)) {
+      $default_value = $lib_type . ' ' . $version;
+    }
+
+    $form["opigno_h5p"]["widget"][0]["h5p_content"]["library"]["#default_value"] = $default_value;
+  }
+
+  $build_info = $form_state->getBuildInfo();
+  $route_name = \Drupal::routeMatch()->getRouteName();
+
+  // Check if there is an entry with the key "opigno_group_info".
+  $is_learning_path = FALSE;
+  foreach ($build_info['args'] as $info_value) {
+    if (is_array($info_value) && array_key_exists('opigno_group_info', $info_value)) {
+      $is_learning_path = TRUE;
+      break;
+    }
+  }
+
+  // Improve module form display.
+  if ($route_name == 'opigno_group_manager.manager.get_item_form') {
+    $form['uid']['#access'] = FALSE;
+    $form['created']['#access'] = FALSE;
+    if (isset($form['actions']['delete'])) {
+      unset($form['actions']['delete']);
+    }
+  }
+
+  // If the form is from the learning_path_manager and has an entity,
+  // ajaxify it.
+  if (
+    $is_learning_path
+    && method_exists($build_info['callback_object'], 'getEntity')
+  ) {
+    // Get the entity.
+    $entity = $build_info['callback_object']->getEntity();
+    $entity_type = $entity->getEntityTypeId();
+    $bundle = $entity->bundle();
+    $id = $entity->id();
+
+    // Add form class for ajaxification. In case of add form,
+    // append "new" instead of the entity ID.
+    if ($id) {
+      $ajax_id = 'ajax-form-entity-' . $entity_type . '-' . $bundle . '-' . $id;
+    }
+    else {
+      $ajax_id = 'ajax-form-entity-' . $entity_type . '-' . $bundle . '-new';
+    }
+    $form['#attributes']['class'][] = $ajax_id;
+
+    // Ajaxification settings of the buttons.
+    $ajax_settings = [
+      'callback' => 'Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::ajaxFormEntityCallback',
+      'wrapper' => $ajax_id,
+      'effect' => 'fade',
+    ];
+
+    $form['#prefix'] = '<div id="' . $ajax_id . '">';
+    $form['#suffix'] = '</div>';
+
+    $form['#attached']['library'][] = 'opigno_group_manager/ajax_form';
+    $form['actions']['submit']['#ajax'] = $ajax_settings;
+    $form['actions']['publish']['#ajax'] = $ajax_settings;
+    $form['actions']['unpublish']['#ajax'] = $ajax_settings;
+    $form['actions']['preview']['#access'] = FALSE;
+    unset($form['actions']['publish']['#dropbutton']);
+    unset($form['actions']['unpublish']['#dropbutton']);
+
+    // Ajaxify the buttons.
+    foreach (array_keys($form['actions']) as $action) {
+      if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+        $form['actions'][$action]['#submit'][] = 'Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::ajaxFormEntityFormSubmit';
+      }
+    }
+
+    // Handle case of entity edition : define the options.
+    if ($id) {
+      $current_path = \Drupal::service('path.current')->getPath();
+      $path_args = explode('/', $current_path);
+
+      // Case of edit link.
+      if ($path_args[1] == 'ajax-form-entity') {
+        $view_mode = $path_args[5];
+        $reload = FALSE;
+      }
+
+      // Case of form inside the display of the entity.
+      else {
+        $view_mode = 'default';
+        $reload = 'reload_entity';
+      }
+    }
+    // Case of creation.
+    else {
+      $view_mode = 'default';
+      $reload = TRUE;
+    }
+
+    // Add all configurations to the form to make it available everywhere.
+    $form['ajax_form_entity'] = [
+      '#type' => 'hidden',
+      '#value' => [
+        'view_mode' => $view_mode,
+        'reload' => $reload,
+        'content_selector' => '.' . $ajax_id,
+        'form_selector' => '.' . $ajax_id,
+      ],
+    ];
+  }
+
+  // Change submit label on /group/add/opigno_course.
+  if ($form_id == 'group_opigno_course_add_form') {
+    $form['actions']['submit']['#value'] = t('Save');
+  }
+}

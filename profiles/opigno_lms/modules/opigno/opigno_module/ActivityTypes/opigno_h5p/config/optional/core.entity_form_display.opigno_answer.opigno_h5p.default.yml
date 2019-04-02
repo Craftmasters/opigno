@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_answer.opigno_h5p.field_correct_response
+    - field.field.opigno_answer.opigno_h5p.field_response
+    - field.field.opigno_answer.opigno_h5p.field_xapidata
+    - opigno_module.opigno_answer_type.opigno_h5p
+id: opigno_answer.opigno_h5p.default
+targetEntityType: opigno_answer
+bundle: opigno_h5p
+mode: default
+content: {  }
+hidden:
+  field_correct_response: true
+  field_response: true
+  field_xapidata: true

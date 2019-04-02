@@ -1,0 +1,26 @@
+.alert {
+  margin-bottom: 0;
+  border: 0;
+
+  + .alert {
+    // margin-top: 1rem;
+  }
+
+  body.anonymous-slider & {
+    margin-top: 1rem;
+  }
+
+  button[type="button"].close {
+    font-size: 1.25rem;
+  }
+}
+
+.message-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  max-height: 50vh;
+  overflow: auto;
+}

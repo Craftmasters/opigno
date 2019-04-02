@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_calendar_event.field_meeting
+    - opigno_calendar_event.type.meeting_calendar_event
+  module:
+    - opigno_calendar_event
+third_party_settings:
+  opigno_calendar_event:
+    embedded_widget: 0
+id: opigno_calendar_event.meeting_calendar_event.field_meeting
+field_name: field_meeting
+entity_type: opigno_calendar_event
+bundle: meeting_calendar_event
+label: 'Live Meeting'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:opigno_moxtra_meeting'
+  handler_settings:
+    target_bundles: null
+    sort:
+      field: _none
+    auto_create: false
+field_type: entity_reference

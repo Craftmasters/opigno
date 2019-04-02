@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_certificate
+    - group.type.learning_path
+id: group.learning_path.field_certificate
+field_name: field_certificate
+entity_type: group
+bundle: learning_path
+label: Certificate
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:certificate'
+  handler_settings:
+    target_bundles:
+      template: template
+      wysiwyg: wysiwyg
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: template
+field_type: entity_reference

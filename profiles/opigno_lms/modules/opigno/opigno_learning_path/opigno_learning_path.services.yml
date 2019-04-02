@@ -1,0 +1,44 @@
+services:
+  opigno_learning_path.content_types.manager:
+    class: Drupal\opigno_learning_path\LearningPathContentTypesManager
+    parent: default_plugin_manager
+
+#  opigno_learning_path.lp_tools_database:
+#    class: Drupal\opigno_learning_path\Database\LearningPathContentsDatabase
+#    arguments: ['@database']
+#    tags:
+#      - { name: backend_overridable }
+
+  opigno_learning_path.event_subscriber:
+    class: Drupal\opigno_learning_path\EventSubscriber\LearningPathEventSubscriber
+    arguments: ['@opigno_learning_path.content_types.manager']
+    tags:
+      - { name: event_subscriber }
+
+  # remove  X-Frame-Options: SAMEORIGIN for angular dev
+  remove_x_frame_options_subscriber:
+    class: Drupal\opigno_learning_path\EventSubscriber\RemoveXFrameOptionsSubscriber
+    tags:
+      - { name: event_subscriber }
+
+  opigno_learning_path.group_operations:
+    class: Drupal\opigno_learning_path\LearningPathGroupOperationsLinks
+
+  opigno_learning_path.route_subscriber:
+    class: Drupal\opigno_learning_path\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
+  opigno_learning_path.twig.extension:
+    class: Drupal\opigno_learning_path\TwigExtension\DefaultTwigExtension
+    arguments: []
+    tags:
+      - { name: twig.extension }
+  opigno_learning_path.join_form:
+    class: Drupal\opigno_learning_path\JoinService
+    arguments: ['@current_user', '@entity.form_builder']
+
+  opigno_learning_path.redirect_on_access_denied:
+    class: Drupal\opigno_learning_path\EventSubscriber\RedirectOnAccessDeniedSubscriber
+    arguments: ['@current_user']
+    tags:
+      - { name: event_subscriber }

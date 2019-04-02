@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: {  }
+id: tft_file
+label: File
+description: 'TFT File'
+source: file
+queue_thumbnail_downloads: false
+new_revision: true
+source_configuration:
+  source_field: tft_file
+field_map: {  }

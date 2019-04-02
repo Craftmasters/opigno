@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Certificate module.
+ */
+
+use Drupal\opigno_certificate\Entity\OpignoCertificate;
+use Drupal\user\Entity\Role;
+
+/**
+ * Creates default certificate.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function opigno_certificate_install() {
+  // Create default certificate.
+  $certificate = OpignoCertificate::create([
+    'bundle' => 'template',
+    'label' => t('Default certificate'),
+  ]);
+
+  $certificate->save();
+}
+
+/**
+ * Grand permissions for Content manager global role.
+ */
+function opigno_certificate_update_8001() {
+  // Allow platform-level content managers to administer certificates.
+  $role = Role::load('content_manager');
+  $role->grantPermission('administer certificates');
+  $role->grantPermission('add certificate entities');
+  $role->grantPermission('delete certificate entities');
+  $role->grantPermission('edit certificate entities');
+  $role->grantPermission('access certificate overview');
+  $role->grantPermission('view published certificate entities');
+  $role->grantPermission('view unpublished certificate entities');
+  $role->save();
+}

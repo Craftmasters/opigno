@@ -1,0 +1,96 @@
+<!-- <button mat-raised-button color="primary" class="back" [routerLink]="'/'" *ngIf="mainId"><mat-icon>arrow_back</mat-icon></button> -->
+<div class="flashMessage alert alert-danger" *ngIf="errorMessage" [innerHtml]="errorMessage"></div>
+
+<button id="add-first-entity"
+        mat-raised-button
+        color="primary"
+        (click)="openAddPanel(null)"
+        *ngIf="entities && entities.length==0"
+        i18n>Add your first item</button>
+
+<div id="entity-wrapper" [class.add-link]="addLinkIsRunning" #entitiesWrapper>
+  <table class="drag-and-drop-wrapper my-5" [class.gu-dragging]="dragging" [class.user-has-info-card]="userHasInfoCard">
+    <tbody>
+      <tr *ngFor="let row of appService.range(entityGrid.rows); let firstRow = first; let lastRow = last;"
+          [ngClass]="{'first': firstRow, 'last': lastRow}">
+
+        <td class="drag-and-drop-bag"
+            *ngFor="let col of appService.range(entityGrid.columns); let firstCol = first; let lastCol = last"
+            [ngClass]="{'first': firstCol, 'last': lastCol}"
+            [dragula]='"nested-bag"'
+            [attr.data-col]="col"
+            [attr.data-row]="row">
+
+            <entity *ngIf="entityService.isEntityForPosition(col, row, entities, entitiesPositions)"
+                    [attr.data-cid]="entityService.getNidForPosition(col, row, entities, entitiesPositions)"
+                    [col]="col"
+                    [row]="row"
+                    [entity]="entityService.getEntityForPosition(col, row, entities, entitiesPositions)"
+                    [entities]="entities"
+                    [links]="links"
+                    [selectedEntity]="selectedEntity"
+                    [selectedEntity1]="selectedEntity1"
+                    [selectedEntity2]="selectedEntity2"
+                    [addLinkIsRunning]="addLinkIsRunning"
+                    [groupId]="groupId"
+                    [apiBaseUrl]="apiBaseUrl"
+                    (addLink)="addLink()"
+                    (updateSelectedEntity1)="selectedEntity1=$event"
+                    (updateSelectedEntity2)="selectedEntity2=$event"
+                    (openAddPanel)="openAddPanel($event)"
+                    (openUpdatePanel)="openUpdatePanel($event)"
+                    (openManagePanel)="openManagePanel($event)"
+                    (openDeletePanel)="openDeletePanel($event)"
+                    (updateNextLinkEvent)="updateNextLink()"
+                    [infoCard]="levelService.isFirstEntity(entityService.getEntityForPosition(col, row, entities, entitiesPositions), entities)"
+                    (removeInfoCardEvent)="userHasInfoCard=false"></entity>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div id="links-wrapper" [class.gu-dragging]="dragging">
+    <entity-link *ngFor="let link of links" [link]="link" [ngStyle]="{'zIndex': link.zIndex}" (clicked)="openLinkPanel($event)"></entity-link>
+  </div>
+</div>
+
+<mat-button-toggle class="add-link"
+                   (click)="listenAddLink()"
+                   [class.activate]="addLinkIsRunning"
+                   [class.disable]="!entities || entities.length==0"
+                   #addLinkButton
+                   i18n>Add a link</mat-button-toggle>
+
+<entity-add [entities]="entities"
+            [entitiesPositions]="entitiesPositions"
+            [selectedEntity]="selectedEntity"
+            [groupId]="groupId"
+            [apiBaseUrl]="apiBaseUrl"
+            [addCourse]="addCourse"
+            (closePanelEvent)="closePanels()"
+            (updateEntitiesEvent)="entities=$event;updateCount($event);updateNextLink()"
+            (updateEntitiesPositionsEvent)="entitiesPositions=$event; resizeEntityGrid(); updateLinks(); setEntitiesPositions()"
+            *ngIf="addEntityPanel"></entity-add>
+
+<entity-update [selectedEntity]="selectedEntity"
+               [groupId]="groupId"
+               [apiBaseUrl]="apiBaseUrl"
+               (closed)="closePanels()"
+               *ngIf="selectedEntity && updateEntityPanel"></entity-update>
+
+<entity-delete [selectedEntity]="selectedEntity"
+               [entitiesPositions]="entitiesPositions"
+               [groupId]="groupId"
+               [apiBaseUrl]="apiBaseUrl"
+               [entities]="entities"
+               (closePanelEvent)="closePanels()"
+               (updateEntitiesPositionsEvent)="entitiesPositions=$event; resizeEntityGrid(); updateLinks(); setEntitiesPositions()"
+               (updateEntitiesEvent)="entities=$event;updateCount($event);updateNextLink()"
+               *ngIf="selectedEntity && deleteEntityPanel"></entity-delete>
+
+<entity-link-admin [entities]="entities"
+                   [selectedLink]="selectedLink"
+                   [groupId]="groupId"
+                   [apiBaseUrl]="apiBaseUrl"
+                   (closed)="closePanels()"
+                   (deleted)="deleteLink($event); closePanels(); updateLinks()"
+                   *ngIf="selectedLink && updateLinkPanel"></entity-link-admin>

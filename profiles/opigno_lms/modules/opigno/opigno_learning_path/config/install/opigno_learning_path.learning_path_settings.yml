@@ -1,0 +1,10 @@
+langcode: en
+opigno_learning_path_notify_admin: 1
+opigno_learning_path_notify_users: 1
+opigno_learning_path_notify_admin_user_subscribed: "User \"[user]\" subscription to \"[group]\" has been updated.\r\nRole: [user-role]\r\nStatus: [user-status]\r\n\r\nLink: [link]"
+opigno_learning_path_notify_admin_user_approval: "User \"[user]\" has subscribed to \"[group]\" and waiting for your approval.\r\n\r\nLink: [link]"
+opigno_learning_path_notify_admin_user_blocked: "User \"[user]\" subscribe to \"[group]\" is blocked.\r\n\r\nLink: [link]"
+opigno_learning_path_notify_user_user_subscribed: "Your subscription to \"[group]\" has been updated.\r\nRole: [user-role]\r\nStatus: [user-status]\r\n\r\nLink: [link]"
+opigno_learning_path_notify_user_user_approval: "You are awaiting approval for accessing to \"[group]\".\r\n\r\nLink: [link]"
+opigno_learning_path_notify_user_user_blocked: "Your subscription to \"[group]\" is blocked\r\n\r\nLink: [link]"
+opigno_learning_path_notify_admin_mails: ""

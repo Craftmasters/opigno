@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_scorm_package
+    - opigno_module.opigno_activity_type.opigno_scorm
+  module:
+    - opigno_scorm
+id: opigno_activity.opigno_scorm.opigno_scorm_package
+field_name: opigno_scorm_package
+entity_type: opigno_activity
+bundle: opigno_scorm
+label: 'Scorm package'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_extensions: zip
+  file_directory: opigno_scorm
+  max_filesize: ''
+  description_field: 0
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: opigno_scorm_package

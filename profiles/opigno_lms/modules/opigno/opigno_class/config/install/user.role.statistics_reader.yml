@@ -1,0 +1,12 @@
+langcode: en
+status: true
+dependencies: {  }
+id: statistics_reader
+label: 'Statistics manager'
+weight: -7
+is_admin: null
+permissions:
+- 'view any group statistics'
+- 'view any user statistics'
+- 'view global statistics'
+- 'view module results'

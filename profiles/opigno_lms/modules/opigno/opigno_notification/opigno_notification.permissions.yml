@@ -1,0 +1,15 @@
+view opigno notification:
+  title: 'View opigno notification'
+
+add opigno notification:
+  title: 'Add opigno notification'
+
+edit opigno notification:
+  title: 'Edit opigno notification'
+
+delete opigno notification:
+  title: 'Delete opigno notification'
+
+administer opigno notification:
+  title: 'Administer opigno notification'
+  restrict access: TRUE

@@ -1,0 +1,187 @@
+#first-sidebar {
+  background-color: $darken-gray;
+  color: #fff;
+  padding: 80px 20px;
+  width: auto;
+
+  &:not(.open) {
+    min-width: 80px;
+    overflow: hidden;
+    flex: 0 0 80px;
+  }
+
+  ul:not(.contextual-links) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8em;
+    line-height: 1;
+    font-weight: 600;
+
+    li {
+      a {
+        color: inherit;
+        text-transform: uppercase;
+        text-decoration: none;
+        line-height: 40px;
+        height: 40px;
+        white-space: nowrap;
+        display: inline-block;
+        padding-right: 10px;
+
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 40px;
+          height: 40px;
+          margin-right: 20px;
+          vertical-align: middle;
+        }
+
+        &[data-drupal-link-system-path="<front>"] {
+          &::before {
+            background-image: url('../../images/main-navigation-home-icon-inactive.png');
+          }
+
+          &.is-active::before {
+            background-image: url('../../images/main-navigation-home-icon-active.png');
+          }
+        }
+
+        &.is-active {
+          // color: $dark-blue;
+        }
+      }
+
+      & + li {
+        margin-top: 20px;
+      }
+    }
+  }
+
+  button.trigger {
+    background-color: transparent;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    overflow: hidden;
+    text-indent: 100%;
+    color: transparent;
+    white-space: nowrap;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    margin: 20px 0 0;
+    padding: 0;
+
+    &:focus {
+      box-shadow: none;
+    }
+    @media screen and (max-width: 800px) {
+      display: none;
+    }
+
+    span {
+      margin-top: 1px;
+      top: calc(50% - 2px);
+      left: calc(50% - 16px);
+      transition: all 0.3s ease;
+
+      &,
+      &::after,
+      &::before {
+        position: absolute;
+        width: 22px;
+        height: 1px;
+        border-radius: 1px;
+        background-color: #fff;
+        left: 9px;
+      }
+
+      &::after,
+      &::before {
+        content: '';
+        left: 0;
+        transition: all 0.3s ease;
+      }
+
+      &::before {
+        bottom: 7px;
+      }
+
+      &::after {
+        top: 7px;
+      }
+    }
+
+    &:hover span {
+      transform: rotate(180deg);
+
+      &::before {
+        transform: translateX(-1px) translateY(2px) rotate(-45deg);
+        width: 60%;
+      }
+
+      &::after {
+        transform: translateX(-1px) translateY(-2px) rotate(45deg);
+        width: 60%;
+      }
+    }
+  }
+
+  &.open button.trigger {
+    &:hover span {
+      transform: rotate(180deg);
+
+      &::before {
+        transform: translateX(10px) translateY(2px) rotate(45deg);
+        width: 60%;
+      }
+
+      &::after {
+        transform: translateX(10px) translateY(-2px) rotate(-45deg);
+        width: 60%;
+      }
+    }
+  }
+
+  body.anonymous-menu.anonymous-slider & {
+    z-index: 10;
+    padding: 0;
+    width: 160px;
+    top: $frontpage-block-y-offset;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-100%);
+    margin-left: calc(#{$frontpage-block-x-offset} - #{$frontpage-block-gap / 2});
+
+    nav.block-system_menu_block-main {
+      padding: 20px 18px;
+    }
+
+    .title {
+      text-align: center;
+      text-transform: lowercase;
+      line-height: 50px;
+      background-color: #fff;
+      color: $body-color;
+
+      .close-menu {
+        float: right;
+        margin-right: 12px;
+        line-height: 1em;
+        margin-top: 14px;
+
+        a {
+          transition: 0.5s;
+          display: block;
+
+          &:not(.open) {
+            transform: rotate(135deg);
+          }
+        }
+      }
+    }
+  }
+}

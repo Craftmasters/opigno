@@ -1,0 +1,7 @@
+message all groups:
+  title: 'Message to all groups'
+  description: 'Allows the user to send message to the groups'
+
+message anyone regardless of groups:
+  title: 'Message anyone regardless of groups'
+  description: 'Allows the user to send message to anyone regardless of the groups'

@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Messaging module.
+ */
+
+/**
+ * Alter private_messages module configuration.
+ *
+ * On module install.
+ */
+function opigno_messaging_install() {
+  // private_message_thread.
+  $config = \Drupal::configFactory()->getEditable('core.entity_view_display.private_message_thread.private_message_thread.default');
+  $cfg = $config->get();
+  $cfg['content']['field_pm_subject'] = [
+    'label' => 'above',
+    'region' => 'content',
+    'weight' => -99,
+    'type' => 'string',
+    'third_party_settings' => [],
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
+  unset($cfg['hidden']['field_pm_subject']);
+  $cfg['content']['delete_link']['weight'] = -100;
+  $cfg['content']['members']['label'] = 'hidden';
+  $cfg['content']['private_messages']['label'] = 'hidden';
+  $config->setData($cfg)->save();
+
+  // private_message.
+  $config = \Drupal::configFactory()->getEditable('core.entity_view_display.private_message.private_message.default');
+  $cfg = $config->get();
+  $cfg['content']['owner']['label'] = 'hidden';
+  $cfg['hidden']['created'] = TRUE;
+  unset($cfg['content']['created']);
+  $config->setData($cfg)->save();
+}

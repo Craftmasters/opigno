@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_alter_entity_autocomplete.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_alter_entity_autocomplete_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.alter_entity_autocomplete':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('This module rewrites standard Drupal entity autocomplete behaviour.') . '</p>';
+      return $output;
+
+    default:
+      return '';
+  }
+}

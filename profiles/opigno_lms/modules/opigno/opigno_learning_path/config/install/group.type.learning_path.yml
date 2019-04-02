@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: learning_path
+label: 'Learning Path'
+description: 'A learning path is a group of learning content for a user to learn.'
+creator_membership: true
+creator_wizard: false
+creator_roles:
+  - learning_path-admin

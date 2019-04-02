@@ -1,0 +1,36 @@
+.field--widget-opigno-daterange {
+  margin-left: 200px;
+}
+
+.field--widget-opigno-daterange label {
+  float: left;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-left: -200px;
+}
+
+.daterange-date,
+.daterange-minutes,
+.daterange-hours {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.field--widget-opigno-daterange .daterange-separator {
+  margin-top: 6px;
+  display: inline-block;
+}
+
+.daterange-date .form-element-wrapper {
+  width: 100% !important;
+}
+
+.daterange-minutes select,
+.daterange-hours select {
+  background: #fff !important;
+}
+
+table.ui-datepicker-calendar tr th,
+table.ui-datepicker-calendar tr td {
+  padding: 0;
+}

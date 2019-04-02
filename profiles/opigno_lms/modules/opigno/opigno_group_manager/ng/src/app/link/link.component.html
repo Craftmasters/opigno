@@ -1,0 +1,53 @@
+<div class="entity-link">
+  <svg [id]="link.id" [ngStyle]="{'top': link.top, 'left': link.left, 'width': link.width, 'height': link.height}">
+
+      <!-- visible path -->
+      <path class="link-path clickable"
+            [attr.stroke-dasharray]="link.strokeDasharray"
+            [attr.d]="link.path"
+            [attr.stroke]="link.strokeColor"
+            [attr.fill]="link.fill"
+            [attr.stroke-width]="link.strokeWidth"></path>
+
+      <!-- clickable path -->
+      <path class="link-path clickable"
+          [attr.d]="link.path"
+          stroke="transparent"
+          fill="none"
+          [attr.stroke-width]="10"
+          (click)="click(link)"
+          (mouseenter)="link.hoverSVG=true; mouseenterPath(link)"
+          (mouseleave)="link.hoverSVG=false; mouseleavePath(link)"></path>
+
+      <!-- triangle at the end of the path -->
+      <defs>
+        <polygon [attr.id]="'triangle-' + link.parent + '-' + link.child"
+                 points="0 0,12 0,6 8"
+                 [attr.fill]="link.strokeColor"/>
+      </defs>
+      <use [attr.x]="link.xTriangle"
+           [attr.y]="link.yTriangle"
+           [attr.xlink:href]="'#triangle-' + link.parent + '-' + link.child"
+           [attr.transform]="'translate(-6, -6)'"/>
+
+      <!-- round and min scrore -->
+      <g class="link-path clickable"
+         *ngIf="link.showScore && link.score!=0 && link.score!=null"
+         (mouseenter)="link.hoverSVG=true"
+         (mouseleave)="link.hoverSVG=false; mouseleavePath(link)"
+         (click)="click(link)">
+
+        <circle [attr.cx]="link.xBox"
+                [attr.cy]="link.yBox"
+                [attr.r]="boxRadius"
+                [attr.stroke]="link.strokeColor"
+                [attr.fill]="link.fillColor"
+                [attr.stroke-width]="link.strokeWidth"></circle>
+        <text [attr.x]="link.xText"
+              [attr.y]="link.yText"
+              [attr.transform]="link.score < 10 ? '' : ( link.score < 100 ? 'translate(-3)' : 'translate(-8)')"
+              [attr.fill]="link.strokeColor"
+              font-size="14">{{link.score}}</text>
+      </g>
+  </svg>
+</div>

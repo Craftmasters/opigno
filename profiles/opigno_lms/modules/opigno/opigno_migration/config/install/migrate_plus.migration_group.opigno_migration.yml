@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+id: groups
+label: 'Opigno migration: Groups'
+source_type: Drupal 7
+description: Groups migration from Drupal 7 to 8
+shared_configuration:
+  source:
+    key: legacy

@@ -1,0 +1,121 @@
+opigno_ilt.score:
+  path: '/ilt/{opigno_ilt}/score'
+  defaults:
+    _title: 'Score Instructor-Led Training'
+    _form: '\Drupal\opigno_ilt\Form\ILTScoreForm'
+  requirements:
+    _entity_access: opigno_ilt.score
+  options:
+    parameters:
+      opigno_ilt:
+        type: entity:opigno_ilt
+
+opigno_ilt.opigno_ilt_members_autocomplete:
+  path: '/ilt/{group}/members/autocomplete'
+  defaults:
+    _controller: '\Drupal\opigno_ilt\Controller\ILTController::membersAutocomplete'
+  requirements:
+    _entity_access: group.view
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+entity.opigno_ilt.canonical:
+  path: '/ilt/{opigno_ilt}'
+  defaults:
+    _entity_view: opigno_ilt.full
+    _title: 'Instructor-Led Training'
+  requirements:
+    _entity_access: opigno_ilt.view
+
+entity.opigno_ilt.collection:
+  path: '/admin/content/ilt'
+  defaults:
+    _entity_list: opigno_ilt
+    _title: 'Instructor-Led Training List'
+  requirements:
+    _permission: 'administer ilt entities'
+  options:
+    _admin_route: TRUE
+
+entity.opigno_ilt.create_form:
+  path: '/ilt/add'
+  defaults:
+    _entity_form: opigno_ilt.add
+    _title: 'Create Instructor-Led Training'
+  requirements:
+    _entity_create_access: opigno_ilt
+
+entity.opigno_ilt.edit_form:
+  path: '/ilt/{opigno_ilt}/edit'
+  defaults:
+    _entity_form: opigno_ilt.edit
+    _title: 'Edit Instructor-Led Training'
+  requirements:
+    _entity_access: opigno_ilt.edit
+
+entity.opigno_ilt.delete_form:
+  path: '/ilt/{opigno_ilt}/delete'
+  defaults:
+    _entity_form: opigno_ilt.delete
+    _title: 'Delete Instructor-Led Training'
+  requirements:
+    _entity_access: opigno_ilt.delete
+
+entity.opigno_ilt_result.canonical:
+  path: '/ilt-result/{opigno_ilt_result}'
+  defaults:
+    _entity_view: opigno_ilt_result.full
+    _title: 'Instructor-Led Training Result'
+  requirements:
+    _entity_access: opigno_ilt_result.view
+
+entity.opigno_ilt_result.collection:
+  path: '/admin/content/ilt-result'
+  defaults:
+    _entity_list: opigno_ilt_result
+    _title: 'Instructor-Led Trainings Result List'
+  requirements:
+    _permission: 'administer ilt result entities'
+  options:
+    _admin_route: TRUE
+
+entity.opigno_ilt_result.create_form:
+  path: '/ilt-result/add'
+  defaults:
+    _entity_form: opigno_ilt_result.add
+    _title: 'Create Instructor-Led Training Result'
+  requirements:
+    _entity_create_access: opigno_ilt_result
+
+entity.opigno_ilt_result.edit_form:
+  path: '/ilt-result/{opigno_ilt_result}/edit'
+  defaults:
+    _entity_form: opigno_ilt_result.edit
+    _title: 'Edit Instructor-Led Training Result'
+  requirements:
+    _entity_access: opigno_ilt_result.edit
+
+entity.opigno_ilt_result.delete_form:
+  path: '/ilt-result/{opigno_ilt_result}/delete'
+  defaults:
+    _entity_form: opigno_ilt_result.delete
+    _title: 'Delete Instructor-Led Training Result'
+  requirements:
+    _entity_access: opigno_ilt_result.delete
+
+opigno_ilt.settings:
+  path: '/admin/structure/opigno_ilt'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Instructor-Led Training'
+  requirements:
+    _permission: 'administer ilt entities'
+  options:
+    _admin_route: TRUE
+    parameters:
+      account:
+        type: entity:user

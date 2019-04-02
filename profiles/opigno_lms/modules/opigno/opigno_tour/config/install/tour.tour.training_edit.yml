@@ -1,0 +1,35 @@
+langcode: en
+status: true
+id: training_edit
+label: 'Training edit tour'
+module: opigno_tour
+routes:
+  - route_name: entity.group.edit_form
+tips:
+  training-edit-steps:
+    id: training-edit-steps
+    plugin: text
+    label: 'Creation steps'
+    body: 'This bar indicates the different steps of the training creation, a green pictogram will appear for each step when all the necessary data have been filled-in.'
+    weight: 1
+    attributes:
+      data-class: step-list-top
+    location: bottom
+  training-edit-next:
+    id: training-edit-next
+    plugin: text
+    label: 'Next step'
+    body: 'Once you finished at this step, you can click on that button to go to the next step.'
+    weight: 2
+    attributes:
+      data-class: btn-success
+    location: left
+  training-edit-steps-menu:
+    id: training-edit-steps-menu
+    plugin: text
+    label: 'Steps menu'
+    body: "Here you can click on one of the steps to directly reach it. Note: you won't be allowed to visit a step until one of the prerequisite previous steps hasn't been correctly managed."
+    weight: 3
+    attributes:
+      data-class: step-list-aside
+    location: right

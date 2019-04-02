@@ -1,0 +1,14 @@
+name: Opigno Scorm Activity
+type: module
+description: Opigno scorm activity type.
+# core: 8.x
+package: Opigno
+
+dependencies:
+  - opigno_scorm:opigno_scorm
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_module'
+datestamp: 1550773114

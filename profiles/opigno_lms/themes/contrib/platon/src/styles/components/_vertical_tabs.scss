@@ -1,0 +1,80 @@
+.vertical-tabs {
+  border: $input-btn-border-width solid $input-border-color;
+  margin: 0;
+  display: flex;
+
+  ul.vertical-tabs__menu {
+    float: none;
+    margin: 0;
+    border: 0;
+    border-right: $input-btn-border-width solid $input-border-color;
+    flex: 1 0 15em;
+    max-width: 15em;
+
+    li {
+      border: 0;
+      border-bottom: $input-btn-border-width solid $input-border-color;
+
+      &:not(.last):not(.is-selected) {
+        border-bottom: $input-btn-border-width solid #fff;
+      }
+
+      &:hover {
+        background: #ddd;
+      }
+
+      a:hover {
+        outline: none;
+        text-decoration: none;
+
+        .vertical-tabs__menu-item-title {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  .vertical-tabs__panes {
+    flex: 1 0 calc(100% - 15rem);
+    padding: 1rem 2rem;
+    max-width: calc(100% - 15rem);
+    box-shadow: 0 0 0 5px #eee inset;
+
+    > .form-group:not(.js-form-type-vertical-tabs),
+    .form-wrapper #ajax-wrapper > .form-group,
+    .form-wrapper > .fieldgroup,
+    .form-wrapper > .form-group,
+    .form-wrapper > .form-group > .form-group,
+    details,
+    fieldset {
+      > .form-element-wrapper,
+       > .form-group,
+      > .fieldset-wrapper {
+        float: none;
+        width: auto;
+      }
+
+      label,
+      legend,
+      summary {
+        float: none;
+        width: auto;
+      }
+    }
+
+    .form-wrapper > .js-text-format-wrapper .js-form-type-textarea > label {
+      float: none;
+      margin-left: 0;
+    }
+
+    .form-wrapper > .js-text-format-wrapper {
+      margin-left: 0;
+    }
+
+    label.option {
+      font-weight: 400;
+      //   width: auto;
+      //   padding-right: 0.75rem;
+    }
+  }
+}

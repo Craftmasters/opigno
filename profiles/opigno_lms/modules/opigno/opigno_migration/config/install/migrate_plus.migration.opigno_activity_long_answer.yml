@@ -1,0 +1,33 @@
+id: opigno_activity_long_answer
+label: 'Opigno Group activity Long Answer (source: long_answer)'
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+langcode: en
+source:
+  plugin: opigno_activity_long_answer
+  node_type: long_answer
+process:
+  id: nid
+  vid: nid
+  name: title
+  uid: node_uid
+  type:
+    plugin: default_value
+    default_value: opigno_long_answer
+  'opigno_body/value': body_value
+  'opigno_body/summary': body_summary
+  'opigno_body/format':
+    plugin: default_value
+    default_value: basic_html
+  created: created
+  changed: changed
+  status: status
+destination:
+  plugin: 'entity:opigno_activity'
+migration_dependencies:
+  required:
+    - opigno_users
+    - opigno_module_lesson

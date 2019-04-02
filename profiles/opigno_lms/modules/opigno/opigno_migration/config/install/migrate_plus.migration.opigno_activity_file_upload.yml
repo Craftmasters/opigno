@@ -1,0 +1,35 @@
+id: opigno_activity_file_upload
+label: 'Opigno Group activity File Upload (source: quizfileupload)'
+migration_group: opigno_migration
+langcode: en
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_activity_file_upload
+  node_type: quizfileupload
+process:
+  id: nid
+  vid: nid
+  name: title
+  uid: node_uid
+  type:
+    plugin: default_value
+    default_value: opigno_file_upload
+  created: created
+  changed: changed
+  status: status
+  'opigno_body/value': body_value
+  'opigno_body/summary': body_summary
+  'opigno_body/format':
+    plugin: default_value
+    default_value: basic_html
+  opigno_allowed_extension: filetypes
+  opigno_evaluation_method: correct_answer_evaluation
+destination:
+  plugin: 'entity:opigno_activity'
+migration_dependencies:
+  required:
+    - opigno_users
+    - opigno_module_lesson

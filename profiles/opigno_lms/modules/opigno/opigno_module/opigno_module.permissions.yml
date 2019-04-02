@@ -1,0 +1,112 @@
+add module entities:
+  title: 'Create new Module entities'
+
+administer module entities:
+  title: 'Administer Module entities'
+  description: 'Allow to access the administration form to configure Module entities.'
+  restrict access: true
+
+delete module entities:
+  title: 'Delete Module entities'
+
+edit module entities:
+  title: 'Edit Module entities'
+
+access module overview:
+  title: 'Access the Module overview page'
+
+view published module entities:
+  title: 'View published Module entities'
+
+view unpublished module entities:
+  title: 'View unpublished Module entities'
+
+evaluate modules:
+  title: 'Score unevaluated entities'
+
+take modules:
+  title: 'Take module entities'
+
+view own module results:
+  title: 'View own module results'
+
+view module results:
+  title: 'View module results'
+
+add activity entities:
+  title: 'Create new Activity entities'
+
+administer activity entities:
+  title: 'Administer Activity entities'
+  description: 'Allow to access the administration form to configure Activity entities.'
+  restrict access: true
+
+delete activity entities:
+  title: 'Delete Activity entities'
+
+edit activity entities:
+  title: 'Edit Activity entities'
+
+access activity overview:
+  title: 'Access the Activity overview page'
+
+view published activity entities:
+  title: 'View published Activity entities'
+
+view unpublished activity entities:
+  title: 'View unpublished Activity entities'
+add answer entities:
+  title: 'Create new Answer entities'
+
+administer answer entities:
+  title: 'Administer Answer entities'
+  description: 'Allow to access the administration form to configure Answer entities.'
+  restrict access: true
+
+delete answer entities:
+  title: 'Delete Answer entities'
+
+edit answer entities:
+  title: 'Edit Answer entities'
+
+access answer overview:
+  title: 'Access the Answer overview page'
+
+view published answer entities:
+  title: 'View published Answer entities'
+
+view unpublished answer entities:
+  title: 'View unpublished Answer entities'
+
+view all answer revisions:
+  title: 'View all Answer revisions'
+
+revert all answer revisions:
+  title: 'Revert all Answer revisions'
+  description: 'Role requires permission <em>view Answer revisions</em> and <em>edit rights</em> for answer entities in question or <em>administer answer entities</em>.'
+
+delete all answer revisions:
+  title: 'Delete all revisions'
+  description: 'Role requires permission to <em>view Answer revisions</em> and <em>delete rights</em> for answer entities in question or <em>administer answer entities</em>.'
+add user module status entities:
+  title: 'Create new User module status entities'
+
+administer user module status entities:
+  title: 'Administer User module status entities'
+  description: 'Allow to access the administration form to configure User module status entities.'
+  restrict access: true
+
+delete user module status entities:
+  title: 'Delete User module status entities'
+
+edit user module status entities:
+  title: 'Edit User module status entities'
+
+access user module status overview:
+  title: 'Access the User module status overview page'
+
+view published user module status entities:
+  title: 'View published User module status entities'
+
+view unpublished user module status entities:
+  title: 'View unpublished User module status entities'

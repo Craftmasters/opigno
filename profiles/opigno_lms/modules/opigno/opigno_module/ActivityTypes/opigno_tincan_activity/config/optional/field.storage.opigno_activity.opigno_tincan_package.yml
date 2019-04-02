@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - file
+    - opigno_module
+    - opigno_tincan_api
+id: opigno_activity.opigno_tincan_package
+field_name: opigno_tincan_package
+entity_type: opigno_activity
+type: opigno_tincan_package
+settings:
+  target_type: file
+  display_field: false
+  display_default: false
+  uri_scheme: public
+module: opigno_tincan_api
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

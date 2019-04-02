@@ -1,0 +1,11 @@
+<div class="scorm-ui-player" id="scorm-ui-player-scorm-{{ scorm_id }}>" data-scorm-id="{{ scorm_id }}">
+  {#<?php if (!empty($tree)): ?>#}
+    {#<div class="scorm-ui-player-tree-wrapper">#}
+      {#<?php print theme('opigno_scorm_ui__player_tree', array('tree' => $tree)); ?>#}
+    {#</div>#}
+  {#<?php endif; ?>#}
+
+  <div class="scorm-ui-player-iframe-wrapper">
+    <iframe data-sco-id="{{ start_sco.id }}" src="{{ start_sco.base_path }}opigno-scorm/player/sco/{{ start_sco.id }}"></iframe>
+  </div>
+</div>

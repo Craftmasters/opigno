@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: collaborative_features
+label: 'Collaborative features'
+weight: -8
+is_admin: null
+permissions:
+  - 'add workspace entities'
+  - 'view meeting entities'
+  - 'view workspace entities'

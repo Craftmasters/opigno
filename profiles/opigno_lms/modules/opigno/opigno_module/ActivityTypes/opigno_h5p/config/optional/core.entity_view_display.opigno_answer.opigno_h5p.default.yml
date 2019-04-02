@@ -1,0 +1,38 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_answer.opigno_h5p.field_correct_response
+    - field.field.opigno_answer.opigno_h5p.field_response
+    - field.field.opigno_answer.opigno_h5p.field_xapidata
+    - opigno_module.opigno_answer_type.opigno_h5p
+id: opigno_answer.opigno_h5p.default
+targetEntityType: opigno_answer
+bundle: opigno_h5p
+mode: default
+content:
+  activity:
+    label: above
+    type: entity_reference_entity_view
+    weight: -4
+    region: content
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+  module:
+    label: above
+    type: entity_reference_entity_view
+    weight: -4
+    region: content
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_correct_response: true
+  field_response: true
+  field_xapidata: true

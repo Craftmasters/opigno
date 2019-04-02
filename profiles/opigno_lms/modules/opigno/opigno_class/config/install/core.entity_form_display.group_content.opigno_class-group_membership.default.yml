@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group_content.opigno_class-group_membership.group_roles
+    - group.content_type.opigno_class-group_membership
+_core: {  }
+id: group_content.opigno_class-group_membership.default
+targetEntityType: group_content
+bundle: opigno_class-group_membership
+mode: default
+content:
+  entity_id:
+    type: entity_reference_autocomplete
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    region: content
+    third_party_settings: {  }
+  group_roles:
+    type: options_buttons
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  path: true
+  uid: true

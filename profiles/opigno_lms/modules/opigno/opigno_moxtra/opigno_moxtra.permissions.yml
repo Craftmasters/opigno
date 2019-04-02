@@ -1,0 +1,57 @@
+configure moxtra:
+  title: 'Configure Opigno Moxtra'
+  restrict access: TRUE
+
+administer meeting entities:
+  title: 'Administer Meeting entities'
+  restrict access: TRUE
+
+view meeting entities:
+  title: 'View Meeting entities'
+
+add meeting entities:
+  title: 'Add Meeting entities'
+
+edit meeting entities:
+  title: 'Edit Meeting entities'
+
+delete meeting entities:
+  title: 'Delete Meeting entities'
+
+start meeting:
+  title: 'Start Meeting'
+
+score meeting:
+  title: 'Score Meeting'
+
+administer meeting result entities:
+  title: 'Administer Meeting Result entities'
+  restrict access: TRUE
+
+view meeting result entities:
+  title: 'View Meeting Result entities'
+
+add meeting result entities:
+  title: 'Add Meeting Result entities'
+
+edit meeting result entities:
+  title: 'Edit Meeting Result entities'
+
+delete meeting result entities:
+  title: 'Delete Meeting Result entities'
+
+administer workspace entities:
+  title: 'Administer Workspace entities'
+  restrict access: TRUE
+
+view workspace entities:
+  title: 'View Workspace entities'
+
+add workspace entities:
+  title: 'Add Workspace entities'
+
+edit workspace entities:
+  title: 'Edit Workspace entities'
+
+delete workspace entities:
+  title: 'Delete Workspace entities'

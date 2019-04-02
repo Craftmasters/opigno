@@ -1,0 +1,15 @@
+name: Opigno H5P
+type: module
+description: Opigno h5p activity type.
+# core: 8.x
+package: Opigno
+dependencies:
+  - opigno_module:opigno_module
+  - h5p:h5p
+  - h5p:h5peditor
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_module'
+datestamp: 1550773114

@@ -1,0 +1,52 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - media.type.image_png
+    - views.view.media_browser_images_png
+  module:
+    - dropzonejs_eb_widget
+    - media
+    - views
+name: media_entity_browser_badge_images
+label: 'Media Entity Browser (Badge images) '
+display: iframe
+display_configuration:
+  width: 100%
+  height: '256'
+  link_text: 'Select entities'
+  auto_open: true
+selection_display: no_display
+selection_display_configuration: {  }
+widget_selector: drop_down
+widget_selector_configuration: {  }
+widgets:
+  1d0b97b9-031b-4fbc-b221-c26961c0ee01:
+    settings:
+      media_type: image_png
+      upload_location: 'public://[date:custom:Y]-[date:custom:m]'
+      dropzone_description: 'Drop files here to upload them'
+      max_filesize: 64M
+      extensions: png
+      clientside_resize: false
+      resize_width: null
+      resize_height: null
+      resize_quality: !!float 1
+      resize_method: contain
+      thumbnail_method: contain
+      submit_text: Upload
+      auto_select: false
+    uuid: 1d0b97b9-031b-4fbc-b221-c26961c0ee01
+    weight: 1
+    label: 'Upload a new image'
+    id: dropzonejs_media_entity
+  4d5661c8-390b-4a42-a68b-74505fafcb79:
+    settings:
+      view: media_browser_images_png
+      view_display: media_browser_all
+      submit_text: 'Select image'
+      auto_select: false
+    uuid: 4d5661c8-390b-4a42-a68b-74505fafcb79
+    weight: 2
+    label: 'Select an existing image'
+    id: view

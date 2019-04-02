@@ -1,0 +1,37 @@
+#opigno-moxtra-create-meeting-form #meeting_members-available,
+#opigno-moxtra-create-meeting-form #meeting_members {
+  background: #fff;
+  height: 280px;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+#opigno-moxtra-create-meeting-form .multiselect-btns ul {
+  display: block;
+  position: static;
+  margin: 10px 20px 0 20px !important;
+}
+
+#opigno-moxtra-create-meeting-form .multiselect-add,
+#opigno-moxtra-create-meeting-form .multiselect-remove {
+  display: block;
+  height: 23px !important;
+  margin: 0 auto;
+  padding: 0;
+  width: 32px !important;
+}
+
+#opigno-moxtra-create-meeting-form .multiselect-add:hover,
+#opigno-moxtra-create-meeting-form .multiselect-remove:hover {
+  background-position: unset !important;
+}
+
+#opigno-moxtra-create-meeting-form .multiselect-add {
+  margin-top: 120px !important;
+  background-image: url('../img/add_member.png') !important;
+}
+
+#opigno-moxtra-create-meeting-form .multiselect-remove {
+  margin-top: 10px !important;
+  background-image: url('../img/remove_member.png') !important;
+}

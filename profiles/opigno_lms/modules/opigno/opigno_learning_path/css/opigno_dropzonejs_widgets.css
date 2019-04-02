@@ -1,0 +1,52 @@
+/* Here is style for each dropzone widget field (like field_learning_path_media_image,
+ * field_course_media_image, badge_media_image ect.)
+ */
+#entity-browser-media-entity-browser-badge-images-form .dropzone,
+#entity-browser-media-entity-browser-groups-form .dropzone,
+#entity-browser-media-entity-browser-file-pdf-form .dropzone {
+  border: none!important;
+  margin: 0!important;
+}
+
+#entity-browser-media-entity-browser-badge-images-form .form-item-widget.js-form-item-widget,
+#entity-browser-media-entity-browser-groups-form .form-item-widget.js-form-item-widget,
+#entity-browser-media-entity-browser-file-pdf-form .form-item-widget.js-form-item-widget {
+  margin: 0;
+}
+
+#entity-browser-media-entity-browser-badge-images-form .remove-button,
+#entity-browser-media-entity-browser-groups-form .remove-button,
+#entity-browser-media-entity-browser-file-pdf-form .remove-button {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+#entity-browser-media-entity-browser-badge-images-form .form-item-upload,
+#entity-browser-media-entity-browser-groups-form .form-item-upload,
+#entity-browser-media-entity-browser-file-pdf-form .form-item-upload {
+  margin: 0;
+}
+
+#entity-browser-media-entity-browser-badge-images-form .form-item-upload label,
+#entity-browser-media-entity-browser-groups-form .form-item-upload label,
+#entity-browser-media-entity-browser-file-pdf-form .form-item-upload label {
+  display: none;
+}
+#entity-browser-media-entity-browser-badge-images-form .form-item-upload .form-element-wrapper,
+#entity-browser-media-entity-browser-groups-form .form-item-upload .form-element-wrapper,
+#entity-browser-media-entity-browser-file-pdf-form .form-item-upload .form-element-wrapper {
+  width: 100%;
+}
+
+#entity-browser-media-entity-browser-badge-images-form .form-actions,
+#entity-browser-media-entity-browser-groups-form .form-actions,
+#entity-browser-media-entity-browser-file-pdf-form .form-actions {
+  display: none;
+}
+
+#entity-browser-media-entity-browser-badge-images-form .dialog-off-canvas-main-canvas,
+#entity-browser-media-entity-browser-groups-form .dialog-off-canvas-main-canvas,
+#entity-browser-media-entity-browser-file-pdf-form .dialog-off-canvas-main-canvas {
+  background-color: #f8f7f5;
+}

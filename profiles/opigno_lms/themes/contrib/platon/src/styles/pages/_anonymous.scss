@@ -1,0 +1,341 @@
+$side-bar-width: 34%;
+
+body.anonymous-slider {
+  div#main {
+    position: relative;
+    min-height: 100vh;
+    margin-bottom: 0;
+
+    @include media-breakpoint-down($content-mobile-breakpoint) {
+      display: block;
+    }
+
+    #menu-wrapper {
+      @include media-breakpoint-down($content-mobile-breakpoint) {
+        margin: 0;
+      }
+    }
+
+    div#page-branding {
+      position: absolute;
+      z-index: 100;
+      left: 55px;
+      top: 30px;
+
+      @include media-breakpoint-down($header-mobile-breakpoint) {
+        left: 0;
+        top: 0;
+        padding: 15px;
+        position: relative;
+        flex: 1 0 100%;
+        background: $header-background-color;
+        color: #fff;
+        display: flex;
+        align-items: center;
+      }
+
+      button.navbar-toggler {
+        @include svg-picto('picto-menu-white');
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 0;
+        background-size: 2rem;
+        padding: 0;
+        box-shadow: none;
+        margin-left: auto;
+
+        &.open {
+          @include svg-picto('picto-close-white');
+        }
+
+        @include media-breakpoint-up(breakpoint-next($header-mobile-breakpoint)) {
+          display: none;
+        }
+      }
+
+      a {
+        display: inline-block;
+
+        img {
+          max-height: calc(#{$header-height} - 1.5rem);
+          width: 110px;
+        }
+      }
+    }
+
+    div#main-content {
+      padding: 0;
+      display: flex;
+      max-width: calc(100% - #{$side-bar-width});
+
+      @include media-breakpoint-down($content-mobile-breakpoint) {
+        max-width: 100%;
+      }
+
+      .anonymous-slider {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        max-width: 100%;
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        .slick-list,
+        .slick-track {
+          height: 100%;
+        }
+
+        .slider-item {
+          background-position: center;
+          background-size: cover;
+          display: flex;
+          align-items: center;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+
+          .slider-markup {
+            color: #fff;
+            width: 40%;
+            min-width: 540px;
+            position: relative;
+            left: 55px;
+            text-shadow: 1px 1px 8px #323232;
+
+            @include media-breakpoint-down($content-mobile-breakpoint) {
+              width: 100%;
+              left: 0;
+              padding: 30px 15px;
+              min-width: 0;
+            }
+
+            *:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+
+    #user-sidebar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-color: #fff;
+      width: $side-bar-width;
+      padding: 55px 55px 30px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+
+      div#footer {
+        margin-left: -55px;
+        margin-bottom: -30px;
+        margin-right: -55px;
+        padding: 30px 55px;
+
+        p:last-child {
+          margin-bottom: 0;
+        }
+      }
+
+      @include media-breakpoint-down(lg) {
+        padding: 55px 30px;
+      }
+
+      @include media-breakpoint-down(md) {
+        width: 40%;
+      }
+
+      @include media-breakpoint-down($content-mobile-breakpoint) {
+        width: 100%;
+        padding: 15px;
+        position: relative;
+      }
+
+      .form-wrapper {
+        &.user-login,
+        &.user-password,
+        &.user-register {
+          flex: 1 0 auto;
+          display: flex;
+          flex-direction: column;
+        }
+      }
+
+      nav.block-system_menu_block-main {
+        $size: 3rem;
+        padding-left: 0;
+        padding-right: 0;
+
+        ul {
+          text-align: left;
+          background-color: $blue;
+          border-radius: $size / 2;
+          display: inline-block;
+          height: $size;
+          width: $size;
+          overflow: hidden;
+
+          &:hover {
+            width: auto;
+          }
+
+          li {
+            margin-left: 0;
+
+            a {
+              font-size: 0;
+              padding: 0;
+              min-width: 0;
+              height: $size;
+              width: $size;
+              border: 0;
+              background-position: center;
+              background-size: 45%;
+
+              @each $path, $picto in $menu-pictos {
+                &[data-drupal-link-system-path="#{$path}"] {
+                  @include svg-picto(unquote($picto + '-white'), true, false);
+
+                  &.is-active,
+                  &:hover {
+                    @include svg-picto(unquote($picto + '-darkblue'), true, false);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      h1 {
+        color: #84d4f0;
+        border-bottom: 0;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        margin-top: 2rem;
+        line-height: 1;
+        font-weight: 600;
+
+        @include media-breakpoint-down($content-mobile-breakpoint) {
+          margin-top: 1rem;
+        }
+      }
+
+      .status_messages {
+        margin-left: -55px;
+        margin-right: -55px;
+        margin-top: 1rem;
+        text-align: right;
+
+        @include media-breakpoint-down($content-mobile-breakpoint) {
+          margin-left: -15px;
+          margin-right: -15px;
+        }
+
+        .alert {
+          padding-right: 55px;
+
+          @include media-breakpoint-down($content-mobile-breakpoint) {
+            padding-right: 15px;
+          }
+
+          &.alert-danger {
+            background-color: #ea5547;
+            color: #fff;
+
+            a {
+              color: inherit;
+              text-decoration: underline;
+            }
+          }
+
+          button[type="button"].close {
+            @include svg-picto('picto-close-white');
+            position: absolute;
+            margin-left: 0.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-size: 1rem;
+          }
+        }
+      }
+
+      form.user-login-form,
+      form.user-pass,
+      form.user-register-form {
+        margin-top: 3rem;
+
+        @include media-breakpoint-down($content-mobile-breakpoint) {
+          margin-top: 2rem;
+        }
+
+        .form-control {
+          border: 0;
+          padding: 1rem;
+          min-height: 52px;
+
+          &.error {
+            box-shadow: 0 0 0 2px #ea5547 inset !important;
+          }
+        }
+
+        input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0 30px $input-bg inset;
+        }
+
+        input:-webkit-autofill {
+          -webkit-text-fill-color: inherit !important;
+        }
+
+        .form-actions {
+          $btn-width: 220px;
+          text-align: center;
+          width: $btn-width;
+          max-width: 100%;
+          flex: 0 0 auto;
+          margin: 1.5rem auto 0;
+
+          @include media-breakpoint-down(sm) {
+            max-width: 100%;
+          }
+
+          .form-submit {
+            background-color: darken($input-bg, 5%) !important;
+            color: #888;
+            font-style: italic;
+            border-right: 0;
+            border-left: 0;
+            width: 100%;
+            padding: 1rem;
+            transition: box-shadow 0.15s;
+
+            &:hover {
+              box-shadow: $btn-width 0 0 0 inset $blue;
+              color: #fff;
+              text-decoration: none;
+            }
+          }
+        }
+      }
+
+      .switch-link {
+        margin-top: auto;
+        text-align: center;
+
+        a {
+          color: inherit;
+        }
+
+        @include media-breakpoint-down($content-mobile-breakpoint) {
+          margin-top: 2rem;
+        }
+      }
+    }
+  }
+}

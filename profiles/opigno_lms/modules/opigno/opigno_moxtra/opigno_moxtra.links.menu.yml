@@ -1,0 +1,61 @@
+opigno_moxtra.settings:
+  title: Moxtra
+  route_name: opigno_moxtra.settings
+  parent: opigno_learning_path.opigno_admin_index
+  description: 'Collaborative workspaces and Live meetings configuration.'
+
+entity.opigno_moxtra_meeting.collection:
+  title: 'Live Meetings'
+  route_name: entity.opigno_moxtra_meeting.collection
+  parent: system.admin_content
+  description: 'List Live Meetings'
+
+entity.opigno_moxtra_meeting_result.collection:
+  title: 'Live Meetings Results'
+  route_name: entity.opigno_moxtra_meeting_result.collection
+  parent: system.admin_content
+  description: 'List Live Meetings Results'
+
+entity.opigno_moxtra_workspace.collection:
+  title: 'Collaborative Workspaces'
+  route_name: entity.opigno_moxtra_workspace.collection
+  parent: system.admin_content
+  description: 'List Collaborative Workspaces'
+
+# Opigno-admin menu
+opigno_admin.collaborative_features:
+  title: Collaborative features
+  description: 'Collaborative features'
+  route_name: <none>
+  menu_name: opigno-admin
+  weight: -45
+
+opigno_admin.collaborative_features_administration:
+  title: Settings
+  description: 'Collaborative features administration'
+  route_name: opigno_moxtra.settings
+  parent: opigno_admin.collaborative_features
+  menu_name: opigno-admin
+  weight: -44
+
+opigno_admin.recordered_meetings:
+  title: Live meetings
+  description: 'Live meetings'
+  route_name: entity.opigno_moxtra_meeting.collection
+  parent: opigno_admin.collaborative_features
+  menu_name: opigno-admin
+  weight: -43
+
+opigno_admin.manage_live_meetings:
+  title: Manage and score live meetings
+  description: 'Manage and score live meetings'
+  route_name: entity.opigno_moxtra_meeting.collection
+  parent: opigno_admin.user_and_class_managments
+  menu_name: opigno-admin
+  weight: -32
+
+opigno_moxtra.live_meeting.settings:
+  title: 'Live Meetings Settings'
+  description: 'Configure live meeting entity'
+  route_name:  opigno_moxtra.live_meeting.settings
+  parent: system.admin_structure

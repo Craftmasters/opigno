@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+  enforced:
+    config:
+      - user.role.content_manager
+id: learning_path-1eb7047a7
+label: 'Content manager'
+weight: 3
+internal: true
+audience: outsider
+group_type: learning_path
+permissions_ui: false
+permissions: {  }

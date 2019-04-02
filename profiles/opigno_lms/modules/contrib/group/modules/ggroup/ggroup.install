@@ -1,0 +1,54 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the ggroup module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function ggroup_schema() {
+  $schema['group_graph'] = [
+    'description' => 'Stores a graph of group relationships.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique edge ID.',
+      ],
+      'entry_edge_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'description' => 'The ID of the incoming edge to the start vertex that is the creation reason for this implied edge; direct edges contain the same value as the id column.',
+      ],
+      'direct_edge_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'description' => 'The ID of the direct edge that caused the creation of this implied edge; direct edges contain the same value as the id column.',
+      ],
+      'exit_edge_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'description' => 'The ID of the outgoing edge from the end vertex that is the creation reason for this implied edge; direct edges contain the same value as the id column.',
+      ],
+      'start_vertex' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'description' => 'The ID of the start vertex.',
+      ],
+      'end_vertex' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'description' => 'The ID of the end vertex',
+      ],
+      'hops' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'description' => 'Indicates how many vertex hops are necessary for the path; it is zero for direct edges.',
+      ],
+    ],
+    'primary key' => ['id'],
+  ];
+
+  return $schema;
+}

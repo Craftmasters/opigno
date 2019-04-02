@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - platon
+id: addclassaction
+theme: platon
+region: content
+weight: 3
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Classes Primary admin actions'
+  provider: core
+  label_display: '0'
+visibility:
+  request_path:
+    id: request_path
+    pages: /group/classes
+    negate: false
+    context_mapping: {  }
+  user_role:
+    id: user_role
+    roles:
+      user_manager: user_manager
+      administrator: administrator
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'

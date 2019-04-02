@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_body
+    - opigno_module.opigno_activity_type.opigno_slide
+  module:
+    - text
+id: opigno_activity.opigno_slide.opigno_body
+field_name: opigno_body
+entity_type: opigno_activity
+bundle: opigno_slide
+label: Content
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+field_type: text_with_summary

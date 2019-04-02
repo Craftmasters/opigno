@@ -1,0 +1,10 @@
+field.widget.settings.opigno_daterange:
+  type: mapping
+  label: 'Opigno Date Range widget settings'
+  mapping:
+    value_format:
+      type: string
+      label: 'Value format'
+    value_timezone:
+      type: string
+      label: 'Value timezone'

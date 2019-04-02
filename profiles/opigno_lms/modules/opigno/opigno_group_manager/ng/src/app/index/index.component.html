@@ -1,0 +1,40 @@
+<div class="next-link d-flex justify-content-end mb-4 text-uppercase" [innerHtml]="nextLink"></div>
+
+<div *ngIf="viewType=='manager'" class="manager-view p-relative">
+  <level [groupId]="groupId" [addCourse]="true" (updateNextLinkEvent)="updateNextLink($event)"></level>
+</div>
+<div *ngIf="viewType=='modules'" class="modules-view p-relative">
+  <div class="modules-wrapper">
+    <ng-container *ngFor="let entity of entities">
+      <ng-container *ngIf="entity.editable">
+        <div class="module-item mb-4" [ngClass]="'cid-' + entity.cid + ' id-' + entity.entityId" *ngIf="entity.contentType=='ContentTypeCourse'">
+          <div class="bg-light px-5 pt-4">
+            <div class="title-wrapper d-flex mb-4">
+              <h2 class="module-title mb-0">{{entity.title}}</h2>
+              <!-- <button class="ml-auto btn btn-success" (click)="addModule(entity)" i18n>Add module</button> -->
+            </div>
+            <div class="content-wrapper bg-white px-5 py-4">
+              <div class="module-count" *ngIf="entity.modules_count||entity.modules_count===0">
+                {{entity.modules_count}}
+                <ng-container *ngIf="entity.modules_count<=1" i18n>module</ng-container>
+                <ng-container *ngIf="entity.modules_count>1" i18n>modules</ng-container>
+              </div>
+              <div class="tree-view my-5" *ngIf="entity.treeViewOpened">
+                <level [groupId]="entity.entityId" [addCourse]="false" (updateNextLinkEvent)="updateNextLink($event)" (updateCountEvent)="entity.modules_count=$event"></level>
+              </div>
+            </div>
+          </div>
+          <div class="tree-view-toggler">
+            <button class="w-100 text-right pr-5 py-3 bg-secondary"
+                    (click)="entity.treeViewOpened = entity.treeViewOpened ? false : true;"
+                    [class.open]="entity.treeViewOpened"
+                    i18n>Tree view</button>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+<div *ngIf="viewType=='activities'" class="activities-view">
+  <activities [groupId]="groupId" (updateNextLinkEvent)="updateNextLink($event)"></activities>
+</div>

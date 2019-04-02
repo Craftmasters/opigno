@@ -1,0 +1,14 @@
+name: 'Message notify test module'
+description: 'Functionality to assist Message notify testing.'
+type: module
+# core: 8.x
+dependencies:
+  - field
+  - message_notify
+package: Testing
+
+# Information added by Drupal.org packaging script on 2017-03-31
+version: '8.x-1.0-beta1'
+core: '8.x'
+project: 'message_notify'
+datestamp: 1490992413

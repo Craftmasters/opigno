@@ -1,0 +1,720 @@
+<?php
+/**
+ * @file
+ * The primary PHP file for the Drupal Platon base theme.
+ */
+
+define('PLATON_HOMEPAGE_DEFAULT_NUM_SLIDES', 1);
+define('PLATON_HOMEPAGE_IMAGE_STYLE', 'frontpage_slider');
+define('IS_DEV', TRUE);
+
+use Drupal\file\Entity\File;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Url;
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Xss;
+use Drupal\user\Entity\User;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Callback for both ajax-enabled buttons.
+ *
+ * Selects and returns the fieldset with the names in it.
+ */
+function platon_form_system_theme_settings_slide_callback(array &$form, FormStateInterface $form_state)
+{
+  return $form['platon_home_page_settings']['platon_home_page_slides'];
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function platon_theme_suggestions_alter(&$suggestions, $variables, $hook)
+{
+    if ($hook == 'page') {
+
+        // node type
+        $node = \Drupal::routeMatch()->getParameter('node');
+        if ($node) {
+            $suggestions[] = 'page__node__' . $node->type->target_id;
+        }
+
+        // anonymous/logged frontpages
+        if (\Drupal::service('path.matcher')->isFrontPage() && \Drupal::currentUser()->isAnonymous()) {
+            $suggestions[] = 'page__front__not_logged_in';
+        } elseif (\Drupal::service('path.matcher')->isFrontPage() && !\Drupal::currentUser()->isAnonymous()) {
+            $suggestions[] = 'page__front__logged_in';
+        }
+
+        // if anonymous has slider/login page
+        if (platon_anonymous_has_slider()) {
+            $suggestions[] = 'page__anonymous__with_slider';
+        }
+
+        // admin
+        $route = \Drupal::routeMatch()->getRouteObject();
+        $is_admin = false;
+        if (!empty($route)) {
+            $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
+            $has_node_operation_option = $route->getOption('_node_operation_route');
+            $is_admin = ($is_admin_route || $has_node_operation_option);
+        } else {
+            $current_path = \Drupal::service('path.current')->getPath();
+            if (preg_match('/node\/(\d+)\/edit/', $current_path, $matches)) {
+                $is_admin = true;
+            } elseif (preg_match('/taxonomy\/term\/(\d+)\/edit/', $current_path, $matches)) {
+                $is_admin = true;
+            }
+        }
+
+        if ($is_admin) {
+            $suggestions[] = 'page__admin';
+        }
+
+        $suggestions = array_unique($suggestions);
+    }
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ */
+function platon_page_attachments_alter(&$page)
+{
+    // Remove dashboard libraries if frontpage slider
+    if (platon_anonymous_has_slider() && in_array('opigno_dashboard/ng_app', $page['#attached']['library'])) {
+        unset($page['#attached']['library'][array_search('opigno_dashboard/ng_app', $page['#attached']['library'])]);
+    }
+
+    if (theme_get_setting('browser_sync.enabled', 'platon')) {
+        $page['#attached']['library'][] = 'platon/global_dev';
+    } else {
+        $page['#attached']['library'][] = 'platon/global';
+    }
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function platon_preprocess_html(&$variables)
+{
+    try {
+        $variables['is_front'] = \Drupal::service('path.matcher')->isFrontPage();
+    } catch (Exception $e) {
+        $variables['is_front'] = false;
+    }
+
+    // If we're on the front page.
+    if (!$variables['is_front']) {
+        $variables['attributes']['class'][] = 'page-not-front';
+        // Add unique classes for each page and website section.
+        $path = \Drupal::service('path.current')->getPath();
+        $alias = \Drupal::service('path.alias_manager')->getAliasByPath($path);
+        $alias = trim($alias, '/');
+        if (!empty($alias)) {
+            $name = str_replace('/', '-', $alias);
+            $variables['attributes']['class'][] = 'page-' . $name;
+            list($section, ) = explode('/', $alias, 2);
+            if (!empty($section)) {
+                $variables['attributes']['class'][] = 'section-' . $section;
+            }
+        }
+    } else {
+        $variables['attributes']['class'][] = 'page-front';
+    }
+
+    if (\Drupal::currentUser()->isAnonymous()) {
+        $variables['attributes']['class'][] = 'user-not-logged-in';
+    } else {
+        $variables['attributes']['class'][] = 'user-logged-in';
+    }
+
+    if (isset($variables['node_type']) && $variables['node_type']) {
+        $variables['attributes']['class'][] = 'page-node-' . $variables['node_type'];
+    } elseif (\Drupal::routeMatch()->getRouteName() == 'opigno_learning_path.manager.index') {
+        $variables['attributes']['class'][] = 'page-node-learning_path';
+    }
+
+    // Add cachability metadata.
+    $theme_name = \Drupal::theme()->getActiveTheme()->getName();
+    $theme_settings = \Drupal::config($theme_name . '.settings');
+    CacheableMetadata::createFromRenderArray($variables)
+      ->addCacheableDependency($theme_settings)
+      ->applyTo($variables);
+    // Union all theme setting variables to the html.html.twig template.
+    $variables += $theme_settings->getOriginal();
+
+    if (platon_anonymous_has_slider()) {
+        $variables['attributes']['class'][] = 'anonymous-slider';
+    }
+
+    if (platon_anonymous_has_menu()) {
+        $variables['attributes']['class'][] = 'anonymous-menu';
+    }
+
+    if (\Drupal::routeMatch()->getRouteName() == 'opigno_module.manager.get_item_form'
+      || \Drupal::routeMatch()->getRouteName() == 'opigno_group_manager.manager.get_item_form'
+    ) {
+      $variables['attributes']['class'][] = 'lp-iframe';
+    }
+
+    /** Add custom theme css */
+    if (_platon_get_css_override_file()) {
+      $file_url = file_create_url(_platon_get_css_override_file()->getFileUri());
+      $variables['platon_css'] = Xss::filter('@import url(' . $file_url . ')');
+    }
+}
+
+/**
+ * Implements hook_preprocess_group().
+ */
+function platon_preprocess_group(&$variables)
+{
+  $group = $variables['group'];
+  if ($group->hasField('field_learning_path_category')) {
+    $tid = $group->get('field_learning_path_category')->getString();
+    $term = \Drupal\taxonomy\Entity\Term::load($tid);
+    if ($term) {
+      $variables['learning_path_category'] = $term->label();
+    };
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function platon_preprocess_page(&$variables)
+{
+    $route = \Drupal::routeMatch()->getRouteName();
+    $account = \Drupal::currentUser();
+    $moduleHandler = \Drupal::service('module_handler');
+    $variables['route_name'] = $route;
+
+    /** About opigno version */
+    if (function_exists('opigno_lms_check_opigno_lms_updates')) {
+        $variables['opigno_lms_updates'] = opigno_lms_check_opigno_lms_updates() ? 'nok' : 'ok';
+    }
+
+    if (function_exists('opigno_lms_get_current_opigno_lms_release')) {
+        $variables['opigno_lms_release'] = opigno_lms_get_current_opigno_lms_release();
+    }
+
+    if (function_exists('opigno_search_block_form')) {
+      $variables['opigno_search_form'] = opigno_search_block_form();
+    }
+
+    /** Login form */
+    $variables['login_form'] = null;
+    if (!$account->id()) {
+        $form = Drupal::formBuilder()->getForm(Drupal\user\Form\UserLoginForm::class);
+        $render = Drupal::service('renderer');
+
+        $form['name']['#attributes']['placeholder'] = $form['name']['#title'];
+        $form['pass']['#attributes']['placeholder'] = $form['pass']['#title'];
+        $form['name']['#title'] = $form['name']['#description'] = null;
+        $form['pass']['#title'] = $form['pass']['#description'] = null;
+        $form['#action'] = Url::fromRoute('user.login')->toString();
+        $variables['login_form'] = $render->renderPlain($form);
+    }
+
+    /** Password form */
+    $variables['password_form'] = null;
+    if (!$account->id()) {
+        $form = Drupal::formBuilder()->getForm(Drupal\user\Form\UserPasswordForm::class);
+        $render = Drupal::service('renderer');
+
+        $form['name']['#attributes']['placeholder'] = $form['name']['#title'];
+        $form['name']['#title'] = $form['name']['#description'] = null;
+        $form['mail']['#access'] = false;
+        $variables['password_form'] = $render->renderPlain($form);
+    }
+
+    /** Password form */
+    $variables['register_form'] = null;
+    if (!$account->id()) {
+        $entity = \Drupal::entityManager()
+          ->getStorage('user')
+          ->create(array());
+
+        $formObject = \Drupal::entityManager()
+          ->getFormObject('user', 'register')
+          ->setEntity($entity);
+
+        $form = \Drupal::formBuilder()->getForm($formObject);
+
+        $form['account']['mail']['#attributes']['placeholder'] = $form['account']['mail']['#title'];
+        $form['account']['name']['#attributes']['placeholder'] = $form['account']['name']['#title'];
+        $form['account']['mail']['#title'] = null;
+        $form['account']['name']['#title'] = null;
+        $form['user_picture']['#access'] = false;
+        $form['contact']['#access'] = false;
+        $form['timezone']['#access'] = false;
+        $variables['register_form'] = $form;
+    }
+
+    /** Search form */
+    $variables['search_form'] = null;
+    if ($moduleHandler->moduleExists('search')) {
+      $form = Drupal::formBuilder()->getForm(Drupal\search\Form\SearchBlockForm::class);
+      $render = Drupal::service('renderer');
+      $form['keys']['#attributes']['placeholder'] = $form['keys']['#title'];
+      $form['keys']['#title'] = null;
+      $variables['search_form'] = $render->renderPlain($form);
+    }
+
+    /** Frontpage slider */
+    $variables['frontpage_slider'] = false;
+    if (platon_anonymous_has_slider()) {
+        $platon_home_page_settings = theme_get_setting('platon_home_page_settings', 'platon');
+        $variables['frontpage_slider'] = true;
+        $content = null;
+        $content .= '<div class="anonymous-slider list-unstyled d-flex">';
+
+        $nb_items = 0;
+        foreach ($platon_home_page_settings['platon_home_page_slides'] as $slide) {
+            if (!isset($slide['platon_home_page_image_path'])
+                && !isset($slide['platon_home_page_markup_wrapper']['value'])
+            ) {
+                continue;
+            }
+
+            $background_image_uri = 'public://' . $slide['platon_home_page_image_path'];
+            $background_image_url = (ImageStyle::load(PLATON_HOMEPAGE_IMAGE_STYLE)) ? ImageStyle::load(PLATON_HOMEPAGE_IMAGE_STYLE)->buildUrl($background_image_uri) : file_create_url($background_image_uri);
+            $markup = $slide['platon_home_page_markup_wrapper']['value'];
+            if ($slide['platon_home_page_markup_wrapper']['format'] == 'restricted_html') {
+                $markup = '<pre>' . $markup . '</pre>';
+            }
+
+            $content .= '<div class="slider-item" style="background-image: url(' . Xss::filter($background_image_url) . ')">';
+            $content .= '<div class="slider-markup">' . Xss::filterAdmin($markup) . '</div>';
+            $content .= '</div>';
+
+            $nb_items++;
+        }
+        $content .= '</div>';
+
+        $variables['page']['content'] = new FormattableMarkup($content, []);
+    }
+
+    /** Frontpage menu */
+    if (!platon_anonymous_has_menu($variables) && $account->isAnonymous()) {
+        $variables['page']['menu'] = null;
+    }
+
+    /** Pages with faded background */
+    if (platon_page_has_faded_background()) {
+        $variables['content_wrapper_classes'] = 'faded-form-wrapper';
+    }
+
+    /** Header variables */
+    if (method_exists('\Drupal\opigno_notification\Entity\OpignoNotification', 'unreadCount')) {
+      $variables['notifications_unread_count'] = \Drupal\opigno_notification\Entity\OpignoNotification::unreadCount();
+    }
+
+    if (function_exists('_opigno_ilt_upcoming')) {
+      $user = User::load($account->id());
+      $variables['upcoming_ilts'] = array_map(function ($ilt) {
+        /** @var \Drupal\opigno_ilt\ILTInterface $ilt */
+        return [
+          'title' => $ilt->getTitle(),
+          'link' => Url::fromRoute('entity.opigno_ilt.canonical', [
+            'opigno_ilt' => $ilt->id(),
+          ])->toString(),
+        ];
+      }, _opigno_ilt_upcoming($user));
+      $variables['upcoming_ilts_count'] = count($variables['upcoming_ilts']);
+    }
+
+    if (function_exists('_opigno_moxtra_upcoming_live_meetings')) {
+      $user = User::load($account->id());
+      $variables['upcoming_live_meetings'] = array_map(function ($meeting) {
+        /** @var \Drupal\opigno_moxtra\MeetingInterface $meeting */
+        return [
+          'title' => $meeting->getTitle(),
+          'link' => Url::fromRoute('opigno_moxtra.meeting', [
+            'opigno_moxtra_meeting' => $meeting->id(),
+          ])->toString(),
+        ];
+      }, _opigno_moxtra_upcoming_live_meetings($user));
+      $variables['upcoming_live_meetings_count'] = count($variables['upcoming_live_meetings']);
+    }
+
+    $variables['notifications_unread'] = views_embed_view('opigno_notifications', 'block_unread', $account->id());
+    $variables['notifications'] = views_embed_view('opigno_notifications', 'block_all', $account->id());
+    $variables['private_messages'] = views_embed_view('private_message', 'block_last', $account->id());
+
+    /** Header user picture */
+    if (!$account->isAnonymous()) {
+        $user = \Drupal\user\Entity\User::load($account->id());
+        $user_picture = $user->get('user_picture')->getValue();
+        if (isset($user_picture[0]['target_id'])) {
+            $user_picture = \Drupal\file\Entity\File::load($user_picture[0]['target_id']);
+            $variables['user_picture'] = file_create_url($user_picture->getFileUri());
+        }
+    }
+
+    $variables['unread_thread_count'] = \Drupal\opigno_messaging\OpignoMessageThread::getUnreadThreadCount();
+    $variables['opigno_logo'] = file_create_url(drupal_get_path('theme', 'platon') . '/logo.png');
+}
+
+/**
+ * Implements hook_preprocess_region().
+ */
+function platon_preprocess_region(&$variables)
+{
+    if (\Drupal::service('path.matcher')->isFrontPage()
+        && \Drupal::currentUser()->isAnonymous()
+        && platon_anonymous_has_menu()
+        && $variables['elements']['#region'] == 'sidebar_first'
+    ) {
+        $variables['content'] = new FormattableMarkup('<div class="title"> @menu <div class="close-menu"><a href="#" class="open"><img src="/themes/platon/images/homepage-close-menu.png"></a></div></div>'  . $variables['content']->__toString(), ['@menu' => t('Menu')]);
+    }
+
+    $variables['attributes']['class'] = ['region', 'region-' . $variables['region']];
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function platon_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id)
+{
+  foreach ($form as &$item) {
+    if (is_array($item) && isset($item['widget']) && is_array($item['widget'])) {
+      foreach ($item['widget'] as &$widget) {
+        if (is_array($widget) && isset($widget['#type']) && $widget['#type'] == 'managed_file') {
+          $widget['#field_prefix'] = '<div class="opigno-file-widget-wrapper">';
+          $widget['#field_suffix'] = '<div class="empty-informations">';
+          $widget['#field_suffix'] .= '<div class="picto-file-upload"></div>';
+          $widget['#field_suffix'] .= '<div>' . t('Upload a file') . '</div>';
+          $widget['#field_suffix'] .= '<div>' . t('Drag and drop or click here to select a file') . '</div>';
+          $widget['#field_suffix'] .= '</div>';
+          $widget['#field_suffix'] .= '</div>';
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_input().
+ */
+function platon_preprocess_input(&$variables)
+{
+    if ($variables['element']['#type'] == 'submit') {
+        $variables['attributes']['class'][] = 'btn';
+        $variables['attributes']['class'][] = 'btn-success';
+    } elseif ($variables['element']['#type'] == 'checkbox' || $variables['element']['#type'] == 'radio') {
+        $variables['attributes']['class'][] = 'form-check-input';
+    } elseif ($variables['element']['#type'] != 'hidden') {
+        $variables['attributes']['class'][] = 'form-control';
+    }
+}
+
+/**
+ * Implements hook_preprocess_select().
+ */
+function platon_preprocess_select(&$variables)
+{
+    $variables['attributes']['class'][] = 'form-control';
+}
+
+/**
+ * Implements hook_preprocess_textarea().
+ */
+function platon_preprocess_textarea(&$variables)
+{
+    $variables['attributes']['class'][] = 'form-control';
+}
+
+/**
+ * Implements hook_preprocess_form_element().
+ */
+function platon_preprocess_form_element(&$variables)
+{
+    $variables['attributes']['class'][] = 'form-group';
+}
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function platon_preprocess_menu_local_task(&$variables)
+{
+    $variables['attributes']['class'][] = 'list-inline-item';
+}
+
+/**
+ * Implements hook_preprocess_menu_local_action().
+ */
+function platon_preprocess_menu_local_action(&$variables)
+{
+    $variables['attributes']['class'][] = 'list-inline-item';
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function platon_preprocess_field(&$variables)
+{
+    $variables['attributes']['class'][] = str_replace('_', '-', $variables['field_name']);
+
+    if ($variables['element']['#bundle'] === 'private_message') {
+      if ($variables['element']['#field_name'] === 'message') {
+        $date = \Drupal::service('date.formatter')
+          ->format($variables['element']['#object']->get('created')
+            ->getString(), 'short');
+        $variables['items'][0]['content']['#prefix'] = '<div class="date">' . $date . '</div>';
+      }
+
+      unset($variables['attributes']['data-quickedit-field-id']);
+    }
+    elseif ($variables['element']['#bundle'] === 'private_message_thread') {
+      unset($variables['attributes']['data-quickedit-field-id']);
+    }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function platon_preprocess_block(&$variables) {
+  $variables['attributes']['class'][] = 'block-' . $variables['base_plugin_id'];
+  if ($variables['derivative_plugin_id']) {
+    $variables['attributes']['class'][] = 'block-' . $variables['base_plugin_id'] . '-' . $variables['derivative_plugin_id'];
+  }
+}
+
+/**
+ * Implements hook_preprocess_user().
+ */
+function platon_preprocess_user(&$variables, $var1, $var2)
+{
+    if (isset($variables['content']['linked_username'])) {
+        if (empty($variables['user']->get('user_picture')->getValue())) {
+            $variables['content']['linked_username']['#prefix'] = new FormattableMarkup('<div class="user-picture-wrapper"><div class="user-picture without-image"></div>' . $variables['content']['linked_username']['#prefix'], []);
+        } else {
+            $user_picture = $variables['user']->get('user_picture')->getValue();
+            $user_picture = \Drupal\file\Entity\File::load($user_picture[0]['target_id']);
+            $image = NULL;
+
+            if ($user_picture) {
+              $image = file_create_url($user_picture->getFileUri());
+            }
+
+            $variables['content']['linked_username']['#prefix'] = new FormattableMarkup('<div class="user-picture-wrapper"><div class="user-picture with-image" style="background-image: url(@image);"></div>' . $variables['content']['linked_username']['#prefix'], [
+              '@image' => $image
+            ]);
+        }
+
+        $variables['content']['linked_username']['#suffix'] .= '</div>';
+    }
+}
+
+function platon_preprocess_links__comment(&$variables)
+{
+    unset($variables['links']['comment-reply']);
+}
+
+function platon_preprocess_opigno_certificate(&$variables)
+{
+    $variables['theme_path'] = '/' . drupal_get_path('theme', 'platon');
+    $variables['logo_path'] = theme_get_setting('logo.url', 'platon');
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function platon_preprocess_private_message_thread(&$variables)
+{
+    if ($variables['view_mode'] === 'full') {
+        $markup = &$variables['content']['members']['#markup'];
+
+        // Remove 'You and'.
+        $markup = str_replace('<span>You and </span>', '', $markup);
+
+        // Add participants label.
+        $markup = '<span class="label">' . t('Participants') . '</span>'
+          . '<span class="content">' . $markup . '</span>';
+
+        // Needed for private_message AJAX.
+        $variables['content']['private_messages']['#attributes']['class'][] = 'field__items';
+
+        $rendered_messages = $variables['elements']['private_messages'];
+        $rendered_messages = array_filter ($rendered_messages, 'is_numeric', ARRAY_FILTER_USE_KEY);
+
+        /** @var \Drupal\private_message\Entity\PrivateMessageThreadInterface $thread */
+        $thread = $variables['private_message_thread'];
+        $messages = $thread->getMessages();
+
+        if (count($rendered_messages) === count($messages)) {
+          // All messages rendered, so hide 'load previous'.
+          $message = &$variables['content']['private_messages'];
+          $prefix = &$message['#prefix'];
+          $suffix = &$message['#suffix'];
+          $prefix .= '<div class="load_previous_hidden">';
+          $suffix = '</div>' . $suffix;
+        }
+    }
+}
+
+function platon_page_has_faded_background()
+{
+    $route = \Drupal::routeMatch()->getRouteName();
+
+    $faded_form_routes_names = [
+        'node.add',
+        'cancel_form',
+        'add_form',
+        'edit_form',
+        'delete_form',
+        'admin_form',
+        'admin_create',
+        'uninstall_confirm',
+        'settings',
+        'admin',
+        'system',
+        'add_page',
+        'module_update',
+        'backup_migrate',
+        'devel',
+        'dblog'
+    ];
+
+    $faded_form = false;
+    foreach ($faded_form_routes_names as $key => $value) {
+        if (strpos($route, $value) !== false) {
+            $faded_form = true;
+        }
+    }
+
+    $none_faded_form_routes_names = [
+        'entity.group.edit_form',
+        'entity.opigno_module.edit_form',
+        'entity.group.add_form',
+        'entity.group_content.add_form',
+        'opigno_moxtra.settings'
+    ];
+
+    if (in_array($route, $none_faded_form_routes_names)) {
+        $faded_form = false;
+    }
+
+    return $faded_form;
+}
+
+function platon_anonymous_has_menu()
+{
+    return theme_get_setting('platon_menu_show_for_anonymous', 'platon');
+}
+
+function platon_anonymous_has_slider()
+{
+    if ((\Drupal::service('path.matcher')->isFrontPage()
+        || \Drupal::routeMatch()->getRouteName() == 'user.login'
+        || \Drupal::routeMatch()->getRouteName() == 'user.pass'
+        || \Drupal::routeMatch()->getRouteName() == 'user.register')
+        && \Drupal::currentUser()->isAnonymous()
+    ) {
+        $platon_home_page_settings = theme_get_setting('platon_home_page_settings', 'platon');
+        if (isset($platon_home_page_settings['platon_use_home_page_markup'])
+            && $platon_home_page_settings['platon_use_home_page_markup']
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Helper function to load the CSS override file.
+ *
+ * @return object|false
+ */
+function _platon_get_css_override_file()
+{
+    $fid = theme_get_setting('platon_css_override_fid', 'platon');
+    if (!empty($fid)) {
+        $file = File::load($fid);
+        if ($file && is_readable(drupal_realpath($file->getFileUri()))) {
+            return $file;
+        }
+    }
+    return;
+}
+
+/**
+ * Helper function to write the CSS override file.
+ *
+ * If a file already existed, the old one is set to a temporary file so Drupal cleans it up. Returns the new file fid.
+ *
+ * @param string $content
+ *
+ * @return int
+ */
+function _platon_store_css_override_file($content)
+{
+    // If a file already existed, set it to a temporary file so
+    // Drupal cleans it up.
+    if ($file = _platon_get_css_override_file()) {
+        $file->setTemporary();
+        $file->save();
+    }
+
+    if (empty($content)) {
+        return 0;
+    }
+
+    // Create a new file.
+    $filename = uniqid(md5($content)) . '_platon_override.css';
+    $uri = 'public://' . $filename;
+    $f = fopen($uri, 'w');
+
+    // If the write succeeds, store it as a managed file.
+    if (fwrite($f, $content)) {
+        fclose($f);
+
+        $file = File::create(
+            [
+            'uid' => \Drupal::currentUser()->id(),
+            'filename' => $filename,
+            'uri' => $uri,
+            'status' => FILE_STATUS_PERMANENT,
+            ]
+        );
+
+        $file->save();
+
+        // Return the file id.
+        return $file->id();
+    } else {
+        // The write didn't succeed. Return 0.
+        return 0;
+    }
+}
+
+/**
+ * Helper function to load the content of the theme override CSS file.
+ *
+ * If no file exists, will just return an empty string.
+ *
+ * @return string
+ */
+function _platon_get_css_override_file_content()
+{
+    if ($file = _platon_get_css_override_file()) {
+        return file_get_contents(drupal_realpath($file->getFileUri()));
+    } else {
+        return;
+    }
+}
+
+/**
+ * Helper function to inject the override CSS into the current page, if it exists.
+ */
+function _platon_inject_css_override()
+{
+    if ($file = _platon_get_css_override_file()) {
+        $realpath = drupal_realpath($file->uri);
+        $path = str_replace(realpath($_SERVER['DOCUMENT_ROOT']) . '/', '', $realpath);
+        drupal_add_css($path, ['group' => CSS_THEME]);
+    }
+}

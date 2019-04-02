@@ -1,0 +1,14 @@
+name: Opigno Long Answer
+type: module
+description: Opigno long answer activity type.
+# core: 8.x
+package: Opigno
+
+dependencies:
+  - opigno_module:opigno_module
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_module'
+datestamp: 1550773114

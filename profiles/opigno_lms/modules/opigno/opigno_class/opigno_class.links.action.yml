@@ -1,0 +1,8 @@
+opigno_class_add_local_action:
+  route_name: entity.group.add_form
+  route_parameters:
+    group_type: 'opigno_class'
+  title: 'Add a new class'
+  weight: 20
+  appears_on:
+    - view.opigno_classes.all

@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the alt_aero_log_contacts module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function opigno_dashboard_schema() {
+  $schema['opigno_dashboard_positioning'] = [
+    'fields' => [
+      'pid' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'columns' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'positions' => [
+        'type' => 'text',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['pid'],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function opigno_dashboard_install() {
+  $blocks = \Drupal::config('opigno_dashboard.settings')->get('blocks');
+
+  // Create block instances.
+  \Drupal::service('opigno_dashboard.block')->createBlocksInstances($blocks);
+}

@@ -1,0 +1,11 @@
+view global statistics:
+  title: 'View global statistics'
+  description: 'Allows the user to view the global statistics'
+
+view any group statistics:
+  title: 'View any group statistics'
+  description: 'Allows the user to view any group statistics'
+
+view any user statistics:
+  title: 'View any user statistics'
+  description: 'Allows the user to view any user statistics'

@@ -1,0 +1,50 @@
+<div class="trigger-btn d-flex">
+  <button type="button" class="ml-auto manage-dashboard" (click)="appService.managePanel=true">{{locales.manageYourDashboard}}</button>
+</div>
+
+<app-panel *ngIf="appService.managePanel"></app-panel>
+
+<div class="dashboard-column-wrapper" [class.panel-open]="appService.managePanel">
+  <div class="dashboard-column" [dragula]="'nested-bag'" [dragulaModel]="appService.positions[1]" *ngIf="appService.columns>=1">
+    <ng-container *ngIf="appService.managePanel">
+      <div *ngFor="let block of appService.positions[1]" class="dashboard-block">
+        <span class="handle ic-drag-handle-black-24px" [class.hidden]="!appService.managePanel"></span>
+        <div class="title" [innerHtml]="block.admin_label"></div>
+        <button type="button" class="remove" *ngIf="appService.managePanel" (click)="removeBlock(block)">{{locales.remove}}</button>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!appService.managePanel">
+      <ng-container *ngFor="let block of appService.positions[1]">
+        <div *ngIf="appService.getBlockContent(block)" [innerHtml]="appService.getBlockContent(block) | safeHtml" appRunScripts class="dashboard-drupal-block"></div>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="dashboard-column" [dragula]="'nested-bag'" [dragulaModel]="appService.positions[2]" *ngIf="appService.columns>=2" [class.wide-col]="appService.columns==3">
+    <ng-container *ngIf="appService.managePanel">
+      <div *ngFor="let block of appService.positions[2]" class="dashboard-block">
+        <span class="handle ic-drag-handle-black-24px" [class.hidden]="!appService.managePanel"></span>
+        <div class="title" [innerHtml]="block.admin_label"></div>
+        <button type="button" class="remove" *ngIf="appService.managePanel" (click)="removeBlock(block)">{{locales.remove}}</button>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!appService.managePanel">
+      <ng-container *ngFor="let block of appService.positions[2]">
+        <div *ngIf="appService.getBlockContent(block)" [innerHtml]="appService.getBlockContent(block) | safeHtml" appRunScripts class="dashboard-drupal-block"></div>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="dashboard-column" [dragula]="'nested-bag'" [dragulaModel]="appService.positions[3]" *ngIf="appService.columns>=4">
+    <ng-container *ngIf="appService.managePanel">
+      <div *ngFor="let block of appService.positions[3]" class="dashboard-block">
+        <span class="handle ic-drag-handle-black-24px" [class.hidden]="!appService.managePanel"></span>
+        <div class="title" [innerHtml]="block.admin_label"></div>
+        <button type="button" class="remove" *ngIf="appService.managePanel" (click)="removeBlock(block)">{{locales.remove}}</button>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!appService.managePanel">
+      <ng-container *ngFor="let block of appService.positions[3]">
+        <div *ngIf="appService.getBlockContent(block)" [innerHtml]="appService.getBlockContent(block) | safeHtml" appRunScripts class="dashboard-drupal-block"></div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

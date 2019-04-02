@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.opigno_training_catalog
+  module:
+    - system
+    - views
+  theme:
+    - platon
+id: opigno_training_catalog_filter
+theme: platon
+region: sidebar_first
+weight: -1
+provider: null
+plugin: 'views_exposed_filter_block:opigno_training_catalog-training_catalogue'
+settings:
+  id: 'views_exposed_filter_block:opigno_training_catalog-training_catalogue'
+  label: ''
+  provider: views
+  label_display: visible
+  views_label: ''
+visibility:
+  request_path:
+    id: request_path
+    pages: /catalogue
+    negate: false
+    context_mapping: {  }

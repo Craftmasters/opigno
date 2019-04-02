@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the "opigno_lms" installation
+ * profile.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\file\Entity\File;
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_install().
+ *
+ * Performs actions to set up the site for this profile.
+ *
+ * @see system_install()
+ *
+ * @throws \Drupal\Core\Extension\MissingDependencyException
+ */
+function opigno_lms_install() {
+  $config = \Drupal::configFactory();
+
+  // Disable the user pictures on nodes.
+  $config->getEditable('system.theme.global')
+    ->set('features.node_user_picture', FALSE)
+    ->save(TRUE);
+
+  // Allow visitor account creation, but with administrative approval.
+  $config->getEditable('user.settings')
+    ->set('register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)
+    ->save(TRUE);
+
+  // Set default home page.
+  $config->getEditable('system.site')
+    ->set('page.front', '/node')
+    ->save(TRUE);
+
+  // Set theme logo path.
+  $theme_path = drupal_get_path("theme", "platon");
+  $logo_path = $theme_path . "/logo.png";
+  $config->getEditable('platon.settings')
+    ->set('logo.path', $logo_path)
+    ->save(TRUE);
+
+  // Assign user 1 the "administrator" role.
+  $user = User::load(1);
+  $user->addRole('administrator');
+  $user->save();
+
+  // Copy user login page background image to public folder.
+  $image = file_get_contents(drupal_get_path("profile", "opigno_lms") . "/images/Opigno_Image_connexion_1600-829_2.jpg");
+  file_save_data($image, 'public://Opigno_Image_connexion_1600-829_2.jpg', TRUE);
+
+  $dompdf_autoloaders = [
+    'libraries/dompdf/src/Autoloader.php',
+    'profiles/opigno_lms/libraries/dompdf/src/Autoloader.php',
+  ];
+
+  foreach ($dompdf_autoloaders as $dompdf_autoloader) {
+    if (file_exists($dompdf_autoloader)) {
+      // Load dompdf for the entity_print install.
+      require_once $dompdf_autoloader;
+      \Dompdf\Autoloader::register();
+
+      // Install entity_print.
+      \Drupal::service('module_installer')->install(['entity_print']);
+      break;
+    }
+  }
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function opigno_lms_update_8001() {
+  // Install module.
+  \Drupal::service('module_installer')->install(['opigno_tour', 'opigno_alter_entity_autocomplete']);
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Updates Opigno Activities Bank (LP Interface) view.
+ *
+ */
+function opigno_lms_update_8002() {
+  $config_path = drupal_get_path('module', 'opigno_module')
+    . '/config/optional';
+  /* @var Drupal\Core\Config\CachedStorage $config_storage */
+  $storage = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $data = $storage->read('views.view.opigno_activities_bank_lp_interface');
+  $config_storage->write('views.view.opigno_activities_bank_lp_interface', $data);
+
+}
+

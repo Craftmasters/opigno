@@ -1,0 +1,191 @@
+.class {
+  background-color: #f6f6f6;
+  margin-bottom: 40px;
+  padding: 35px 60px;
+}
+
+@media (max-width: 768px) {
+  .class {
+    padding: 35px 15px;
+  }
+}
+
+.class .class_delete {
+  background-color: #ff5541;
+  color: #fff;
+  float: right;
+  font-size: 30px;
+  height: 60px;
+  width: 120px;
+}
+
+.class .class_delete:hover {
+  background-color: #d04d3f;
+  color: #fff;
+}
+
+.class .class_title {
+  color: #70706f;
+  text-transform: uppercase;
+}
+
+.class .class_members_header_member_count,
+.class .class_members_header_member_since {
+  white-space: pre;
+}
+
+.class .class_members {
+  background-color: #fff;
+}
+
+.class .class_members tr {
+  height: 60px;
+}
+
+.class .class_members th {
+  background-color: #fff;
+  color: #b3b3b3;
+}
+
+.class .class_members td {
+  background-color: #f6f6f6 !important;
+  color: #585857;
+}
+
+.class .class_member_since_pending {
+  color: #7eb6d0 !important;
+  font-style: italic;
+  position: relative;
+}
+
+.class .class_member_since_pending::after {
+  color: transparent;
+  content: 'Validate registration';
+  display: block;
+  position: absolute;
+  font-style: normal;
+  font-weight: bold;
+  padding-left: 0;
+  padding-top: 5px;
+  width: 2px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #7cc3e0;
+  -webkit-transition: width 0.2s, padding-left 0.2s;
+  -o-transition: width 0.2s, padding-left 0.2s;
+  transition: width 0.2s, padding-left 0.2s;
+  z-index: 1;
+}
+
+.class .class_member_since_pending:hover::after {
+  color: white;
+  padding-left: 20px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.class .class_hide,
+.class .class_show {
+  background-color: #dadada;
+  color: #575756;
+  cursor: pointer;
+  height: 65px;
+  margin: 0 -60px;
+  padding: 0 45px;
+}
+
+@media (max-width: 768px) {
+  .class .class_hide,
+  .class .class_show {
+    margin: 0 -15px;
+  }
+}
+
+.class .class_hide:hover,
+.class .class_show:hover {
+  background-color: #7eb6d0;
+  color: #fff;
+}
+
+.class .class_hide_text,
+.class .class_show_text {
+  float: right;
+  font-style: italic;
+  line-height: 65px;
+}
+
+.class .class_hide_text::after,
+.class .class_show_text::after {
+  content: '';
+  display: inline-block;
+  height: 18px;
+  margin-left: 10px;
+  vertical-align: middle;
+  width: 25px;
+}
+
+.class .class_hide_text::after {
+  background-image: url('../img/hide.png');
+}
+
+.class .class_show_text::after {
+  background-image: url('../img/show.png');
+  height: 14px;
+}
+
+.class .class_hide:hover .class_hide_text::after {
+  background-image: url('../img/hide_hover.png');
+}
+
+.class .class_show:hover .class_show_text::after {
+  background-image: url('../img/show_hover.png');
+}
+
+.class .class_member_toggle_sm,
+.class .class_member_toggle_cm,
+.class .class_member_toggle_class_manager {
+  background-color: #fff;
+  display: block;
+  font-size: 0;
+  margin: 0 auto;
+  height: 25px;
+  width: 25px;
+}
+
+.class .class_member_toggle_sm:hover,
+.class .class_member_toggle_cm:hover,
+.class .class_member_toggle_class_manager:hover {
+  background-color: #fff;
+}
+
+.class .class_member_toggle_sm_active,
+.class .class_member_toggle_cm_active,
+.class .class_member_toggle_class_manager_active,
+.class .class_member_toggle_sm_active:hover,
+.class .class_member_toggle_cm_active:hover,
+.class .class_member_toggle_class_manager_active:hover {
+  background-color: #c3e86c;
+}
+
+.class .class_member_delete_wrapper {
+  padding: 0;
+}
+
+.class .class_member_delete {
+  background-color: #ff5541;
+  color: #fff;
+  display: block;
+  font-size: 30px;
+  line-height: 45px;
+  height: 45px;
+  text-decoration: none;
+  text-align: center;
+  width: 90px;
+}
+
+.class .class_member_delete:hover {
+  background-color: #d04d3f;
+  color: #fff;
+  text-decoration: none;
+}

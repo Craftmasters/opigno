@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_allowed_extension
+    - opigno_module.opigno_activity_type.opigno_file_upload
+id: opigno_activity.opigno_file_upload.opigno_allowed_extension
+field_name: opigno_allowed_extension
+entity_type: opigno_activity
+bundle: opigno_file_upload
+label: 'Allowed extension'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: 'txt doc docx xls xlsx ppt pptx pdf odt ods odp'
+default_value_callback: ''
+settings: {  }
+field_type: string

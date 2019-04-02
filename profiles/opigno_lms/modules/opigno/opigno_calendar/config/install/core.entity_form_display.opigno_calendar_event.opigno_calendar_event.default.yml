@@ -1,0 +1,45 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_calendar_event.opigno_calendar_event.field_calendar_event_members
+    - opigno_calendar_event.type.opigno_calendar_event
+  module:
+    - datetime_range
+    - multiselect
+    - text
+id: opigno_calendar_event.opigno_calendar_event.default
+targetEntityType: opigno_calendar_event
+bundle: opigno_calendar_event
+mode: default
+content:
+  date_daterange:
+    type: opigno_daterange
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  description:
+    type: text_textarea
+    weight: 2
+    region: content
+    settings:
+      placeholder: ''
+      rows: 5
+    third_party_settings: {  }
+  field_calendar_event_members:
+    type: multiselect
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  displayed: true

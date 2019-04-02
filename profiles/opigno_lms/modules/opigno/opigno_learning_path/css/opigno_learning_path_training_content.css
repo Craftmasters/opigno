@@ -1,0 +1,447 @@
+.lp_progress {
+  background-color: #f6f6f6;
+  color: #b3b3b3;
+  padding: 27px 70px;
+}
+
+.lp_progress_label {
+  display: inline-block;
+  font-style: italic;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.lp_progress_value {
+  float: right;
+}
+
+.lp_progress_bar {
+  background-color: #dadada;
+  display: block;
+  height: 5px;
+  width: 100%;
+}
+
+.lp_progress_bar_completed {
+  background-color: #f0a794;
+  height: 100%;
+}
+
+.lp_progress_continue {
+  /*background-color: #c2e76b;*/
+  /*color: #fff;*/
+  cursor: pointer;
+  /*display: block;*/
+  height: 93px;
+  font-weight: bold;
+  padding: 25px 40px;
+  text-align: center;
+  text-transform: uppercase;
+  color: transparent;
+  background-color: #c2e76b;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNS4yMyAyNi4yMiI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7c3Ryb2tlOiM5ZDlkOWM7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjNweDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnBpY3RvLXN0YXJ0PC90aXRsZT48ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiPjxnIGlkPSJDYWxxdWVfMS0yIiBkYXRhLW5hbWU9IkNhbHF1ZSAxIj48cG9seWxpbmUgY2xhc3M9ImNscy0xIiBwb2ludHM9IjEuMDYgMjUuMTYgMTMuMTEgMTMuMTEgMS4wNiAxLjA2Ii8+PC9nPjwvZz48L3N2Zz4=');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 22px;
+}
+
+.lp_progress_continue + .ajax-progress {
+  display: none !important;
+}
+
+/* .lp_progress_continue::before {
+  content: '';
+  display: block;
+  border-bottom: 4px solid #9d9c9c;
+  border-right: 4px solid #9d9c9c;
+  width: 23px;
+  height: 23px;
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -18px;
+  margin-top: -12px;
+}
+
+.lp_progress_continue:hover::before {
+  display: none;
+} */
+
+.lp_progress_continue:hover {
+  background-color: #9faf5b;
+  color: #fff;
+  text-decoration: none;
+  background-image: none;
+}
+
+.lp_progress_admin_continue,
+.lp_progress_admin_edit {
+  background-color: #eee;
+  cursor: pointer;
+  display: inline-block;
+  height: 93px;
+  text-align: center;
+  width: calc(50% - 0.5rem);
+}
+
+.lp_progress_admin_continue {
+  background-color: #c2e76b;
+  /*background-image: url('../img/lp_continue.png');*/
+  /*background-position: center;*/
+  /*background-repeat: no-repeat;*/
+  position: relative;
+  margin-right: .5rem;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNS4yMyAyNi4yMiI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7c3Ryb2tlOiM5ZDlkOWM7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjNweDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnBpY3RvLXN0YXJ0PC90aXRsZT48ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiPjxnIGlkPSJDYWxxdWVfMS0yIiBkYXRhLW5hbWU9IkNhbHF1ZSAxIj48cG9seWxpbmUgY2xhc3M9ImNscy0xIiBwb2ludHM9IjEuMDYgMjUuMTYgMTMuMTEgMTMuMTEgMS4wNiAxLjA2Ii8+PC9nPjwvZz48L3N2Zz4=');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 22px;
+}
+
+.lp_progress_admin_continue+.ajax-progress {
+  display: none !important;
+}
+
+.lp_progress_admin_continue:hover {
+  background-color: #9faf5b;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNS4yMyAyNi4yMiI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOm5vbmU7c3Ryb2tlOiNmZmY7c3Ryb2tlLW1pdGVybGltaXQ6MTA7c3Ryb2tlLXdpZHRoOjNweDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPnBpY3RvLXN0YXJ0LWhvdmVyPC90aXRsZT48ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiPjxnIGlkPSJDYWxxdWVfMS0yIiBkYXRhLW5hbWU9IkNhbHF1ZSAxIj48cG9seWxpbmUgY2xhc3M9ImNscy0xIiBwb2ludHM9IjEuMDYgMjUuMTYgMTMuMTEgMTMuMTEgMS4wNiAxLjA2Ii8+PC9nPjwvZz48L3N2Zz4=');
+}
+
+/* .lp_progress_admin_continue::before {
+  content: '';
+  display: block;
+  border-bottom: 4px solid #9d9c9c;
+  border-right: 4px solid #9d9c9c;
+  width: 23px;
+  height: 23px;
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -18px;
+  margin-top: -12px;
+} */
+
+.lp_progress_admin_continue:hover:before {
+  border-color: #fff;
+}
+
+.lp_progress_admin_edit {
+  background-image: url('../img/lp_edit.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-left: .5rem;
+}
+
+.lp_progress_admin_edit:hover {
+  background-color: #9faf5b;
+  background-image: url('../img/pen-icon.svg');
+  background-size: 38px;
+}
+
+.lp_progress_summary {
+  color: #585857;
+  margin: 2rem 0 .5rem;
+  padding-left: 70px;
+  position: relative;
+}
+
+.lp_progress_summary_passed {
+  background: url(../img/state_passed.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 43px;
+  left: 5px;
+  height: 43px;
+  position: absolute;
+  width: 43px;
+}
+
+.lp_progress_summary_title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lp_progress_summary_score,
+.lp_progress_summary_date {
+  font-size: 16px;
+  margin: 0;
+}
+
+.lp_progress_summary_date {
+  font-style: italic;
+}
+
+.lp_tabs {
+  color: #c7c7c6;
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  margin: 50px 0;
+  text-transform: uppercase;
+}
+
+.lp_tabs_link {
+  color: inherit;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 18px;
+  padding: 12px 10px;
+}
+
+.lp_tabs_link:hover {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.lp_tabs_link.active {
+  border-bottom: 3px solid #70706f;
+}
+
+.lp_step {
+  margin-bottom: 40px;
+}
+
+.lp_step_title_wrapper {
+  background-color: #f0a794;
+  padding: 1rem 20px;
+}
+
+.lp_step_required {
+  background: url('../img/required.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100%;
+  display: block;
+  height: 30px;
+  width: 30px;
+  float: left;
+}
+
+.lp_step_title {
+  color: #585857;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  margin-left: 30px;
+  padding-left: 1rem;
+  text-transform: uppercase;
+}
+
+.lp_step_content {
+  background-color: #f6f6f6;
+  padding: 30px 65px;
+}
+
+.lp_step_summary {
+  background-color: #fff;
+  padding: 50px;
+}
+
+.lp_step_summary::after {
+  display: table;
+  content: '';
+  clear: both;
+}
+
+.lp_step_summary .tableresponsive-toggle-columns {
+  display: none;
+}
+
+.lp_step_summary_title_wrapper {
+  display: inline-block;
+}
+
+.lp_step_summary_title {
+  color: #585857;
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lp_step_summary_subtitle {
+  color: #585857;
+  display: block;
+  font-size: 14px;
+  font-weight: normal;
+  margin: 0;
+}
+
+.lp_step_summary_details {
+  border-spacing: 0;
+  max-width: 250px;
+  margin: 0;
+  padding: 0;
+}
+
+.lp_step_summary_details tr {
+  padding: 10px 0;
+}
+
+.lp_step_summary_details tr:nth-child(2n+1),
+.lp_step_summary_details tr:nth-child(2n+1) td:not([class*="ui-datepicker"]) {
+  background-color: unset;
+}
+
+.lp_step_summary_details th {
+  background-color: unset;
+  color: #b3b3b3;
+  font-style: italic;
+  font-weight: normal;
+  text-transform: unset;
+}
+
+.lp_step_summary_details td {
+  background-color: unset;
+  color: #b3b3b3;
+  white-space: nowrap;
+}
+
+.lp_step_summary_details .lp_step_details_state {
+  color: #b3b3b3;
+  font-style: italic;
+}
+
+.lp_step_result_bar {
+  background-color: #dadada;
+  height: 2.5px;
+  width: 100%;
+}
+
+.lp_step_result_bar_value {
+  background-color: #f0a794;
+  height: 2.5px;
+}
+
+.lp_step_state_pending,
+.lp_step_state_passed,
+.lp_step_state_failed {
+  display: inline-block;
+  height: 43px;
+  margin-right: 25px;
+  vertical-align: middle;
+  width: 43px;
+}
+
+.lp_step_state_pending {
+  background: url('../img/state_pending.png');
+}
+
+.lp_step_state_passed {
+  background: url('../img/state_passed.png');
+}
+
+.lp_step_state_failed {
+  background: url('../img/state_failed.png');
+}
+
+.lp_step_details_wrapper {
+  background-color: #fff;
+  border-top: 0.625px #1d1d1b solid;
+  display: none;
+  padding: 0 110px 0 100px;
+}
+
+@media (max-width: 768px) {
+  .lp_step_details_wrapper {
+    padding: 0 15px 0 15px;
+  }
+}
+
+.lp_step_details {
+  border-spacing: 0 10px;
+  margin: 0;
+  width: 100%;
+}
+
+.lp_step_details th {
+  background-color: unset;
+  color: #b3b3b3;
+  font-style: italic;
+  font-weight: normal;
+  text-transform: unset;
+}
+
+.lp_step_details td:not(:first-child) {
+  background-color: unset;
+  color: #b3b3b3;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lp_step_details td:nth-child(3) {
+  text-align: left;
+}
+
+.lp_step_details .lp_step_details_state {
+  color: #b3b3b3;
+  font-style: italic;
+}
+
+.lp_step_details tbody tr,
+.lp_step_details tbody tr td:not([class*="ui-datepicker"]),
+.lp_step_details tbody tr:nth-child(2n),
+.lp_step_details tbody tr:nth-child(2n) td:not([class*="ui-datepicker"]),
+.lp_step_details tbody tr:nth-child(2n+1),
+.lp_step_details tbody tr:nth-child(2n+1) td:not([class*="ui-datepicker"]) {
+  background-color: #f6f6f6;
+}
+
+.lp_step_hide,
+.lp_step_show {
+  background-color: #dadada;
+  clear: both;
+  color: #575756;
+  cursor: pointer;
+  font-style: italic;
+  padding: 25px 35px 20px;
+  text-align: right;
+}
+
+.lp_step_hide {
+  display: none;
+}
+
+.lp_step_hide_text::after,
+.lp_step_show_text::after {
+  content: '';
+  display: inline-block;
+  height: 18px;
+  margin-left: 10px;
+  vertical-align: middle;
+  width: 25px;
+}
+
+.lp_step_hide_text::after {
+  background-image: url('../img/step_hide.png');
+}
+
+.lp_step_show_text::after {
+  background-image: url('../img/show.png');
+  height: 14px;
+}
+
+table.lp_step_details {
+  margin-top: 1rem;
+}

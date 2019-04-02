@@ -1,0 +1,25 @@
+id: opigno_pm_message
+label: Opigno Private Messages
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_pm_message
+process:
+  id: mid
+  owner: author
+  'message/value': body
+  'message/format':
+    plugin: static_map
+    source: format
+    map:
+      html: basic_html
+    default_value: basic_html
+  created: timestamp
+destination:
+  plugin: entity:private_message
+migration_dependencies:
+  required:
+    - opigno_users

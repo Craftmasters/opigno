@@ -1,0 +1,58 @@
+entity {
+  display: block;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+
+#entity-wrapper {
+  position: relative;
+}
+
+#links-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+
+  &.gu-dragging {
+    z-index: -1;
+  }
+}
+
+#add-first-entity {}
+
+mat-button-toggle {
+  &.add-link {
+    position: fixed;
+    z-index: 99;
+    right: 0;
+    top: 0;
+    &.activate {
+      background-color: #9faf5b;
+    }
+  }
+}
+
+entity-link-admin {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, .8);
+}
+
+entity-link {
+  position: relative;
+  display: block;
+}
+
+.flashMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+}

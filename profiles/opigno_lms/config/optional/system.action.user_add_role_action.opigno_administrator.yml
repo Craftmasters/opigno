@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.opigno_administrator
+  module:
+    - user
+id: user_add_role_action.opigno_administrator
+label: 'Add the Opigno administrator role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: opigno_administrator

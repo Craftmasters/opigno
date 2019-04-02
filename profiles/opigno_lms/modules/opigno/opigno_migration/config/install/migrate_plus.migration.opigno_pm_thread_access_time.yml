@@ -1,0 +1,19 @@
+id: opigno_pm_thread_access_time
+label: Opigno PM Threads Access Time
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_pm_thread_access_time
+  key: default
+process:
+  id: destid1
+  owner: owner
+  access_time: access_time
+destination:
+  plugin: entity:pm_thread_access_time
+migration_dependencies:
+  required:
+    - opigno_pm_thread_delete_time

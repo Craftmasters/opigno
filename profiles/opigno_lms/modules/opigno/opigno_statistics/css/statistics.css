@@ -1,0 +1,324 @@
+.form-item-year,
+.form-item-month {
+  display: inline-block;
+  min-width: 100px;
+}
+
+.trainings-progress {
+  background-color: #f6f6f6;
+  color: #585857;
+  padding: 80px 45px 0;
+}
+
+@media screen and (max-width: 768px) {
+  .trainings-progress {
+    padding: 3rem 1rem 0;
+    text-align: center;
+  }
+}
+
+.trainings-progress::after {
+  display: table;
+  content: '';
+  clear: both;
+}
+
+.trainings-progress .value-indicator-wrapper {
+  margin-bottom: 2rem;
+  margin-right: 30px;
+  float: left;
+  clear: left;
+}
+
+@media screen and (max-width: 768px) {
+  .trainings-progress .value-indicator-wrapper {
+    margin-bottom: 2rem;
+    margin-right: 0;
+    float: none;
+    text-align: center;
+  }
+}
+
+.trainings-progress .value-wrapper {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 30px;
+  width: 100px;
+}
+
+.trainings-progress .value,
+.trainings-progress .label {
+  display: block;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.trainings-progress .value {
+  color: #5bb4d8;
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.trainings-progress .label {
+  font-size: 16px;
+}
+
+.trainings-progress .indicator-wrapper {
+  display: inline-block;
+}
+
+.trainings-progress .indicator {
+  display: inline-block;
+  width: 135px;
+  height: 135px;
+}
+
+.trainings-progress .indicator circle {
+  stroke: transparent;
+  fill: #eee;
+}
+
+.trainings-progress .indicator path {
+  fill: #5bb4d8;
+}
+
+.trainings-progress .indicator circle.inner {
+  fill: #f6f6f6;
+}
+
+.user-metrics-title {
+  background-color: #f6f6f6;
+  color: #585857;
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+  padding: 20px 45px;
+}
+
+.user-metrics-content {
+  display: flex;
+  flex-flow: row nowrap;
+  margin-bottom: 45px;
+}
+
+@media screen and (max-width: 768px) {
+  .user-metrics-content {
+    display: block;
+  }
+}
+
+.user-metric {
+  background-color: #5bb4d8;
+  flex: 1;
+  padding: 20px;
+  text-align: center;
+}
+
+.user-metric+.user-metric {
+  margin-left: 4px;
+}
+
+@media screen and (max-width: 768px) {
+  .user-metric+.user-metric {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}
+
+.user-metric-value,
+.user-metric-label {
+  color: #fff;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.user-metric-value {
+  font-size: 36px;
+}
+
+.user-metric-label {
+  font-size: 20px;
+}
+
+/* table.statistics-table {
+  border: 1px solid #70706f;
+} */
+
+.statistics-table thead th {
+  background-color: #5bb4d8;
+  border: 0 !important;
+  color: #fff;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: normal;
+  padding-left: 30px;
+  padding-right: 30px;
+  text-transform: none;
+}
+
+/* .statistics-table thead th:not(:first-child) {
+  text-align: center;
+}
+
+.statistics-table tbody tr {
+  border: 0;
+}
+
+.statistics-table tbody tr:nth-child(2n+1),
+.statistics-table tbody tr:nth-child(2n+1):hover {
+  background-color: #eee;
+}
+
+.statistics-table tbody tr:nth-child(2n),
+.statistics-table tbody tr:nth-child(2n):hover {
+  background-color: #fff;
+}
+
+.statistics-table tbody td {
+  border: 0;
+  color: #70706f;
+  padding: 5px 30px;
+} */
+
+.statistics-table thead th:not(:first-child),
+.statistics-table tbody td:not(:first-child) {
+  text-align: center;
+}
+
+.statistics-table tbody td {
+  position: relative;
+}
+
+.statistics-table tbody td .details {
+  display: inline-block;
+  background-image: url('../img/icon_details.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 22px;
+  height: 1.75rem;
+}
+
+.statistics-table tbody td .details:hover {
+  background-image: url('../img/icon_details_hover.png');
+}
+
+.badges .statistics-table th:not(:first-child),
+.badges .statistics-table tbody td:not(:first-child) {
+  text-align: left;
+}
+
+.badges .statistics-table th:nth-child(2),
+.badges .statistics-table tbody td:nth-child(2),
+.badges .statistics-table th:nth-child(5),
+.badges .statistics-table tbody td:nth-child(5) {
+  text-align: center;
+}
+
+.icon_state {
+  background-position: center;
+  background-repeat: no-repeat;
+  display: inline-block;
+  width: 43px;
+  height: 43px;
+  margin: 0 10px;
+  vertical-align: middle;
+}
+
+.icon_state_pending,
+.step_state_pending {
+  background-image: url('../img/icon_state_pending.png');
+}
+
+.icon_state_failed,
+.step_state_failed {
+  background-image: url('../img/icon_state_failed.png');
+}
+
+.icon_state_passed,
+.step_state_passed {
+  background-image: url('../img/icon_state_passed.png');
+}
+
+.score-bar,
+.score-bar-inner {
+  display: block;
+  height: 2.5px;
+  width: 100%;
+}
+
+.score-bar {
+  background-color: #dadada;
+}
+
+.score-bar-inner {
+  background-color: #f0a794;
+}
+
+form .p-relative {
+  position: relative;
+}
+
+form .popover-help {
+  padding: 0;
+  background: none;
+  border: 0;
+  width: 18px;
+  height: 18px;
+  background-color: #5bb4d8 !important;
+  border-radius: 100%;
+  color: #fff !important;
+  display: inline-block;
+  line-height: 18px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  margin-left: .5rem;
+  vertical-align: top;
+  position: relative;
+  cursor: pointer;
+  margin-right: calc(-18px - .5rem);
+}
+
+form .popover-help .popover {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%);
+  width: 250px;
+  margin-left: 12px;
+  border-radius: 5px;
+  border-color: #5bb4d8;
+  cursor: auto;
+}
+
+form .user-metric .popover-help {
+  background-color: #22637d !important;
+}
+
+form .popover-help .popover .arrow {
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+form .popover-help .popover-header {
+  background-color: transparent;
+  border-bottom: 0;
+  padding-bottom: 0;
+  padding-top: 0.25rem;
+}
+
+form .popover-help .popover-header .close {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0 0 0 0.5rem;
+}
+
+.bs-popover-auto[x-placement^=right] .arrow:before,
+.bs-popover-right .arrow:before {
+  border-right-color: #5bb4d8;
+}

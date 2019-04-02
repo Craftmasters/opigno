@@ -1,0 +1,39 @@
+<table *ngIf="activities" class="activities">
+  <thead>
+    <tr>
+      <th></th>
+      <th i18n>Activity ID</th>
+      <th i18n>Max score</th>
+      <th i18n>Edit</th>
+      <th i18n>Remove</th>
+    </tr>
+  </thead>
+  <tbody [dragula]="'nested-bag'">
+    <ng-container *ngFor="let activity of activities">
+      <activity [module]="module"
+                [activity]="activity"
+                [attr.data-omr-id]="activity.omr_id"
+                [attr.data-weight]="activity.weight"
+                (updateActivityEvent)="updateActivity($event)"
+                (showDeleteEvent)="showDelete($event)"></activity>
+    </ng-container>
+  </tbody>
+</table>
+
+<div class="delete-activity" *ngIf="showDeleteModal">
+  <div id="delete-panel-content" (clickOutside)="closeDelete()" [exclude]="'.delete-link'">
+    <h2 class="mb-3" i18n>Confirm delete</h2>
+    <div>
+      <button mat-button (click)="closeDelete()" i18n>cancel</button>
+      <button mat-raised-button color="warn" (click)="deleteActivity()" i18n>confirm</button>
+    </div>
+  </div>
+</div>
+
+<activities-bank [module]="module"
+                 (closeEvent)="module.showAddModal=false;updateActivities($event)"
+                 *ngIf="module.showAddModal"></activities-bank>
+
+<add-activity [activities]="activities"
+              (closeEvent)="showAddModal=false" (updateEvent)="updateActivities($event)"
+              *ngIf="showAddModal"></add-activity>

@@ -1,0 +1,15 @@
+name: Opigno Statistics
+type: module
+description: Opigno Statistics.
+# core: 8.x
+package: Opigno
+dependencies:
+  - group:group
+  - opigno_learning_path:opigno_learning_path
+  - opigno_module:opigno_module
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_statistics'
+datestamp: 1550773254

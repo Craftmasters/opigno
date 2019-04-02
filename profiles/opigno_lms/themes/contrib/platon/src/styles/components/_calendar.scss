@@ -1,0 +1,337 @@
+$color-pink: #efa693;
+
+div#block-dashboard-views-block-opigno-calendar-month-block {
+  h2 {
+    &::before {
+      content: '';
+      @include svg-picto(picto-dashboard-calendar);
+      background-size: contain;
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      vertical-align: top;
+      margin-right: 0.75rem;
+    }
+  }
+
+  h3 {
+    background-color: #fff;
+    text-align: center;
+    margin-bottom: 0;
+    padding: 1rem 0 0.5rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+  }
+
+  nav.pager {
+    display: none;
+  }
+
+  .view-content {
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+  }
+}
+
+.view-id-opigno_calendar,
+div#block-dashboard-views-block-opigno-calendar-month-block {
+  table {
+    @extend .calendar-month-table;
+    margin-left: 1.5rem !important;
+    width: calc(100% - 3rem) !important;
+    border-collapse: separate;
+    border-spacing: 10px 8px;
+  }
+}
+
+.js .view-id-opigno_calendar[class*="month"] table td.single-day.single-day-active .inner {
+  height: 12.5em !important;
+}
+
+.js .view-id-opigno_calendar[class*="month"] .view-content.single-day-active {
+  padding-bottom: 14em;
+}
+
+.view-opigno-calendar {
+  background-color: #f7f6f6;
+  padding: 1.5rem 0;
+
+  .dashboard & {
+    padding: 0;
+  }
+
+  &.view-display-id-page_month .view-header {
+    margin: 0 1.5rem;
+  }
+
+  .view-header {
+    position: relative;
+
+    h3 {
+      background-color: #fff;
+      text-align: center;
+      margin-bottom: 0;
+      padding: 2rem 0;
+      font-weight: 400;
+      text-transform: uppercase;
+      font-size: 1.5rem;
+    }
+
+    nav.pager {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+
+        li {
+          height: calc(2rem * 2 + 1.5rem);
+          line-height: calc(2rem * 2 + 1.5rem);
+
+          &.pager__item--next,
+          &.pager__item--previous {
+            a {
+              display: inline-block;
+              vertical-align: middle;
+              width: 2rem;
+              height: 2rem;
+            }
+          }
+
+          &.pager__item--previous {
+            margin-left: 4rem;
+
+            @include media-breakpoint-down(sm) {
+              margin-left: 0.75rem;
+            }
+
+            a {
+              @include svg-picto('picto-calendar-prev');
+            }
+          }
+
+          &.pager__item--next {
+            margin-right: 4rem;
+
+            @include media-breakpoint-down(sm) {
+              margin-right: 0.75rem;
+            }
+
+            a {
+              @include svg-picto('picto-calendar-next');
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .calendar-calendar {
+    .month-view {
+      table {
+        @extend .calendar-month-table;
+
+        thead {
+          tr {
+            th {
+              padding: 0 0 1.25rem;
+            }
+          }
+        }
+      }
+
+      td.date-box.today,
+      tr td.single-day.today {
+        border: 0;
+        background-color: $color-pink;
+      }
+
+      td.date-box.empty,
+      td.single-day .calendar-empty,
+      td.single-day.empty {
+        background-color: transparent;
+      }
+    }
+
+    .year-view {
+      div.month-view div.date-nav {
+        background-color: transparent;
+        text-transform: uppercase;
+        color: $body-color;
+      }
+
+      .table tbody tr:nth-child(even) td:not([class*="ui-datepicker"]),
+      table tbody tr:nth-child(even) td:not([class*="ui-datepicker"]) {
+        background-color: transparent;
+      }
+
+      td div.day {
+        width: 100%;
+        border: 0;
+        background-color: #fff;
+      }
+
+      td.days {
+        text-transform: uppercase;
+        color: $body-color;
+      }
+    }
+
+    .day-view,
+    .week-view {
+      div#single-day-container {
+        min-height: 500px;
+      }
+
+      #multi-day-container table tr td.calendar-agenda-hour {
+        width: 100%;
+      }
+
+      .full .calendar-agenda-hour {
+        width: 100%;
+      }
+    }
+
+    .day-view .full td.single-day div.dayview,
+    .month-view .full td.single-day div.monthview,
+    .week-view .full td.single-day div.weekview {
+      background: #fff;
+    }
+  }
+}
+
+.calendar-month-table {
+  background-color: #fff;
+
+  tbody,
+  thead {
+    tr {
+      td,
+      th {
+        background-color: #fff;
+        color: inherit;
+        font-weight: 400;
+        border: 0;
+        text-align: center;
+      }
+    }
+  }
+
+  thead {
+    tr {
+      th {}
+    }
+  }
+
+  tbody {
+    tr {
+      td {
+        &.date-box.today {
+          background-color: $color-pink;
+          color: #fff;
+        }
+
+        .inner div.day,
+        .inner div.day a {
+          width: 100%;
+        }
+
+        .inner div.day a {
+          color: inherit;
+          font-weight: 400;
+
+          &::after {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: $color-pink;
+            border-radius: 100%;
+            vertical-align: top;
+          }
+        }
+
+        &.single-day-active {
+          .inner {
+            background-color: $color-pink;
+            color: #fff;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+
+            .date-box {
+              width: calc(50% + 1rem);
+              float: left;
+              position: relative;
+
+              &::after {
+                content: '';
+                display: block;
+                position: absolute;
+                width: 1px;
+                height: 100%;
+                background-color: #fff;
+                right: 1rem;
+                top: 0;
+              }
+
+              > * {
+                display: block;
+                line-height: 1.1;
+              }
+
+              span.date-day {
+                font-size: 104px;
+                line-height: 0.85em;
+              }
+
+              span.date-month {
+                font-size: 28px;
+              }
+
+              span.date-year {
+                font-size: 30px;
+                font-weight: 700;
+              }
+            }
+
+            .items,
+            h4.title {
+              float: right;
+              width: calc(50% - 2rem);
+              text-align: left;
+              padding-right: 1rem;
+            }
+
+            h4.title {
+              font-size: 16px;
+              text-transform: uppercase;
+            }
+
+            .items {
+              div.dayview,
+              div.monthview,
+              div.weekview {
+                background: transparent;
+                padding: 0;
+                font-size: 0.875rem;
+
+                a {
+                  color: inherit;
+                  font-weight: 400;
+                  text-transform: uppercase;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

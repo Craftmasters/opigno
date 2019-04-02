@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+name: catalog_thumbnail
+label: 'Catalog thumbnail'
+effects:
+  568d15d2-1a74-4925-acff-cea38f2e1aed:
+    uuid: 568d15d2-1a74-4925-acff-cea38f2e1aed
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 545
+      height: 340

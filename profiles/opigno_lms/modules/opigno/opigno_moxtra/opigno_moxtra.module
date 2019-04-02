@@ -1,0 +1,964 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_moxtra.module.
+ */
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Link;
+use Drupal\group\Entity\Group;
+use Drupal\group\Entity\GroupInterface;
+use Drupal\opigno_calendar_event\Entity\CalendarEvent;
+use Drupal\opigno_group_manager\OpignoGroupContext;
+use Drupal\opigno_moxtra\Entity\Meeting;
+use Drupal\opigno_moxtra\Entity\Workspace;
+use Drupal\user\UserInterface;
+
+const OPIGNO_MOXTRA_COLLABORATIVE_FEATURES_RID = 'collaborative_features';
+
+/**
+ * Returns current organization id.
+ *
+ * @return string|null
+ *   Organization id.
+ */
+function _opigno_moxtra_get_organization_id() {
+  $config = \Drupal::config('opigno_moxtra.settings');
+  return $config->get('org_id');
+}
+
+/**
+ * Returns current organization status.
+ *
+ * @return bool|null
+ *   Organization status.
+ */
+function _opigno_moxtra_get_organization_status() {
+  $config = \Drupal::config('opigno_moxtra.settings');
+  return $config->get('status');
+}
+
+/**
+ * Returns the Opigno API service.
+ *
+ * @return \Drupal\opigno_moxtra\OpignoServiceInterface
+ *   Opigno API service.
+ */
+function _opigno_moxtra_get_opigno_api() {
+  return \Drupal::service('opigno_moxtra.opigno_api');
+}
+
+/**
+ * Returns the Moxtra API service.
+ *
+ * @return \Drupal\opigno_moxtra\MoxtraServiceInterface
+ *   Moxtra API service.
+ */
+function _opigno_moxtra_get_moxtra_api() {
+  return \Drupal::service('opigno_moxtra.moxtra_api');
+}
+
+/**
+ * Helper function to determin if Moxtra is active.
+ *
+ * @return bool
+ *   True if Moxtra integration is active.
+ */
+function _opigno_moxtra_is_active() {
+  $org_id = _opigno_moxtra_get_organization_id();
+  $status = _opigno_moxtra_get_organization_status();
+  return !empty($org_id) && $status === TRUE;
+}
+
+/**
+ * Returns the workspace ID of the training group.
+ *
+ * @param \Drupal\group\Entity\GroupInterface $group
+ *   Training group.
+ *
+ * @return int|null
+ *   Workspace ID.
+ */
+function _opigno_moxtra_get_workspace_id(GroupInterface $group) {
+  if ($group->hasField('field_workspace')) {
+    $value = $group->get('field_workspace')->getValue();
+    if (!empty($value)) {
+      return $value[0]['target_id'];
+    }
+  }
+
+  return NULL;
+}
+
+/**
+ * Returns the workspace of the training group.
+ *
+ * @param \Drupal\group\Entity\GroupInterface $group
+ *   Training group.
+ *
+ * @return \Drupal\opigno_moxtra\WorkspaceInterface
+ *   Workspace.
+ */
+function _opigno_moxtra_get_workspace(GroupInterface $group) {
+  $id = _opigno_moxtra_get_workspace_id($group);
+  if (isset($id)) {
+    return Workspace::load($id);
+  }
+
+  return NULL;
+}
+
+/**
+ * Returns the Moxtra binder ID of the workspace of the training group.
+ *
+ * @param \Drupal\group\Entity\GroupInterface $group
+ *   Training group.
+ *
+ * @return string|null
+ *   Moxtra binder ID.
+ */
+function _opigno_moxtra_get_binder_id(GroupInterface $group) {
+  $workspace = _opigno_moxtra_get_workspace($group);
+  if (isset($workspace)) {
+    return $workspace->getBinderId();
+  }
+
+  return NULL;
+}
+
+/**
+ * Checks user quota.
+ *
+ * @return bool
+ *   True if user limit is not reached, false otherwise.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _opigno_moxtra_check_user_quota() {
+  $opigno_api = _opigno_moxtra_get_opigno_api();
+  $max_total_users = $opigno_api->getMaxTotalUsers();
+  $is_trial = $max_total_users == 0;
+  if ($is_trial) {
+    return TRUE;
+  }
+
+  $current_users = \Drupal::entityTypeManager()
+    ->getStorage('user')
+    ->getQuery()
+    ->condition('status', 1)
+    ->condition('roles', OPIGNO_MOXTRA_COLLABORATIVE_FEATURES_RID)
+    ->count()
+    ->execute();
+
+  return $current_users < $max_total_users;
+}
+
+/**
+ * Enables user in the Moxtra.
+ *
+ * @param \Drupal\user\UserInterface $user
+ *   User.
+ * @param bool $save
+ *   False to not save user immediately.
+ *
+ * @see opigno_moxtra_user_update()
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _opigno_moxtra_enable_user(UserInterface $user, $save = TRUE) {
+  $user->addRole(OPIGNO_MOXTRA_COLLABORATIVE_FEATURES_RID);
+  // API will be notified in hook_ENTITY_TYPE_update().
+  if ($save) {
+    $user->save();
+  }
+}
+
+/**
+ * Disables user in the Moxtra.
+ *
+ * @param \Drupal\user\UserInterface $user
+ *   User.
+ * @param bool $save
+ *   False to not save user immediately.
+ *
+ * @see opigno_moxtra_user_update()
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _opigno_moxtra_disable_user(UserInterface $user, $save = TRUE) {
+  $user->removeRole(OPIGNO_MOXTRA_COLLABORATIVE_FEATURES_RID);
+  // API will be notified in hook_ENTITY_TYPE_update().
+  if ($save) {
+    $user->save();
+  }
+}
+
+/**
+ * Check if the user is enabled in the Moxtra.
+ *
+ * @param \Drupal\user\UserInterface $user
+ *   User.
+ *
+ * @return bool
+ *   True if user is enabled.
+ */
+function _opigno_moxtra_is_user_enabled(UserInterface $user) {
+  return $user->hasRole(OPIGNO_MOXTRA_COLLABORATIVE_FEATURES_RID);
+}
+
+/**
+ * Returns upcoming live meetings.
+ *
+ * @param \Drupal\user\UserInterface $user
+ *   User.
+ *
+ * @return \Drupal\opigno_moxtra\MeetingInterface[]
+ *   Upcoming live meetings.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _opigno_moxtra_upcoming_live_meetings(UserInterface $user) {
+  if (!_opigno_moxtra_is_active() || !($user->hasRole('administrator') || $user->hasRole(OPIGNO_MOXTRA_COLLABORATIVE_FEATURES_RID))) {
+    return [];
+  }
+
+  $timestamp = \Drupal::time()->getRequestTime();
+  $now = DrupalDateTime::createFromTimestamp($timestamp);
+  $now_str = $now->format(DrupalDateTime::FORMAT);
+
+  // Load upcoming meeting.
+  $meetings_ids = \Drupal::entityTypeManager()
+    ->getStorage('opigno_moxtra_meeting')
+    ->getQuery()
+    ->condition('date__value', $now_str, '>')
+    ->execute();
+  $meetings = Meeting::loadMultiple($meetings_ids);
+
+  // Load user groups.
+  $groups_ids = [];
+  $membership_service = \Drupal::service('group.membership_loader');
+  $memberships = $membership_service->loadByUser($user);
+  /** @var \Drupal\group\GroupMembership[] $memberships */
+  foreach ($memberships as $membership) {
+    $group = $membership->getGroup();
+    if ($group->getGroupType()->id() !== 'learning_path') {
+      continue;
+    }
+
+    $groups_ids[] = $group->id();
+  }
+
+  $moxtra_api = _opigno_moxtra_get_moxtra_api();
+  $user_id = \Drupal::currentUser()->id();
+  $meetings = array_filter($meetings, function ($meeting) use (
+    $moxtra_api,
+    $user_id,
+    $groups_ids
+  ) {
+    /** @var \Drupal\opigno_moxtra\MeetingInterface $meeting */
+    // Remove meetings that are not related to the current user groups.
+    if (!in_array($meeting->getTrainingId(), $groups_ids)) {
+      return FALSE;
+    }
+
+    // Remove meetings with the member restriction without the current user.
+    $members_ids = $meeting->getMembersIds();
+    if (!empty($members_ids) && !in_array($user_id, $members_ids)) {
+      return FALSE;
+    }
+
+    // Check the live meeting session key.
+    $session_key = $meeting->getSessionKey();
+    if (empty($session_key)) {
+      return FALSE;
+    }
+
+    // Check the live meeting status.
+    $owner_id = $meeting->getOwnerId();
+    $info = $moxtra_api->getMeetingInfo($owner_id, $session_key);
+    $status = $info['data']['status'];
+    if ($status === 'SESSION_ENDED') {
+      return FALSE;
+    }
+
+    return TRUE;
+  });
+
+  return $meetings;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function opigno_moxtra_cron() {
+  $org_id = _opigno_moxtra_get_organization_id();
+  if (empty($org_id)) {
+    return;
+  }
+
+  // Update organization status from the Opigno/Moxtra API.
+  $opigno_api = _opigno_moxtra_get_opigno_api();
+  $info = $opigno_api->getOrganizationInfo();
+  if (!isset($info['opigno_error_message'])) {
+    \Drupal::configFactory()
+      ->getEditable('opigno_moxtra.settings')
+      ->set('status', (int) $info['active'] === 1)
+      ->save();
+  }
+
+  // Send the email notifications for the upcoming live meetings.
+  /** @var \Drupal\Core\Mail\MailManagerInterface $mail_service */
+  $mail_service = \Drupal::service('plugin.manager.mail');
+
+  $timestamp = \Drupal::time()->getRequestTime();
+  $date_min = DrupalDateTime::createFromTimestamp($timestamp);
+  $date_max = clone $date_min;
+  $date_max->add(new DateInterval('P1D'));
+  $date_min_str = $date_min->format(DrupalDateTime::FORMAT);
+  $date_max_str = $date_max->format(DrupalDateTime::FORMAT);
+
+  $meetings_ids = \Drupal::entityTypeManager()
+    ->getStorage('opigno_moxtra_meeting')
+    ->getQuery()
+    ->condition('date__value', [
+      $date_min_str,
+      $date_max_str,
+    ], 'BETWEEN')
+    ->execute();
+
+  /** @var \Drupal\opigno_moxtra\MeetingInterface[] $meetings */
+  $meetings = Meeting::loadMultiple($meetings_ids);
+  foreach ($meetings as $meeting) {
+    $members = $meeting->getMembers();
+    if (empty($members)) {
+      $training = $meeting->getTraining();
+      if ($training !== NULL) {
+        $members = array_map(function ($member) {
+          /** @var \Drupal\group\GroupMembership $member */
+          return $member->getUser();
+        }, $training->getMembers());
+      }
+    }
+
+    $notified = $meeting->getNotifiedMembers();
+    /** @var \Drupal\user\UserInterface[] $not_notified */
+    $not_notified = array_udiff($members, $notified, function ($user1, $user2) {
+      /** @var \Drupal\user\UserInterface $user1 */
+      /** @var \Drupal\user\UserInterface $user2 */
+      return $user2->id() - $user1->id();
+    });
+
+    $params['subject'] = $params['message'] = t('The Live Meeting %meeting starts in less than 24 hours', [
+      '%meeting' => $meeting->getTitle(),
+    ]);
+    if (\Drupal::hasService('opigno_calendar_event.iCal')) {
+      $params['attachments'] = opigno_moxtra_ical_prepare($meeting);
+    }
+
+    $module = 'opigno_moxtra';
+    $key = 'upcoming_meeting_notify';
+    foreach ($not_notified as $user) {
+      $to = $user->getEmail();
+      $langcode = $user->getPreferredLangcode();
+      $mail_service->mail($module, $key, $to, $langcode, $params, NULL, TRUE);
+
+      $meeting->addNotifiedMember($user->id());
+      $meeting->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function opigno_moxtra_mail($key, &$message, $params) {
+  if ($key !== 'upcoming_meeting_notify') {
+    return;
+  }
+
+  $message['from'] = \Drupal::config('system.site')->get('mail');
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['message'];
+  $message['params']['attachments'][] = $params['attachments'];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * Updates the calendar event related to the live meeting.
+ */
+function opigno_moxtra_opigno_moxtra_meeting_presave(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\opigno_moxtra\Entity\Meeting $entity */
+  /** @var \Drupal\opigno_calendar_event\Entity\CalendarEvent $calendar_event */
+  $calendar_event = $entity->getCalendarEvent();
+  if (!isset($calendar_event)) {
+    $calendar_event = CalendarEvent::create([
+      'type' => 'meeting_calendar_event',
+    ]);
+  }
+
+  $calendar_event->set('title', $entity->getTitle());
+  $calendar_event->set('uid', $entity->getOwnerId());
+
+  // Set date.
+  $start_value = $entity->getStartDate();
+  $end_value = $entity->getEndDate();
+
+  $start_date = isset($start_value)
+    ? DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $start_value)
+      ->setTimezone(new \DateTimeZone('UTC'))
+      ->format('Y-m-d\TH:i:s')
+    : NULL;
+
+  $end_date = isset($end_value)
+    ? DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $end_value)
+      ->setTimezone(new \DateTimeZone('UTC'))
+      ->format('Y-m-d\TH:i:s')
+    : NULL;
+
+  $date = [
+    'value' => $start_date,
+    'end_value' => $end_date,
+  ];
+  $calendar_event->set('date_daterange', $date);
+
+  // Set members.
+  $members = $entity->getMembersIds();
+  if (empty($members)) {
+    $training = $entity->getTraining();
+    if (isset($training)) {
+      $members = array_map(function ($member) {
+        /** @var \Drupal\group\GroupMembership $member */
+        return $member->getUser()->id();
+      }, $training->getMembers());
+    }
+  }
+  $calendar_event->set('field_calendar_event_members', $members);
+  $calendar_event->save();
+
+  $entity->setCalendarEvent($calendar_event);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * Checks user quota.
+ */
+function opigno_moxtra_user_presave(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\user\Entity\User $entity */
+  if (_opigno_moxtra_is_user_enabled($entity)) {
+    if (!_opigno_moxtra_check_user_quota()) {
+      _opigno_moxtra_disable_user($entity, FALSE);
+      \Drupal::messenger()->addWarning(t('You have reached the Moxtra user limit.'));
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * Creates a collaborative workspace for the training.
+ */
+function opigno_moxtra_group_insert(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\group\Entity\Group $entity */
+  if ($entity->bundle() === 'learning_path') {
+    $has_workspace = !$entity->get('field_workspace')->isEmpty();
+    if (!$has_workspace) {
+      $moxtra_api = _opigno_moxtra_get_moxtra_api();
+      $user = \Drupal::currentUser();
+      $user_id = $user->id();
+      $name = $entity->label();
+      $response = $moxtra_api->createWorkspace($user_id, $name);
+      $binder_id = $response['data']['id'];
+
+      // Create workspace.
+      $workspace = Workspace::create();
+      $workspace->setName($entity->label());
+      $workspace->setBinderId($binder_id);
+      $workspace->save();
+
+      // Attach workspace to the training.
+      $entity->set('field_workspace', [
+        'target_id' => $workspace->id(),
+      ]);
+      $entity->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function opigno_moxtra_group_content_insert(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\group\Entity\GroupContentInterface $entity */
+  $bundle = $entity->bundle();
+  $type = $entity->getEntity()->getEntityTypeId();
+  if ($bundle === 'learning_path-group_membership') {
+    // Adds user to the collaborative workspace of the training.
+    $group = $entity->getGroup();
+    $workspace = _opigno_moxtra_get_workspace($group);
+    if ($workspace !== NULL) {
+      $binder_id = $workspace->getBinderId();
+      if (!empty($binder_id)) {
+        $moxtra_api = _opigno_moxtra_get_moxtra_api();
+        $owner_id = $workspace->getOwnerId();
+
+        /** @var \Drupal\user\Entity\User $user */
+        $user = $entity->getEntity();
+        $user_id = $user->id();
+
+        $auto_register = $workspace->getAutoRegister();
+        if ($auto_register == 1) {
+          if (_opigno_moxtra_is_user_enabled($user)) {
+            // Add user to the collaborative workspace.
+            $workspace->addMember($user_id);
+            $workspace->save();
+
+            // Add user to the binder in the Moxtra.
+            $moxtra_api->addUsersToWorkspace($owner_id, $binder_id, [$user_id]);
+          }
+        }
+      }
+    }
+  }
+  elseif ($type === 'opigno_moxtra_meeting') {
+    // Updates the related training field in the meeting.
+    /** @var \Drupal\opigno_moxtra\MeetingInterface $meeting */
+    $meeting = $entity->getEntity();
+    $training = $entity->getGroup();
+    $meeting->setTraining($training);
+    $meeting->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * Updates the calendar event related to the live meeting.
+ */
+function opigno_moxtra_opigno_moxtra_meeting_insert(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  // Set meeting reference on the related calendar event.
+  /** @var \Drupal\opigno_moxtra\MeetingInterface $entity */
+  $calendar_event = $entity->getCalendarEvent();
+  if (isset($calendar_event)) {
+    $calendar_event->set('field_meeting', $entity);
+    $calendar_event->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * Creates user in the Moxtra.
+ */
+function opigno_moxtra_user_insert(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\user\Entity\User $entity */
+  $user_active = $entity->isActive()
+    && _opigno_moxtra_is_user_enabled($entity);
+
+  if ($user_active) {
+    $opigno_api = _opigno_moxtra_get_opigno_api();
+    $opigno_api->createUsers([$entity]);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * Updates meeting info in the Moxtra.
+ */
+function opigno_moxtra_opigno_moxtra_meeting_update(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  // Set meeting reference on the related calendar event.
+  /** @var \Drupal\opigno_moxtra\MeetingInterface $entity */
+  $calendar_event = $entity->getCalendarEvent();
+  if (isset($calendar_event)) {
+    $calendar_event->set('field_meeting', $entity);
+    $calendar_event->save();
+  }
+
+  $moxtra_api = _opigno_moxtra_get_moxtra_api();
+  $owner_id = $entity->getOwnerId();
+  $session_key = $entity->getSessionKey();
+  if (!empty($session_key)) {
+    $info = $moxtra_api->getMeetingInfo($owner_id, $session_key);
+    $status = $info['data']['status'];
+    if ($status !== 'SESSION_SCHEDULED') {
+      // Not update the meeting info in the Moxtra, if it is not scheduled.
+      return;
+    }
+
+    $title = $entity->getTitle();
+
+    // Get ISO-8601 date without a timezone when meeting starts.
+    $starts_value = $entity->getStartDate();
+    $starts = isset($starts_value)
+      ? DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $starts_value)
+        ->setTimezone(new \DateTimeZone('UTC'))
+        ->format('Y-m-d\TH:i:s\Z')
+      : NULL;
+
+    // Get ISO-8601 date without a timezone when meeting ends.
+    $ends_value = $entity->getEndDate();
+    $ends = isset($ends_value)
+      ? DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $ends_value)
+        ->setTimezone(new \DateTimeZone('UTC'))
+        ->format('Y-m-d\TH:i:s\Z')
+      : NULL;
+
+    $moxtra_api->updateMeeting($owner_id, $session_key, $title, $starts, $ends);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * Updates collaborative workspace info in the Moxtra.
+ */
+function opigno_moxtra_opigno_moxtra_workspace_update(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\opigno_moxtra\WorkspaceInterface $entity */
+  if ($entity->label() !== $entity->original->label()) {
+    $binder_id = $entity->getBinderId();
+    if (!empty($binder_id)) {
+      $moxtra_api = _opigno_moxtra_get_moxtra_api();
+      $owner_id = $entity->getOwnerId();
+      $name = $entity->label();
+      $moxtra_api->updateWorkspace($owner_id, $binder_id, $name);
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * Updates user info in the Moxtra.
+ */
+function opigno_moxtra_user_update(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  $opigno_api = _opigno_moxtra_get_opigno_api();
+
+  /** @var \Drupal\user\Entity\User $entity */
+  $user_active = $entity->isActive()
+    && _opigno_moxtra_is_user_enabled($entity);
+
+  if ($user_active) {
+    // Update user info in Moxtra if it is active.
+    $opigno_api->updateUser($entity);
+  }
+
+  $original_user_active = isset($entity->original)
+    && $entity->original->isActive()
+    && _opigno_moxtra_is_user_enabled($entity->original);
+
+  if ($user_active !== $original_user_active) {
+    if ($user_active) {
+      // Create & enable user in Moxtra
+      // if it is active now and was not active.
+      $opigno_api->createUsers([$entity]);
+      $opigno_api->enableUser($entity);
+    }
+    else {
+      // Disable user in Moxtra if it is not active now and was active.
+      $opigno_api->deleteUser($entity->id());
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function opigno_moxtra_group_content_delete(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\group\Entity\GroupContentInterface $entity */
+  $content = $entity->getEntity();
+  if (!isset($content)) {
+    // If related entity is already deleted.
+    return;
+  }
+
+  $bundle = $entity->bundle();
+  $type = $content->getEntityTypeId();
+  if ($bundle === 'learning_path-group_membership') {
+    // Removes user from the collaborative workspace of the training.
+    $group = $entity->getGroup();
+    $workspace = _opigno_moxtra_get_workspace($group);
+    if ($workspace !== NULL) {
+      $binder_id = $workspace->getBinderId();
+      if (!empty($binder_id)) {
+        $moxtra_api = _opigno_moxtra_get_moxtra_api();
+        $owner_id = $workspace->getOwnerId();
+
+        /** @var \Drupal\user\Entity\User $user */
+        $user = $content;
+        $user_id = $user->id();
+
+        // Remove user from collaborative workspace.
+        $workspace->removeMember($user_id);
+        $workspace->save();
+
+        // Remove in the Moxtra.
+        $moxtra_api->removeUserFromWorkspace($owner_id, $binder_id, $user_id);
+      }
+    }
+  }
+  elseif ($type === 'opigno_moxtra_meeting') {
+    // Removes the related training field in the meeting.
+    /** @var \Drupal\opigno_moxtra\MeetingInterface $meeting */
+    $meeting = $content;
+    $meeting->setTrainingId(NULL);
+    $meeting->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * Deletes meeting in the Moxtra.
+ */
+function opigno_moxtra_opigno_moxtra_meeting_delete(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\opigno_moxtra\MeetingInterface $entity */
+  $moxtra_api = _opigno_moxtra_get_moxtra_api();
+  $owner_id = $entity->getOwnerId();
+  $session_key = $entity->getSessionKey();
+  $moxtra_api->deleteMeeting($owner_id, $session_key);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * Deletes collaborative workspace (binder) in the Moxtra.
+ */
+function opigno_moxtra_opigno_moxtra_workspace_delete(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  /** @var \Drupal\opigno_moxtra\WorkspaceInterface $entity */
+  $moxtra_api = _opigno_moxtra_get_moxtra_api();
+  $owner_id = $entity->getOwnerId();
+  $binder_id = $entity->getBinderId();
+  $moxtra_api->deleteWorkspace($owner_id, $binder_id);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ *
+ * Disables user in the Moxtra.
+ */
+function opigno_moxtra_user_delete(EntityInterface $entity) {
+  if (!_opigno_moxtra_is_active()) {
+    return;
+  }
+
+  $opigno_api = _opigno_moxtra_get_opigno_api();
+  $result = $opigno_api->deleteUser($entity->id());
+}
+
+/**
+ * Implements hook_preprocess_views_view_field().
+ *
+ * Replaces titles of a live meeting calendar event with links.
+ */
+function opigno_moxtra_preprocess_views_view_field(&$vars) {
+  $id = $vars['view']->id();
+  $field = $vars['field']->field;
+  if ($id === 'opigno_calendar' && $field === 'title') {
+    /** @var \Drupal\opigno_calendar_event\CalendarEventInterface $entity */
+    $entity = $vars['row']->_entity;
+    $bundle = $entity->bundle();
+    if ($bundle === 'meeting_calendar_event') {
+      $title = $vars['field']->getValue($vars['row']);
+      /** @var \Drupal\opigno_moxtra\MeetingInterface $meeting */
+      $meeting = $entity->get('field_meeting')->entity;
+      if ($meeting !== NULL) {
+        $link = Link::createFromRoute($title, 'opigno_moxtra.meeting', [
+          'opigno_moxtra_meeting' => $meeting->id(),
+        ]);
+        $vars['output'] = $link;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ *
+ * Adds upcoming live meeting banner to the training pages.
+ */
+function opigno_moxtra_preprocess_page(&$variables) {
+  $training_routes = [
+    'entity.group.canonical',
+    'opigno_module.group.answer_form',
+    'opigno_module.module_result',
+  ];
+
+  $route = \Drupal::routeMatch();
+  $route_name = $route->getRouteName();
+  if (!in_array($route_name, $training_routes)) {
+    return;
+  }
+
+  /** @var \Drupal\group\Entity\GroupInterface $group */
+  $group = $route->getParameter('group');
+  if (!isset($group)) {
+    $group_id = OpignoGroupContext::getCurrentGroupId();
+    if (!isset($group_id)) {
+      return;
+    }
+
+    $group = Group::load($group_id);
+  }
+
+  $bundle = $group->bundle();
+  if ($bundle !== 'learning_path') {
+    return;
+  }
+
+  $user = \Drupal::currentUser();
+  $user_id = $user->id();
+  if (!$user->hasPermission('view meeting entities')) {
+    return;
+  }
+
+  $moxtra_api = _opigno_moxtra_get_moxtra_api();
+
+  $steps = opigno_learning_path_get_steps($group->id(), $user_id);
+  $live_meeting_steps = array_filter($steps, function ($step) {
+    return $step['typology'] === 'Meeting';
+  });
+  $live_meeting_ids = array_map(function ($step) {
+    return $step['id'];
+  }, $live_meeting_steps);
+  /** @var \Drupal\opigno_moxtra\MeetingInterface[] $live_meetings */
+  $live_meetings = Meeting::loadMultiple($live_meeting_ids);
+  foreach ($live_meetings as $live_meeting) {
+    $owner_id = $live_meeting->getOwnerId();
+    $session_key = $live_meeting->getSessionKey();
+    if (!empty($session_key)) {
+      $info = $moxtra_api->getMeetingInfo($owner_id, $session_key);
+      $status = $info['data']['status'];
+      if ($status === 'SESSION_ENDED') {
+        continue;
+      }
+    }
+
+    $members_ids = $live_meeting->getMembersIds();
+    if (empty($members_ids)) {
+      $training = $live_meeting->getTraining();
+      if (isset($training)) {
+        $members_ids = array_map(function ($member) {
+          /** @var \Drupal\group\GroupMembership $member */
+          return $member->getUser()->id();
+        }, $training->getMembers());
+      }
+    }
+
+    if (!in_array($user_id, $members_ids)) {
+      continue;
+    }
+
+    $date_str = $live_meeting->getStartDate();
+    $date = DrupalDateTime::createFromFormat(DrupalDateTime::FORMAT, $date_str);
+    $diff = $date->getTimestamp() - time();
+    // If live meeting is in two days.
+    if ($diff > 0 && $diff < 60 * 60 * 24 * 2) {
+      $title = $live_meeting->getTitle();
+      $link = Link::createFromRoute($title, 'opigno_moxtra.meeting', [
+        'opigno_moxtra_meeting' => $live_meeting->id(),
+      ]);
+      $variables['page']['top'][] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['moxtra-meeting-banner'],
+        ],
+        'content' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => [
+            'class' => ['moxtra-meeting-banner-text'],
+          ],
+          '#value' => t('Click here to join the live meeting %live_meeting!', [
+            '%live_meeting' => $link->toString(),
+          ]),
+        ],
+        '#attached' => [
+          'library' => [
+            'opigno_moxtra/meeting',
+          ],
+        ],
+      ];
+      break;
+    }
+  }
+}
+
+/**
+ * Helper function to prepare iCal file for Live Meetings.
+ */
+function opigno_moxtra_ical_prepare($meeting) {
+  $startDate = new DateTime($meeting->getStartDate());
+  $endDate = new DateTime($meeting->getEndDate());
+
+  $iCal = \Drupal::service('opigno_calendar_event.iCal')->buildICalEvent([
+    'summary' => $meeting->getTitle(),
+    'start' => $startDate->setTimezone(new DateTimeZone("UTC")),
+    'end' => $endDate->setTimezone(new DateTimeZone("UTC")),
+    'description' => t('The Live Meeting %meeting starts in less than 24 hours', [
+      '%meeting' => $meeting->getTitle(),
+    ]),
+    'url' => $meeting->toUrl('canonical', ['absolute' => TRUE])->setAbsolute()->toString(),
+    'org' => \Drupal::config('system.site')->get('name'),
+  ]);
+  $attachments = [
+    'filecontent' => $iCal,
+    'filename' => $meeting->getTitle() . '.ical',
+    'filemime' => 'text/calendar',
+  ];
+
+  return $attachments;
+}

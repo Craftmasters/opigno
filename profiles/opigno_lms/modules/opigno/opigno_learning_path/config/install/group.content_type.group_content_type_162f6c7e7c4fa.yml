@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+  module:
+    - opigno_module
+    - opigno_module_group
+id: group_content_type_162f6c7e7c4fa
+label: 'Learning Path: Opigno Module Group'
+description: 'Adds opigno module entity to groups .'
+group_type: learning_path
+content_plugin: opigno_module_group
+plugin_config:
+  group_cardinality: 0
+  entity_cardinality: 1

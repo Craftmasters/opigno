@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.default
+    - group.type.subgroup
+id: default-subgroup-subgroup
+label: 'Default group: Subgroup'
+description: 'Adds <em class="placeholder">Subgroup</em> groups to groups both publicly and privately.'
+group_type: default
+content_plugin: 'subgroup:subgroup'
+plugin_config:
+  group_cardinality: 0
+  entity_cardinality: 1

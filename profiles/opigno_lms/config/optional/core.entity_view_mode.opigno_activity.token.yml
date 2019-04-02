@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_module
+id: opigno_activity.token
+label: Token
+targetEntityType: opigno_activity
+cache: true

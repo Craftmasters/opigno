@@ -1,0 +1,34 @@
+<!-- group/{group}/inner-courses -->
+
+<base href="{{ base_path ~ base_href }}">
+
+<script type="text/javascript">
+  window.appConfig = {
+    formSubmitBtn: false,
+    groupId: {{ learning_path_id }},
+    apiBaseUrl: '{{ base_path }}',
+    viewType: '{{ view_type }}',
+    userHasInfoCard: '{{ user_has_info_card }}',
+    hideInfocardUrl: '/opigno-group-manager/hide-info-card',
+    getCourses: '/group/%groupId/courses/get-items',
+    getEntitiesUrl: '/group/%groupId/get-items',
+    getEntitiesPositionsUrl: '/group/%groupId/get-positions',
+    setEntitiesPositionsUrl: '/group/%groupId/set-positions',
+    getEntitiesTypesUrl: '/group/%groupId/get-item-types',
+    getEntitiesAvailableUrl: '/group/%groupId/get-available-items',
+    getEntityFormUrl: '/group/%groupId/item-form/%bundle/%entityId',
+    submitAddEntityFormUrl: '/group/%groupId/create-item/%bundle',
+    addEntityUrl: '/group/%groupId/add-item',
+    removeEntityUrl: '/group/%groupId/remove-item',
+    addEntityLinkUrl: '/group/%groupId/add-link',
+    updateEntityLinkUrl: '/group/%groupId/update-link',
+    removeEntityLinkUrl: '/group/%groupId/remove-link',
+    updateEntityMandatoryUrl: '/group/%groupId/update-mandatory',
+    updateEntityMinScoreUrl: '/group/%groupId/update-min-score',
+    updateEntitiesUrl: '/group/%groupId/update-entities',
+
+    nextLink: '{{ next_link }}',
+  };
+</script>
+
+<app-root class="d-block">Loading app...</app-root>

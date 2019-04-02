@@ -1,0 +1,29 @@
+id: opigno_learning_path_class
+label: 'Opigno Group Learning Path (source: class)'
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+- 'Drupal 7'
+migration_group: opigno_migration
+source:
+  plugin: opigno_learning_path_class
+  node_type: class
+process:
+  type:
+    plugin: default_value
+    default_value: opigno_class
+    default_bundle: opigno_class
+  id: nid
+  vid: nid
+  label: title
+  uid: node_uid
+destination:
+  plugin: 'entity:group'
+migration_dependencies: null

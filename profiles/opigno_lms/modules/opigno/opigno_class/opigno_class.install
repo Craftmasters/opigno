@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Class module.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Create new field in opigno_class group type.
+ */
+function opigno_class_update_8001() {
+
+  $config_path = drupal_get_path('module', 'opigno_class')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.group.field_class_media_image');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.group.opigno_class.field_class_media_image');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+
+}
+
+/**
+ * Update class roles.
+ */
+function opigno_class_update_8002() {
+  // Remove old configs.
+  $configs = [
+    'group.role.opigno_class-admin',
+    'group.role.opigno_class-student',
+    'group.role.opigno_class-coach',
+  ];
+  foreach ($configs as $config) {
+    try {
+      \Drupal::configFactory()->getEditable($config)->delete();
+    }
+    catch (Exception $e) {
+      \Drupal::logger('opigno_class')->error($e->getMessage());
+    }
+  }
+
+  $config_path = drupal_get_path('module', 'opigno_class') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write('group.role.opigno_class-class_manager', $source->read('group.role.opigno_class-class_manager'));
+}
+
+/**
+ * Update view with list of classes and admin menu.
+ */
+function opigno_class_update_8003() {
+  $config_path = drupal_get_path('module', 'opigno_class') . '/config/optional';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write('views.view.opigno_classes', $source->read('views.view.opigno_classes'));
+}

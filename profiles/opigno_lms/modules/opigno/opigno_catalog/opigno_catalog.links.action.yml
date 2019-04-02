@@ -1,0 +1,7 @@
+opigno_catalog_add_local_action:
+  route_name: entity.group.add_form
+  route_parameters:
+      group_type: 'learning_path'
+  title: 'Add a new training'
+  appears_on:
+    - view.opigno_training_catalog.training_catalogue

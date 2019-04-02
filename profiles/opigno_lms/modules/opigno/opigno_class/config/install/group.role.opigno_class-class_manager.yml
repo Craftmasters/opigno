@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.opigno_class
+id: opigno_class-class_manager
+label: Class Manager
+weight: -8
+internal: false
+audience: member
+group_type: opigno_class
+permissions_ui: true
+permissions:
+  - 'access content overview'
+  - 'administer group'
+  - 'administer members'
+  - 'update own group_membership content'
+  - 'leave group'
+  - 'view group_membership content'
+  - 'view group'
+  - 'access group_node overview'

@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Module file contains related hooks.
+ */
+
+/**
+ * Implements hook_views_plugins_area_alter().
+ */
+function views_role_based_global_text_views_plugins_area_alter(array &$plugins) {
+  $plugins['text']['class'] = 'Drupal\\views_role_based_global_text\\RoleBasedGlobalText';
+}

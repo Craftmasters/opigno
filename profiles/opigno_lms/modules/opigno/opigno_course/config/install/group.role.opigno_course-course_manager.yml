@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.opigno_course
+id: opigno_course-course_manager
+label: 'Course manager'
+weight: -10
+internal: false
+audience: member
+group_type: opigno_course
+permissions_ui: true
+permissions:
+  0: 'administer group'
+  1: 'administer members'
+  2: 'view group_membership content'
+  4: 'view group'

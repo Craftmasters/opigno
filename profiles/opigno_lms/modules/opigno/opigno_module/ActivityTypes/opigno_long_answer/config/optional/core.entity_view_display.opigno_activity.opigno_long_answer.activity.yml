@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.opigno_activity.activity
+    - field.field.opigno_activity.opigno_long_answer.opigno_body
+    - opigno_module.opigno_activity_type.opigno_long_answer
+  module:
+    - text
+id: opigno_activity.opigno_long_answer.activity
+targetEntityType: opigno_activity
+bundle: opigno_long_answer
+mode: activity
+content:
+  opigno_body:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+hidden:
+  name: true
+  uid: true

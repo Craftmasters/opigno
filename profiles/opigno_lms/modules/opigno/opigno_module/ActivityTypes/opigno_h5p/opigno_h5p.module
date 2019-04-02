@@ -1,0 +1,183 @@
+<?php
+
+/**
+ * @file
+ * Module main functionality.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\opigno_h5p\H5PReport;
+use Drupal\opigno_h5p\H5PReportXAPIData;
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_h5p_theme() {
+  return [
+    'opigno_user_result_item__opigno_h5p' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_h5p_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id === 'opigno_answer_opigno_h5p_form') {
+    $form['actions']['submit']['#submit'][] = '_opigno_h5_form_submit';
+  }
+}
+
+/**
+ * Form submit callback, used in opigno_h5p_form_alter().
+ *
+ * Saves user answer & correct answer patterns.
+ */
+function _opigno_h5_form_submit($form, FormStateInterface $form_state) {
+  $correct_response = $form_state->getValue('correct-response');
+  $response = $form_state->getValue('response');
+  $xapi_data = $form_state->getValue('xapi_data');
+
+  /** @var \Drupal\opigno_module\Form\OpignoAnswerForm $form_obj */
+  $form_obj = $form_state->getFormObject();
+  /** @var \Drupal\opigno_module\Entity\OpignoAnswer $entity */
+  $answer = $form_obj->getEntity();
+
+  $answer->set('field_correct_response', $correct_response);
+  $answer->set('field_response', $response);
+  $answer->set('field_xapidata', $xapi_data);
+
+  $answer->save();
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function opigno_h5p_theme_suggestions_opigno_user_result_item(array $variables) {
+  $suggestions = [];
+  $entity = $variables['opigno_answer'];
+
+  $suggestions[] = 'opigno_user_result_item__' . $entity->bundle();
+  $suggestions[] = 'opigno_user_result_item__' . $entity->id();
+
+  return $suggestions;
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function template_preprocess_opigno_user_result_item__opigno_h5p(&$variables) {
+  $route = \Drupal::routeMatch();
+  /** @var \Drupal\opigno_module\Entity\OpignoModule $opigno_module */
+  $opigno_module = $route->getParameter('opigno_module');
+  // Check if module allow display answer content for users.
+  $hide_results = $opigno_module->getHideResults();
+  /** @var \Drupal\opigno_module\Entity\OpignoAnswer $answer */
+  $answer = $variables['opigno_answer'];
+  /** @var Drupal\opigno_module\Entity\OpignoActivity $answer_activity */
+  $answer_activity = $answer->getActivity();
+  if (!$hide_results) {
+    // Get xApiData.
+    /* @var $db_connection \Drupal\Core\Database\Connection */
+    $db_connection = \Drupal::service('database');
+    $query = $db_connection->select('opigno_h5p_user_answer_results', 'ohr')
+      ->fields('ohr')
+      ->condition('ohr.answer_id', $answer->id());
+    $result = $query->execute()->fetchAll();
+
+    $content = [];
+
+    if ($result) {
+      foreach ($result as $xapi_data) {
+
+        $H5PReport = H5PReport::getInstance();
+        $reportHtml = $H5PReport->generateReport($xapi_data);
+
+        $variables['h5p_library'] = $H5PReport->getStylesUsed();
+        // TODO: find a way for attaching libraries
+        // for each template separately.
+        $content[] = [
+          '#markup' => $reportHtml,
+        ];
+      }
+    }
+    $variables['content'] = $content;
+    $variables['#attached']['library'][] = 'opigno_module/module_results_page';
+  }
+
+  // Output question number info.
+  if ($variables['question_number']) {
+    $activity_title = $answer_activity->getName();
+    $variables['label'] = $variables['question_number'] . '. ' . ucfirst($activity_title);
+  }
+
+  if (isset($variables['answer_max_score'])
+    && $variables['answer_max_score'] > 0) {
+    // Get the user score.
+    $variables['score'] = t('Score: %score of %max_score', [
+      '%score' => $answer->isEvaluated() ? $answer->getScore() : '?',
+      '%max_score' => $variables['answer_max_score'],
+    ]);
+  }
+  else {
+    $variables['score'] = t('No score retrieved');
+  }
+
+  return $variables;
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function opigno_h5p_page_attachments(array &$page) {
+  // Add h5p content libraries.
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if (in_array($route_name, ['opigno_module.module_result', 'opigno_module.module_result_form'])) {
+    $page['#attached']['library'][] = 'opigno_h5p/opigno_h5p.all-libraries';
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for opigno_answer.
+ *
+ * Insert into database xAPI data for h5p activities.
+ */
+function opigno_h5p_opigno_answer_update(EntityInterface $entity) {
+  // Save xAPIData into Database.
+  /* @var \Drupal\opigno_module\Entity\OpignoAnswer $answer*/
+  $answer = $entity;
+  $answer_type = $answer->getType();
+  if ($answer_type == 'opigno_h5p') {
+    $activity = $answer->getActivity();
+    // Check if there are some results.
+    /* @var $db_connection \Drupal\Core\Database\Connection */
+    $db_connection = \Drupal::service('database');
+    // Save statement data.
+    $data = $db_connection->select('opigno_h5p_user_answer_results', 'ohuar')
+      ->fields('ohuar', ['answer_id'])
+      ->condition('answer_id', $answer->id())
+      ->condition('answer_vid', $answer->getLoadedRevisionId())
+      ->execute()->fetchObject();
+    if ($data) {
+      // Delete previous results.
+      $previous_results_deleted = $db_connection->delete('opigno_h5p_user_answer_results')
+        ->condition('answer_id', $answer->id())
+        ->condition('answer_vid', $answer->getLoadedRevisionId())
+        ->execute();
+    };
+    $xapi_data = $answer->get('field_xapidata')->getValue()[0]['value'];
+    $h5p_report_obj = new H5PReportXAPIData($activity, $answer, json_decode($xapi_data));
+    $h5p_report_obj->saveXAPIData();
+  };
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function opigno_h5p_field_formatter_info_alter(array &$info) {
+  if (isset($info['h5p_default'])) {
+    $info['h5p_default']['class'] = 'Drupal\opigno_h5p\Plugin\Field\FieldFormatter\H5PDefaultFormatter';
+  }
+}

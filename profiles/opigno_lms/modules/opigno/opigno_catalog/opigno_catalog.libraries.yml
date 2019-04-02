@@ -1,0 +1,9 @@
+view_style:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_catalog.css: {}
+  js:
+    js/opigno_catalog_style.js: {}
+  dependencies:
+    - core/jquery

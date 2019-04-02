@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.image_only
+label: 'Image only'
+targetEntityType: media
+cache: true

@@ -1,0 +1,45 @@
+id: opigno_forum_migration_forum
+label: Opigno forum migration
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_forum_migration_forum
+  node_type: forum
+migration_dependencies:
+  required:
+    - opigno_forum_migration_term
+    - opigno_users
+process:
+  nid: tnid
+  vid: vid
+  langcode:
+    plugin: default_value
+    source: language
+    default_value: 'en'
+  title: title
+  type:
+    plugin: default_value
+    default_value: forum
+  'body/value': body_value
+  'body/format': body_format
+  uid:
+      plugin: migration
+      migration: opigno_users
+      source: node_uid
+  status: status
+  created: created
+  changed: changed
+  promote: promote
+  sticky: sticky
+  revision_uid: revision_uid
+  revision_log: log
+  revision_timestamp: timestamp
+  taxonomy_forums:
+      plugin: migration
+      migration: opigno_forum_migration_term
+      source: taxonomy_forums
+destination:
+  plugin: entity:node

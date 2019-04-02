@@ -1,0 +1,13 @@
+name: Opigno Module
+type: module
+description: Opigno Modules functionality.
+# core: 8.x
+package: Opigno
+dependencies:
+  - h5p:h5p
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_module'
+datestamp: 1550773114

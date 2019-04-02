@@ -1,0 +1,17 @@
+view all results:
+  title: 'View all results'
+
+view own results:
+  title: 'View own results'
+
+edit all results:
+  title: 'Edit all results'
+
+edit own results:
+  title: 'Edit own results'
+
+delete all results:
+  title: 'Delete all results'
+
+delete own results:
+  title: 'Delete own results'

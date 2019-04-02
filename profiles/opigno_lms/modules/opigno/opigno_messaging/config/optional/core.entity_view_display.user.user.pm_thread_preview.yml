@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.user.pm_thread_preview
+    - field.field.user.user.user_picture
+  module:
+    - user
+id: user.user.pm_thread_preview
+targetEntityType: user
+bundle: user
+mode: pm_thread_preview
+content:
+  linked_username:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  member_for: true
+  private_message_link: true
+  user_picture: true

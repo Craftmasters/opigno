@@ -1,0 +1,14 @@
+name: OpignoLearningPath Test
+description: Support module for Opigno Learing Path testing
+package: Testing
+type: module
+dependencies:
+  - opigno_learning_path
+  - user
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.3'
+core: '8.x'
+project: 'opigno_learning_path'
+datestamp: 1550773108

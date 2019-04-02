@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+  enforced:
+    config:
+      - user.role.statistics_reader
+id: learning_path-9b4c10f4d
+label: 'Statistics manager'
+weight: 5
+internal: true
+audience: outsider
+group_type: learning_path
+permissions_ui: false
+permissions: {  }

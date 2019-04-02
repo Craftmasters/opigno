@@ -1,0 +1,88 @@
+entity.opigno_moxtra_meeting.canonical:
+  route_name: entity.opigno_moxtra_meeting.canonical
+  base_route: entity.opigno_moxtra_meeting.canonical
+  title: 'View'
+
+entity.opigno_moxtra_meeting.edit_form:
+  route_name: entity.opigno_moxtra_meeting.edit_form
+  base_route: entity.opigno_moxtra_meeting.canonical
+  title: 'Edit'
+
+entity.opigno_moxtra_meeting.delete_form:
+  route_name:  entity.opigno_moxtra_meeting.delete_form
+  base_route:  entity.opigno_moxtra_meeting.canonical
+  title: Delete
+  weight: 10
+
+opigno_moxtra.meeting:
+  route_name:  opigno_moxtra.meeting
+  base_route:  entity.opigno_moxtra_meeting.canonical
+  title: Take
+  weight: 11
+
+opigno_moxtra.score_meeting:
+  route_name:  opigno_moxtra.score_meeting
+  base_route:  entity.opigno_moxtra_meeting.canonical
+  title: Score
+  weight: 12
+
+entity.opigno_moxtra_meeting_result.canonical:
+  route_name: entity.opigno_moxtra_meeting_result.canonical
+  base_route: entity.opigno_moxtra_meeting_result.canonical
+  title: 'View'
+
+entity.opigno_moxtra_meeting_result.edit_form:
+  route_name: entity.opigno_moxtra_meeting_result.edit_form
+  base_route: entity.opigno_moxtra_meeting_result.canonical
+  title: 'Edit'
+
+entity.opigno_moxtra_meeting_result.delete_form:
+  route_name:  entity.opigno_moxtra_meeting_result.delete_form
+  base_route:  entity.opigno_moxtra_meeting_result.canonical
+  title: Delete
+  weight: 10
+
+entity.opigno_moxtra_workspace.canonical:
+  route_name: entity.opigno_moxtra_workspace.canonical
+  base_route: entity.opigno_moxtra_workspace.canonical
+  title: 'View'
+
+entity.opigno_moxtra_workspace.edit_form:
+  route_name: entity.opigno_moxtra_workspace.edit_form
+  base_route: entity.opigno_moxtra_workspace.canonical
+  title: 'Edit'
+
+entity.opigno_moxtra_workspace.delete_form:
+  route_name:  entity.opigno_moxtra_workspace.delete_form
+  base_route:  entity.opigno_moxtra_workspace.canonical
+  title: Delete
+  weight: 10
+
+opigno_moxtra.workspace:
+  route_name:  opigno_moxtra.workspace
+  base_route:  entity.opigno_moxtra_workspace.canonical
+  title: Take
+  weight: 11
+
+entity.opigno_moxtra_meeting.collection:
+  title: 'Live Meetings'
+  weight: 10
+  base_route: system.admin_content
+  route_name: entity.opigno_moxtra_meeting.collection
+
+entity.opigno_moxtra_meeting_result.collection:
+  title: 'Live Meetings Results'
+  weight: 11
+  base_route: system.admin_content
+  route_name: entity.opigno_moxtra_meeting_result.collection
+
+entity.opigno_moxtra_workspace.collection:
+  title: 'Collaborative Workspaces'
+  weight: 12
+  base_route: system.admin_content
+  route_name: entity.opigno_moxtra_workspace.collection
+
+entity.opigno_moxtra_meeting.settings:
+  route_name: opigno_moxtra.live_meeting.settings
+  title: 'Settings'
+  base_route: opigno_moxtra.live_meeting.settings

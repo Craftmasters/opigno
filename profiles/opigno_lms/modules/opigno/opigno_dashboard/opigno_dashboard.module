@@ -1,0 +1,79 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_dashboard.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+define('OPIGNO_DASHBOARD_DEFAULT_CONFIG', '{"1":[{"admin_label":"Latest active trainings","id":"views_block:latest_active_trainings-block"}, {"admin_label":"Private Message: Dashboard - Last Threads","id":"views_block:private_message-block_dashboard"}],"2":[{"admin_label":"Opigno calendar block","id":"views_block:opigno_calendar-month_block"},{"admin_label":"Opigno Notifications: Dashboard - Unread Notifications","id":"views_block:opigno_notifications-block_unread_dashboard"}],"3":[]}');
+
+/**
+ * Implements hook_help().
+ */
+function opigno_dashboard_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_dashboard module.
+    case 'help.page.opigno_dashboard':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Opigno dashboard') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_dashboard_theme() {
+  return [
+    'opigno_dashboard' => [
+      'base hook' => 'region',
+      'variables' => [
+        'base_path' => '',
+        'base_href' => '',
+        'default_config' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_region().
+ */
+function opigno_dashboard_preprocess_region(&$variables) {
+  $request = \Drupal::request();
+
+  if (\Drupal::routeMatch()->getRouteName() == 'view.frontpage.page_1'
+      && $variables['region'] == 'content'
+    ) {
+    $variables['base_path'] = \Drupal::request()->getBasePath();
+    $variables['base_href'] = $request->getPathInfo();
+    $variables['default_config'] = OPIGNO_DASHBOARD_DEFAULT_CONFIG;
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function opigno_dashboard_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  // Override default frontpage content region.
+  if (\Drupal::routeMatch()->getRouteName() == 'view.frontpage.page_1'
+      && in_array('region__content', $suggestions)
+    ) {
+    $suggestions[] = 'opigno_dashboard';
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function opigno_dashboard_page_attachments(array &$page) {
+  // Add dashboard libaries.
+  if (\Drupal::routeMatch()->getRouteName() == 'view.frontpage.page_1') {
+    $page['#attached']['library'][] = 'opigno_dashboard/ng_app';
+  }
+}

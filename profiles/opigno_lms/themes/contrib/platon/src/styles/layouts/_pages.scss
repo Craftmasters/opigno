@@ -1,0 +1,44 @@
+html {
+  min-height: 100%;
+  display: flex;
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+
+    footer#site-footer,
+    header#site-header {
+      display: flex;
+    }
+
+    header#site-header {
+      margin-bottom: $header-margin-bottom;
+    }
+
+    footer#site-footer {
+      flex-flow: row wrap;
+      margin-top: $footer-margin-top;
+    }
+
+    #main {
+      display: flex;
+      flex: 1 0 auto;
+      margin-bottom: $footer-margin-top;
+
+      #first-sidebar {}
+
+      #main-content {
+        flex: 0 1 100%;
+      }
+    }
+
+    &.anonymous-slider {
+      #main {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
+  }
+}

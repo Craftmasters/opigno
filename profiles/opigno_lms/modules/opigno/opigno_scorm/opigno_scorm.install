@@ -1,0 +1,392 @@
+<?php
+
+/**
+ * @file
+ * Module install/update functionality.
+ */
+
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_schema().
+ */
+function opigno_scorm_schema() {
+  return [
+    'opigno_scorm_packages' => [
+      'description' => 'Uploaded SCORM packages.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'fid' => [
+          'description' => 'The managed file ID that references the SCORM package (ZIP file).',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'extracted_dir' => [
+          'descripition' => 'The location where the SCORM was extracted.',
+          'type' => 'text',
+        ],
+        'manifest_file' => [
+          'description' => 'The location of the manifest file.',
+          'type' => 'text',
+        ],
+        'manifest_id' => [
+          'type' => 'text',
+        ],
+        'metadata' => [
+          'description' => 'The serialized meta data of the manifest file.',
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => ['fid' => ['fid']],
+      'foreign keys' => [
+        'file_managed' => ['fid' => 'fid'],
+      ],
+    ],
+    'opigno_scorm_package_scos' => [
+      'description' => 'Uploaded SCORM package SCO items.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'scorm_id' => [
+          'description' => 'The SCORM package ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'organization' => [
+          'descripition' => 'The SCO organization.',
+          'type' => 'text',
+        ],
+        'identifier' => [
+          'descripition' => 'The SCO item identifier.',
+          'type' => 'text',
+        ],
+        'parent_identifier' => [
+          'descripition' => 'The SCO item parent identifier. Equals 0 if at the root of the tree.',
+          'type' => 'text',
+        ],
+        'launch' => [
+          'descripition' => 'The SCO item launch URL, if any.',
+          'type' => 'text',
+        ],
+        'type' => [
+          'descripition' => 'The SCO item internal type.',
+          'type' => 'text',
+        ],
+        'scorm_type' => [
+          'descripition' => 'The SCO item SCORM compliant type.',
+          'type' => 'text',
+        ],
+        'title' => [
+          'descripition' => 'The SCO item title.',
+          'type' => 'text',
+        ],
+        'weight' => [
+          'descripition' => 'The SCO item weight. The heavier the weight, the later it will show up in a navigation tree.',
+          'type' => 'int',
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => ['scorm_id' => ['scorm_id']],
+      'foreign keys' => [
+        'opigno_scorm_packages' => ['scorm_id' => 'id'],
+      ],
+    ],
+    'opigno_scorm_package_sco_attributes' => [
+      'description' => 'Uploaded SCORM package SCO item attributes.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'sco_id' => [
+          'description' => 'The SCORM item ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'attribute' => [
+          'type' => 'text',
+        ],
+        'value' => [
+          'type' => 'text',
+        ],
+        'serialized' => [
+          'type' => 'int',
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => ['sco_id' => ['sco_id']],
+      'foreign keys' => [
+        'opigno_scorm_package_scos' => ['sco_id' => 'id'],
+      ],
+    ],
+    'opigno_scorm_scorm_cmi_data' => [
+      'description' => 'SCORM package SCORM CMI data attributes.',
+      'fields' => [
+        'uid' => [
+          'description' => 'The user ID this data belongs to.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'scorm_id' => [
+          'description' => 'The SCORM ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'cmi_key' => [
+          'description' => 'The CMI data key string.',
+          'type' => 'varchar',
+          'length' => 190,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'value' => [
+          'type' => 'text',
+        ],
+        'serialized' => [
+          'type' => 'int',
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['uid', 'scorm_id', 'cmi_key'],
+      'indexes' => [
+        'scorm_id' => ['scorm_id'],
+        'uid' => ['uid'],
+        'cmi_key' => ['cmi_key'],
+      ],
+      'foreign keys' => [
+        'opigno_scorm_packages' => ['scorm_id' => 'id'],
+        'users' => ['uid' => 'uid'],
+      ],
+    ],
+    'opigno_scorm_user_answer_results' => [
+      'description' => 'Table storing user H5P answer results.',
+      'fields' => [
+        'id' => [
+          'description' => 'Primary Key.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'question_id' => [
+          'description' => 'Opigno activity ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'question_vid' => [
+          'description' => 'Opigno activity vid.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'answer_id' => [
+          'description' => 'Opigno answer ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'answer_vid' => [
+          'description' => 'Opigno answer vid.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => FALSE,
+        ],
+        'interaction_id' => [
+          'description' => 'Question ID.',
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'interaction_type' => [
+          'description' => 'Question type.',
+          'type' => 'varchar',
+          'length' => 32,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'description' => [
+          'description' => 'Question text.',
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+        'correct_responses_pattern' => [
+          'description' => 'Correct responses pattern.',
+          'type' => 'text',
+          'size' => 'medium',
+        ],
+        'response' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'result' => [
+          'type' => 'varchar',
+          'length' => 16,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'timestamp' => [
+          'description' => 'Time of question answered',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'interaction_id' => ['interaction_id'],
+        'answer_id' => ['answer_id'],
+        'answer_vid' => ['answer_vid'],
+        'question_id' => ['question_id'],
+        'question_vid' => ['question_vid'],
+        'timestamp' => ['timestamp'],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Sets cmi_key field length to 190.
+ *
+ * To avoid error 1709 on MySQL < 5.7.7 without innodb_large_prefix.
+ */
+function opigno_scorm_update_8001(&$sandbox) {
+  $table_name = 'opigno_scorm_scorm_cmi_data';
+
+  $db_schema = Database::getConnection()->schema();
+  $db_schema->dropPrimaryKey($table_name);
+  $db_schema->dropIndex($table_name, 'cmi_key');
+
+  $spec = [
+    'description' => 'The CMI data key string.',
+    'type' => 'varchar',
+    'length' => 190,
+    'not null' => TRUE,
+    'default' => '',
+  ];
+
+  $keys_new = [
+    'fields' => [
+      'cmi_key' => $spec,
+    ],
+    'indexes' => [
+      'cmi_key' => ['cmi_key'],
+    ],
+  ];
+
+  $db_schema->changeField($table_name, 'cmi_key', 'cmi_key', $spec, $keys_new);
+  $db_schema->addPrimaryKey($table_name, ['uid', 'scorm_id', 'cmi_key']);
+}
+
+/**
+ * Installs the "opigno_scorm_user_answer_results" table.
+ */
+function opigno_scorm_update_8002() {
+  $table = [
+    'description' => 'Table storing user H5P answer results.',
+    'fields' => [
+      'id' => [
+        'description' => 'Primary Key.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'question_id' => [
+        'description' => 'Opigno activity ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'question_vid' => [
+        'description' => 'Opigno activity vid.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'answer_id' => [
+        'description' => 'Opigno answer ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'answer_vid' => [
+        'description' => 'Opigno answer vid.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+      ],
+      'interaction_id' => [
+        'description' => 'Question ID.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'interaction_type' => [
+        'description' => 'Question type.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'description' => [
+        'description' => 'Question text.',
+        'type' => 'text',
+        'size' => 'medium',
+      ],
+      'correct_responses_pattern' => [
+        'description' => 'Correct responses pattern.',
+        'type' => 'text',
+        'size' => 'medium',
+      ],
+      'response' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'result' => [
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'timestamp' => [
+        'description' => 'Time of question answered',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'interaction_id' => ['interaction_id'],
+      'answer_id' => ['answer_id'],
+      'answer_vid' => ['answer_vid'],
+      'question_id' => ['question_id'],
+      'question_vid' => ['question_vid'],
+      'timestamp' => ['timestamp'],
+    ],
+  ];
+
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_scorm_user_answer_results')) {
+    $schema->createTable('opigno_scorm_user_answer_results', $table);
+  }
+}

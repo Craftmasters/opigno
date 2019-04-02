@@ -1,0 +1,9 @@
+services:
+  opigno_catalog.get_style:
+    class: Drupal\opigno_catalog\StyleService
+    arguments: []
+  opigno_catalog.twig.extension:
+    class: Drupal\opigno_catalog\TwigExtension\DefaultTwigExtension
+    arguments: ['@renderer']
+    tags:
+      - { name: twig.extension }

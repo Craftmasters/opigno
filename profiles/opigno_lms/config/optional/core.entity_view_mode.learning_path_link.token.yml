@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_learning_path
+id: learning_path_link.token
+label: Token
+targetEntityType: learning_path_link
+cache: true

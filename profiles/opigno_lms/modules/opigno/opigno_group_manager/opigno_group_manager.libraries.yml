@@ -1,0 +1,16 @@
+manage_app:
+  version: VERSION
+  js:
+    ng/dist/inline.bundle.js: {}
+    ng/dist/polyfills.bundle.js: {}
+    ng/dist/main.bundle.js: {}
+  css:
+    theme:
+      https://fonts.googleapis.com/icon?family=Material+Icons: { type: external }
+      ng/dist/assets/css/dragula.css: {}
+      ng/dist/styles.bundle.css: {}
+
+ajax_form:
+  version: VERSION
+  js:
+    js/opigno_group_iframe.js: {}

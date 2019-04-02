@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: ilt_calendar_event
+label: 'Instructor-led training calendar event'
+description: ''
+date_field_type: daterange

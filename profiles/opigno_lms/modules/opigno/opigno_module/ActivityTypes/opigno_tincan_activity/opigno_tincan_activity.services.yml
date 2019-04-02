@@ -1,0 +1,7 @@
+services:
+  opigno_tincan_activity.tincan:
+    class: Drupal\opigno_tincan_activity\TincanService
+    arguments: ['@database']
+  opigno_tincan_activity.answer_assistant:
+    class: Drupal\opigno_tincan_activity\TincanContentAnswerAssistant
+    arguments: ['@database']

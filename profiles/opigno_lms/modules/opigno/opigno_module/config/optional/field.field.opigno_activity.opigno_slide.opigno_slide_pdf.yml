@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_slide_pdf
+    - media.type.pdf_file
+    - opigno_module.opigno_activity_type.opigno_slide
+  module:
+    - media
+id: opigno_activity.opigno_slide.opigno_slide_pdf
+field_name: opigno_slide_pdf
+entity_type: opigno_activity
+bundle: opigno_slide
+label: PDF
+description: 'The file uploaded here will be displayed inside the slide'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      pdf_file: pdf_file
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: file
+field_type: entity_reference

@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Learning path category'
+vid: learning_path_category
+description: 'Use this taxonomy to assign categories for learning path'
+hierarchy: 0
+weight: 0

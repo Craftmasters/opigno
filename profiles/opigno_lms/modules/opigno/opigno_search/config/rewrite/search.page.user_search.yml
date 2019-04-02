@@ -1,0 +1,12 @@
+config_rewrite: replace
+langcode: en
+status: true
+dependencies:
+  module:
+  - user
+id: user_search
+label: Users
+path: user
+weight: 0
+plugin: user_search
+configuration: {  }

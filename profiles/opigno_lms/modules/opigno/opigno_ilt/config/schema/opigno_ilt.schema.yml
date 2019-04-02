@@ -1,0 +1,9 @@
+# Schema for the configuration files of the "Opigno ILT" module.
+
+field.field.*.*.*.third_party.opigno_calendar_event:
+  type: mapping
+  label: "Opigno Calendar Event settings"
+  mapping:
+    embedded_widget:
+      type: integer
+      label: "Embedded widget option"

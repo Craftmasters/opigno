@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+id: learning_path-user_manager
+label: 'User manager'
+weight: -9
+internal: false
+audience: member
+group_type: learning_path
+permissions_ui: true
+permissions:
+  - 'view group'
+  - 'administer members'
+  - 'update own group_membership content'
+  - 'leave group'
+  - 'view group_membership content'
+  - 'view own results'

@@ -1,0 +1,6 @@
+services:
+  opigno_messaging.twig.extension:
+    class: Drupal\opigno_messaging\TwigExtension\DefaultTwigExtension
+    arguments: []
+    tags:
+      - { name: twig.extension }

@@ -1,0 +1,374 @@
+<?php
+
+/**
+ * @file
+ * Module functionality implementation.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\opigno_module\Entity\OpignoAnswer;
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function opigno_scorm_field_widget_info_alter(array &$info) {
+  $info['file_generic']['field_types'][] = 'opigno_scorm_package';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_scorm_theme() {
+  return [
+    'opigno_scorm__player' => [
+      'variables' => ['scorm_id' => NULL, 'tree' => [], 'start_sco' => NULL],
+      'template' => 'opigno-scorm--player',
+    ],
+    'opigno_scorm__player_tree' => [
+      'variables' => ['tree' => []],
+      'template' => 'opigno-scorm--player-tree',
+    ],
+    'opigno_scorm__player_tree_item' => [
+      'variables' => ['sco' => NULL],
+      'template' => 'opigno-scorm--player-tree-item',
+    ],
+  ];
+}
+
+/**
+ * Get the available CMI paths for the SCORM player.
+ *
+ * Invokes the hook_opigno_scorm_register_cmi_paths()
+ * on all implementing modules to retrieve data
+ * to pass to the SCORM player.
+ */
+function opigno_scorm_add_cmi_paths($scorm_version) {
+  $paths = \Drupal::moduleHandler()->invokeAll('opigno_scorm_register_cmi_paths', [$scorm_version]);
+  \Drupal::moduleHandler()->alter('opigno_scorm_register_cmi_paths', $paths);
+  return $paths;
+}
+
+/**
+ * Get the CMI data for the SCORM player.
+ *
+ * Invokes the hook_opigno_scorm_ui_register_cmi_data()
+ * on all implementing modules to retrieve data
+ * to pass to the SCORM player.
+ *
+ * @param object $scorm
+ *   Scorm object.
+ * @param array $scos
+ *   Scos array.
+ *
+ * @return array
+ *   Cmi data.
+ */
+function opigno_scorm_add_cmi_data($scorm, array $scos, $scorm_version) {
+  $data = \Drupal::moduleHandler()
+    ->invokeAll('opigno_scorm_register_cmi_data', [
+      $scorm,
+      $scos,
+      $scorm_version,
+    ]);
+  \Drupal::moduleHandler()->alter('opigno_scorm_register_cmi_data', $data, $scorm, $scos);
+  return $data;
+}
+
+/**
+ * Implements hook_opigno_scorm_register_cmi_paths().
+ */
+function opigno_scorm_opigno_scorm_register_cmi_paths($scorm_version) {
+  switch ($scorm_version) {
+    case '2004':
+      $data = [
+        'cmi.location' => [],
+        'cmi.completion_status' => [],
+        'cmi.exit' => [],
+        'cmi.learner_id' => [],
+        'cmi.learner_name' => [],
+        'cmi.learner_preference._children' => [],
+        'cmi.learner_preference.audio_level' => [],
+        'cmi.learner_preference.language' => [],
+        'cmi.learner_preference.delivery_speed' => [],
+        'cmi.learner_preference.audio_captioning' => [],
+      ];
+      break;
+
+    case '1.2':
+      $data = [
+        'cmi.core.lesson_location' => [],
+        'cmi.core.lesson_status' => [],
+        'cmi.core.exit' => [],
+        'cmi.core.student_name' => [],
+        'cmi.core.student_id' => [],
+        'cmi.student_preference._children' => [],
+        'cmi.student_preference.audio' => [],
+        'cmi.student_preference.language' => [],
+        'cmi.student_preference.speed' => [],
+        'cmi.student_preference.text' => [],
+        'cmi.core.score._children' => [],
+      ];
+      break;
+  }
+  return $data;
+}
+
+/**
+ * Implements hook_opigno_scorm_register_cmi_data().
+ */
+function opigno_scorm_opigno_scorm_register_cmi_data($scorm, $scos, $scorm_version) {
+  $account = \Drupal::currentUser();
+
+  if (!$account->id()) {
+    $learner_name = "anonymous";
+  }
+  else {
+    $learner_name = $account->getAccountName();
+  }
+
+  switch ($scorm_version) {
+    case '2004':
+      $data = [
+        'cmi.location' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.location', ''),
+        'cmi.completion_status' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.completion_status', 'unknown'),
+        'cmi.exit' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.exit', ''),
+        'cmi.learner_id' => $account->id(),
+        'cmi.learner_name' => $learner_name,
+        'cmi.learner_preference._children' => "audio_level,language,delivery_speed,audio_captioning",
+        'cmi.learner_preference.audio_level' => 1,
+        'cmi.learner_preference.language' => '',
+        'cmi.learner_preference.delivery_speed' => 1,
+        'cmi.learner_preference.audio_captioning' => 0,
+      ];
+      break;
+
+    case '1.2':
+      $data = [
+        'cmi.core.lesson_location' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.lesson_location', ''),
+        'cmi.core.exit' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.exit', ''),
+        'cmi.core.student_id' => $account->id(),
+        'cmi.core.student_name' => $learner_name,
+        'cmi.student_preference._children' => "audio,language,speed,text",
+        'cmi.student_preference.audio' => [],
+        'cmi.student_preference.language' => [],
+        'cmi.student_preference.speed' => [],
+        'cmi.student_preference.text' => [],
+        'cmi.core.score._children' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.score._children', 'raw,min,max'),
+      ];
+      break;
+  }
+
+  return $data;
+}
+
+/**
+ * Helper function to get SCORM CMI data while also providing a default value.
+ *
+ * @param int $uid
+ *   User ID.
+ * @param int $scorm_id
+ *   Scorn ID.
+ * @param string $cmi_key
+ *   Cmi key.
+ * @param mixed $default_value
+ *   Default.
+ *
+ * @return mixed|null
+ *   Scorm cmi.
+ */
+function opigno_scorm_scorm_cmi_get($uid, $scorm_id, $cmi_key, $default_value = NULL) {
+  $value = opigno_scorm_cmi_get($uid, $scorm_id, $cmi_key);
+  return isset($value) ? $value : $default_value;
+}
+
+/**
+ * Get a CMI data value for the given SCORM.
+ *
+ * @param int $uid
+ *   User ID.
+ * @param int $scorm_id
+ *   Scorn ID.
+ * @param string $cmi_key
+ *   Cmi key.
+ *
+ * @return mixed|null
+ *   Scorm cmi.
+ */
+function opigno_scorm_cmi_get($uid, $scorm_id, $cmi_key) {
+  $data = NULL;
+  $result = db_select('opigno_scorm_scorm_cmi_data', 'o')
+    ->fields('o', ['value', 'serialized'])
+    ->condition('o.uid', $uid)
+    ->condition('o.scorm_id', $scorm_id)
+    ->condition('o.cmi_key', $cmi_key)
+    ->execute()
+    ->fetchObject();
+
+  if (isset($result->value)) {
+    $data = !empty($result->serialized) ? unserialize($result->value) : $result->value;
+  }
+
+  return $data;
+}
+
+/**
+ * Set a CMI data value for the given SCORM.
+ *
+ * @param int $uid
+ *   User ID.
+ * @param int $scorm_id
+ *   Scorn ID.
+ * @param string $cmi_key
+ *   Cmi key.
+ * @param string $value
+ *   Value.
+ *
+ * @return bool
+ *   Scorm cmi set flag.
+ *
+ * @throws \Exception
+ */
+function opigno_scorm_scorm_cmi_set($uid, $scorm_id, $cmi_key, $value) {
+  if (isset($value)) {
+    $serialized = 0;
+    if (is_array($value) || is_object($value)) {
+      $value = serialize($value);
+      $serialized = 1;
+    }
+    elseif (is_bool($value)) {
+      $value = (int) $value;
+    }
+
+    $result = db_merge('opigno_scorm_scorm_cmi_data')
+      ->keys([
+        'uid' => $uid,
+        'scorm_id' => $scorm_id,
+        'cmi_key' => $cmi_key,
+      ])
+      ->fields([
+        'uid' => $uid,
+        'scorm_id' => $scorm_id,
+        'cmi_key' => $cmi_key,
+        'value' => $value,
+        'serialized' => $serialized,
+      ])
+      ->execute();
+
+    return !!$result;
+  }
+  else {
+    return TRUE;
+  }
+}
+
+/**
+ * Implements hook_opigno_scorm_commit().
+ */
+function opigno_scorm_opigno_scorm_commit($scorm, $sco_id, $data) {
+  $account = Drupal::currentUser();
+
+  if (!empty($data->scorm_version)) {
+    switch ($data->scorm_version) {
+      case '2004':
+        // Store the last visited SCO id.
+        opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'user.sco', $sco_id);
+
+        // Store the last position.
+        if (!empty($data->cmi->location)) {
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.location', $data->cmi->location);
+        }
+
+        // Store suspend data value.
+        if (!empty($data->cmi->suspend_data)) {
+          if (!is_null($sco_id)) {
+            opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.suspend_data.' . $sco_id, $data->cmi->suspend_data);
+          }
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.suspend_data', $data->cmi->suspend_data);
+        }
+
+        // Store the completion status.
+        if (!empty($data->cmi->completion_status)) {
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.completion_status', $data->cmi->completion_status);
+        }
+        break;
+
+      case '1.2':
+        // Store the last position.
+        if (!empty($data->cmi->core->lesson_location)) {
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.core.lesson_location', $data->cmi->core->lesson_location);
+        }
+
+        // Store suspend data value.
+        if (!empty($data->cmi->suspend_data)) {
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.suspend_data', $data->cmi->suspend_data);
+        }
+
+        // Store the completion status.
+        if (!empty($data->cmi->core->lesson_status)) {
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.core.lesson_status', $data->cmi->core->lesson_status);
+        }
+        break;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_scorm_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id === 'opigno_answer_opigno_scorm_form') {
+    $form['actions']['submit']['#submit'][] = '_opigno_scorm_form_submit';
+  }
+}
+
+/**
+ * Form submit callback, used in opigno_h5p_form_alter().
+ *
+ * Saves user answer & correct answer patterns.
+ */
+function _opigno_scorm_form_submit($form, FormStateInterface $form_state) {
+  $storage = $form_state->getStorage();
+  if (!empty($storage['scorm_answer']) && !empty($_SESSION['scorm_answer_results'])) {
+    if (!empty($_SESSION['scorm_answer_results']['data']->cmi->interactions)) {
+      foreach ($_SESSION['scorm_answer_results']['data']->cmi->interactions as $interaction) {
+        _opigno_scorm_save_interaction($interaction, $storage['scorm_answer']);
+      }
+    }
+
+    unset($_SESSION['scorm_answer_results']);
+  }
+}
+
+/**
+ * Recursive save of xAPI data.
+ *
+ * @param mixed $interaction
+ *   Interaction object array.
+ * @param \Drupal\opigno_module\Entity\OpignoAnswer $answer
+ *   OpignoAnswer object.
+ */
+function _opigno_scorm_save_interaction($interaction, OpignoAnswer $answer) {
+  $db_connection = \Drupal::service('database');
+  $activity = $answer->getActivity();
+  try {
+    // Save SCORM interaction data.
+    $db_connection->insert('opigno_scorm_user_answer_results')
+      ->fields([
+        'interaction_id' => $interaction->id,
+        'question_id' => $activity->id(),
+        'question_vid' => $activity->getLoadedRevisionId(),
+        'answer_id' => $answer->id(),
+        'answer_vid' => $answer->getLoadedRevisionId(),
+        'interaction_type' => $interaction->type,
+        'description' => $interaction->description,
+        'correct_responses_pattern' => '',
+        'response' => $interaction->learner_response,
+        'result' => $interaction->result,
+        'timestamp' => strtotime($interaction->timestamp),
+      ])
+      ->execute();
+  }
+  catch (Exception $e) {
+    \Drupal::logger('opigno_scorm')->error($e->getMessage());
+  }
+}

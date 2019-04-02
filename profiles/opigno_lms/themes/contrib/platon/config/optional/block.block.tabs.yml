@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - platon
+id: tabs
+theme: platon
+region: content
+weight: 0
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Tabs
+  provider: core
+  label_display: '0'
+  primary: true
+  secondary: true
+visibility:
+  request_path:
+    id: request_path
+    pages: "/group/*\r\n/opigno/calendar\r\n/user/*/edit\r\n/user/*"
+    negate: true
+    context_mapping: {  }

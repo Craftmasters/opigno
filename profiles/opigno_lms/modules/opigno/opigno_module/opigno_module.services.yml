@@ -1,0 +1,6 @@
+services:
+  opigno_module.opigno_module:
+    class: Drupal\opigno_module\Controller\OpignoModuleController
+  plugin.manager.activity_answer:
+    class: Drupal\opigno_module\ActivityAnswerManager
+    parent: default_plugin_manager

@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_statistics.module.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\group\Entity\Group;
+use Drupal\user\UserInterface;
+use Drupal\Core\Database\Database;
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function opigno_statistics_group_access(Group $group, $operation, AccountInterface $account) {
+  // Update user activity.
+  $timestamp = strtotime("midnight", \Drupal::time()->getRequestTime());
+  $datetime = DrupalDateTime::createFromTimestamp($timestamp);
+  $datetime_str = $datetime->format(DrupalDateTime::FORMAT);
+
+  $connection = Database::getConnection();
+  $query_a = $connection
+    ->select('opigno_statistics_user_login', 'o_s_u_l')
+    ->condition('o_s_u_l.date', $datetime_str, '>')
+    ->condition('o_s_u_l.uid', $account->id());
+  $user_activity = $query_a->countQuery()->execute()->fetchField();
+
+  if ($user_activity == 0) {
+    $timestamp = \Drupal::time()->getRequestTime();
+    $datetime = DrupalDateTime::createFromTimestamp($timestamp);
+    $datetime_str = $datetime->format(DrupalDateTime::FORMAT);
+
+    // Store user login event to the database.
+    \Drupal::database()
+      ->insert('opigno_statistics_user_login')
+      ->fields([
+        'uid' => $account->id(),
+        'date' => $datetime_str,
+      ])
+      ->execute();
+  }
+
+  if ($operation === 'view statistics') {
+    if ($account->hasPermission('view global statistics')
+      || $account->hasPermission('view any group statistics')
+      || $group->hasPermission('view group statistics', $account)) {
+      return AccessResult::allowed();
+    }
+    else {
+      // Check if user has role 'student manager' in any of trainings.
+      $query_c = $connection
+        ->select('group_content_field_data', 'g_c_f_d')
+        ->fields('g_c_f_d', ['gid']);
+      $query_c->leftJoin('group_content__group_roles', 'g_c_g_r', 'g_c_f_d.id = g_c_g_r.entity_id');
+      $query_c->condition('g_c_g_r.group_roles_target_id', 'learning_path-user_manager');
+      $query_c->condition('g_c_f_d.entity_id', $account->id());
+      $query_c->condition('g_c_f_d.type', 'learning_path-group_membership');
+      $query_c->condition('g_c_f_d.gid', $group->id());
+      $lp_counts = $query_c->countQuery()->execute()->fetchField();
+
+      if ($lp_counts > 0) {
+        return AccessResult::allowed();
+      }
+      else {
+        return AccessResult::forbidden();
+      }
+    }
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function opigno_statistics_user_access(UserInterface $user, $operation, AccountInterface $account) {
+  if ($operation === 'view statistics') {
+    // Allow users to view their own profile.
+    if ($account->id() === $user->id()) {
+      return AccessResult::allowed();
+    }
+
+    if ($account->hasPermission('view global statistics')
+      || $account->hasPermission('view any user statistics')) {
+      return AccessResult::allowed();
+    }
+    else {
+      return AccessResult::forbidden();
+    }
+  }
+
+  return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function opigno_statistics_user_login($account) {
+  /** @var \Drupal\Core\Session\AccountInterface $account */
+  $uid = $account->id();
+  $timestamp = \Drupal::time()->getRequestTime();
+  $datetime = DrupalDateTime::createFromTimestamp($timestamp);
+  $datetime_str = $datetime->format(DrupalDateTime::FORMAT);
+
+  // Store user login event to the database.
+  \Drupal::database()
+    ->insert('opigno_statistics_user_login')
+    ->fields([
+      'uid' => $uid,
+      'date' => $datetime_str,
+    ])
+    ->execute();
+}

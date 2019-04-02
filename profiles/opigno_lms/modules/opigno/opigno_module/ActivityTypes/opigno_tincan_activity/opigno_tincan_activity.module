@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * @file
+ * The main module file which contains the main drupal hooks.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_file_delete().
+ */
+function opigno_tincan_activity_file_delete($file) {
+  // Delete the extracted files that are in the extracted folder.
+  $tincan_content_service = \Drupal::service('opigno_tincan_activity.tincan');
+  $len = strlen($tincan_content_service->PATH_PUBLIC_PACKAGE_FOLDER);
+  if (substr($file->getFileUri(), 0, $len) === $tincan_content_service->PATH_PUBLIC_PACKAGE_FOLDER) {
+    file_unmanaged_delete_recursive($tincan_content_service->getExtractPath($file));
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function opigno_tincan_activity_form_opigno_activity_opigno_tincan_add_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['#validate'][] = 'opigno_tincan_activity_form_opigno_activity_opigno_tincan_add_form_validate';
+}
+
+/**
+ * Function called when a form for type opigno_tincan_activity is raised.
+ */
+function opigno_tincan_activity_form_opigno_activity_opigno_tincan_add_form_validate(&$form, FormStateInterface $form_state) {
+  $messenger = \Drupal::messenger();
+
+  // Check if Tincan PHP library is installed.
+  $has_library = opigno_tincan_api_tincanphp_is_installed();
+  if (!$has_library) {
+    $form_state->setError($form, t('Impossible to create a new TinCan Package activity.'));
+    $messenger->addWarning(Markup::create("Please install the TinCanPHP library using Composer, with the command: <em>composer require rusticisoftware/tincan:@stable</em>"));
+  }
+  else {
+    // Check if the LRS settings are set.
+    $config = \Drupal::config('opigno_tincan_api.settings');
+    $endpoint = $config->get('opigno_tincan_api_endpoint');
+    $username = $config->get('opigno_tincan_api_username');
+    $password = $config->get('opigno_tincan_api_password');
+
+    if (empty($endpoint) || empty($username) || empty($password)) {
+      $form_state->setError($form, t('Impossible to create a new TinCan Package activity. Please, configure the LRS connection in the @setting_page.',
+        ['@setting_page' => Link::createFromRoute('settings page', 'opigno_tincan_api.settings_form')->toString()]
+      ));
+    }
+  }
+}
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_activity_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_modules module.
+    case 'help.page.opigno_tincan_activity':
+      // --- The ABOUT section.
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Opigno TinCan Activity module adds a new activity type. 
+    With this new activity type, you will be able to upload an TinCan Package 
+    and use it as an activity inside a module.') . '</p>';
+
+      // --- The USES section.
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dl>';
+
+      $output .= '<dt>' . t('Install Tincan PHP library') . '</dt>';
+      $output .= '<dd>' . t('First of all, for using Tincan Package activity you need to check if @tincan_library is installed.',
+          [
+            '@tincan_library' => Link::fromTextAndUrl(t('TinCan PHP library'), Url::fromUri('https://github.com/RusticiSoftware/TinCanPHP'))->toString(),
+          ]
+          )
+        . '</dd>';
+      $output .= '<dd>' . t('If not, install it with the command:')
+        . ' ' . '<em>composer require rusticisoftware/tincan:@stable</em></dd>';
+      $output .= '<dl>';
+
+      $output .= '<dt>' . t('Create a new activity type') . '</dt>';
+      $output .= '<dd>' . t('When you create a activity type, you will be able to choose the TinCan Package type of activity. Then, you will be asked to choose a title and to upload a TinCan Package. You can find some on the @tincan_packages_site.',
+          [
+            '@tincan_packages_site' => Link::fromTextAndUrl(t('TinCan Website'), Url::fromUri('https://xapi.com/download-prototypes/'))->toString(),
+          ]
+        ) . '</dd>';
+
+      $output .= '<dt>' . t('Answer a TinCan activity') . '</dt>';
+      $output .= '<dd>' . t('To answer a TinCan activity, you just have to start the module that contains the activity previously created. The TinCan Package will appear in an iFrame.');
+
+      $output .= '<dt>' . t('Get the score') . '</dt>';
+      $output .= '<dd>' . t('The score is taken directly from the LRS. The TinCan Package must provide the score in the way described in the README.md file or on the @module_page to the LRS. Then, this module will get the score back from the LRS and register it to this Opigno LMS instance.',
+          [
+            '@module_page' => Link::fromTextAndUrl(t('module page'), Url::fromUri('https://www.drupal.org/sandbox/amermod/2705191'))->toString(),
+          ]
+        ) . '</dd>';
+
+      $output .= '<dt>' . t('TinCan Package specifications') . '</dt>';
+      $output .= '<dd>' . t('The TinCan Package must follow, at least, the specifications written in the README.md file or on the @module_page. A good TinCan Package should follow the specifications written on the official @github_page.',
+          [
+            '@module_page' => Link::fromTextAndUrl(t('module page'), Url::fromUri('https://www.drupal.org/sandbox/amermod/2705191'))->toString(),
+            '@github_page' => Link::fromTextAndUrl(t('Github page'), Url::fromUri('https://github.com/RusticiSoftware/launch/blob/master/lms_lrs.md'))->toString(),
+          ]
+        ) . '</dd>';
+      $output .= '</dl>';
+
+      return $output;
+  }
+}

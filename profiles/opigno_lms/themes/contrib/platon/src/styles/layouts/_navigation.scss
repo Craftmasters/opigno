@@ -1,0 +1,111 @@
+#menu-wrapper {
+  margin-bottom: $menu-margin-bottom;
+
+  @include media-breakpoint-down($header-mobile-breakpoint) {
+    display: none;
+    margin-top: -$header-margin-bottom;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 0;
+    width: auto;
+    max-width: none;
+
+    &.show {
+      display: block;
+    }
+  }
+
+  > div {
+    @include media-breakpoint-down($header-mobile-breakpoint) {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+  }
+}
+
+nav.block-system_menu_block-main,
+nav#mobile-menu {
+  padding: 2rem 1.5rem 0;
+
+  @include media-breakpoint-down($header-mobile-breakpoint) {
+    padding-top: 0;
+  }
+
+  ul:not(.contextual-links) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+
+    li {
+      @include media-breakpoint-up(breakpoint-next($header-mobile-breakpoint)) {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      & + li {
+        @include media-breakpoint-up(breakpoint-next($header-mobile-breakpoint)) {
+          margin-left: 1rem;
+        }
+      }
+
+      a {
+        $color: #c7c7c7;
+        $color-hover: $blue;
+        background-size: 28px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: $color;
+        text-decoration: none;
+        padding: 2.5rem 0.75rem;
+
+        @each $picto in (search, user, administration, help, logout) {
+          &.#{$picto} {
+            @include svg-picto(#{'picto-' + $picto});
+          }
+        }
+
+        @include media-breakpoint-up(breakpoint-next($header-mobile-breakpoint)) {
+          border-bottom: 3px solid transparent;
+          min-width: 110px;
+          height: 67px;
+        }
+
+        @include media-breakpoint-down($header-mobile-breakpoint) {
+          padding: 1rem 0.75rem 1rem 0;
+          font-size: 1rem !important;
+          text-align: left;
+          background-position: left center !important;
+          padding-left: 3rem;
+        }
+
+        &.is-active,
+        &:hover {
+          border-bottom-color: $color-hover;
+          color: $color-hover;
+        }
+
+        @each $path, $picto in $menu-pictos {
+          &[data-drupal-link-system-path="#{$path}"] {
+            @include svg-picto($picto);
+            display: block;
+
+            @include media-breakpoint-up(breakpoint-next($header-mobile-breakpoint)) {
+              background-position: center top;
+              font-size: 0.9rem;
+              text-align: center;
+            }
+
+            @include media-breakpoint-down($header-mobile-breakpoint) {
+              font-size: 1rem;
+              text-align: left;
+              background-position: left center;
+              padding-left: 3rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

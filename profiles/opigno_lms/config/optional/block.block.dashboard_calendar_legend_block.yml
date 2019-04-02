@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - calendar
+    - system
+  theme:
+    - platon
+id: dashboard_calendar_legend_block
+theme: platon
+region: content
+weight: -3
+provider: null
+plugin: calendar_legend_block
+settings:
+  id: calendar_legend_block
+  label: 'Dashboard: Calendar legend'
+  provider: calendar
+  label_display: visible
+  calendar_legend_view_settings_view: 'opigno_calendar:month_block'
+visibility:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: false
+    context_mapping: {  }

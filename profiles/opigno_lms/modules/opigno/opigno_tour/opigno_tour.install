@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * @file
+ * Opigno Tour module install/uninstall functions.
+ */
+
+use Drupal\user\RoleInterface;
+use Drupal\user\Entity\Role;
+
+/**
+ * Opigno Tour table.
+ */
+function opigno_tour_schema() {
+  $schema['opigno_tour_user_routes'] = [
+    'description' => 'Stores PM thread delete time data.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique delete ID.',
+      ],
+      'uid' => [
+        'description' => 'User ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'route' => [
+        'description' => 'Route ID',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'timestamp' => [
+        'description' => 'Time of page viewed',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'uid_route' => ['uid', 'route'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Set tours access permissions for authenticated user role.
+ *
+ * Implements hook_install().
+ */
+function opigno_tour_update_8001() {
+  $role = Role::load(RoleInterface::AUTHENTICATED_ID);
+  $issueAccessPermissions = [
+    'access tour',
+  ];
+  foreach ($issueAccessPermissions as $permission) {
+    $role->grantPermission($permission);
+  }
+  $role->save();
+}
+
+/**
+ * Removes migration temporary database table.
+ */
+function opigno_tour_uninstall() {
+  // Remove module configs.
+  $configs = [
+    'tour.tour.front',
+    'tour.tour.catalogue',
+    'tour.tour.achievements',
+    'tour.tour.training',
+    'tour.tour.training_edit',
+  ];
+  foreach ($configs as $config) {
+    try {
+      \Drupal::configFactory()->getEditable($config)->delete();
+    }
+    catch (Exception $e) {
+      \Drupal::logger('opigno_tour')->error($e->getMessage());
+    }
+  }
+}

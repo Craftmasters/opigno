@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+name: learning_path_thumbnail
+label: 'Learning path thumbnail'
+effects:
+  1ed761d3-24fd-439d-864e-79ff65747563:
+    uuid: 1ed761d3-24fd-439d-864e-79ff65747563
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 298
+      height: 165

@@ -1,0 +1,292 @@
+<?php
+
+/**
+ * @file
+ * Module main functionality.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_scorm_activity_theme() {
+  return [
+    'opigno_user_result_item__opigno_scorm' => [
+      'render element' => 'elements',
+      'file' => 'opigno_scorm_activity.theme.inc',
+    ],
+    'opigno_answer__opigno_scorm__full' => [
+      'variables' => [
+        'content' => NULL,
+        'table' => NULL,
+      ],
+      'file' => 'opigno_scorm_activity.theme.inc',
+      'template' => 'opigno-answer--opigno-scorm--full',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_opigno_scorm_register_cmi_paths().
+ */
+function opigno_scorm_activity_opigno_scorm_register_cmi_paths($scorm_version) {
+  switch ($scorm_version) {
+    case '2004':
+      $data = [
+        'cmi.score.raw' => [],
+        'cmi.score.min' => [],
+        'cmi.score.max' => [],
+        'cmi.score.scaled' => [],
+        'cmi.suspend_data' => [],
+        'cmi.success_status' => [],
+        'cmi.objectives' => [],
+        'cmi.objectives._count' => ['readOnly' => 1],
+        'cmi.objectives._children' => ['readOnly' => 1],
+        'cmi.objectives.n.id' => [],
+        'cmi.objectives.n.score' => [],
+        'cmi.objectives.n.score._children' => ['readOnly' => 1],
+        'cmi.objectives.n.score.scaled' => [],
+        'cmi.objectives.n.score.raw' => [],
+        'cmi.objectives.n.score.min' => [],
+        'cmi.objectives.n.score.max' => [],
+        'cmi.objectives.n.success_status' => [],
+        'cmi.objectives.n.completion_status' => [],
+        'cmi.objectives.n.progress_measure' => [],
+        'cmi.objectives.n.description' => [],
+        'cmi.interactions.n.objectives._count' => [],
+        'cmi.interactions.n.objectives.n.id' => [],
+        'cmi.interactions' => [],
+        'cmi.interactions._count' => [],
+        'cmi.interactions._children' => [],
+        'cmi.interactions.n.id' => [],
+        'cmi.interactions.n.type' => [],
+        'cmi.interactions.n.description' => [],
+        'cmi.interactions.n.result' => [],
+        'cmi.interactions.n.timestamp' => [],
+        'cmi.interactions.n.learner_response' => [],
+        'cmi.interactions.n.correct_responses._count' => [],
+        'cmi.interactions.n.correct_responses.n.pattern' => [],
+      ];
+      break;
+
+    case '1.2':
+      $data = [
+        'cmi.core.score.raw' => [],
+        'cmi.core.score.max' => [],
+        'cmi.core.score.min' => [],
+        'cmi.suspend_data' => [],
+        'cmi.core.lesson_status' => [],
+        'cmi.objectives' => [],
+        'cmi.objectives._count' => ['readOnly' => 1],
+        'cmi.objectives._children' => ['readOnly' => 1],
+        'cmi.objectives.n.id' => [],
+        'cmi.objectives.n.score' => [],
+        'cmi.objectives.n.score._children' => ['readOnly' => 1],
+        'cmi.objectives.n.score.raw' => [],
+        'cmi.objectives.n.score.min' => [],
+        'cmi.objectives.n.score.max' => [],
+        'cmi.objectives.n.status' => [],
+        'cmi.interactions.n.objectives._count' => [],
+        'cmi.interactions.n.objectives.n.id' => [],
+        'cmi.interactions' => [],
+        'cmi.interactions._count' => [],
+        'cmi.interactions._children' => [],
+        'cmi.interactions.n.id' => [],
+        'cmi.interactions.n.type' => [],
+        'cmi.interactions.n.result' => [],
+        'cmi.interactions.n.timestamp' => [],
+        'cmi.interactions.n.learner_response' => [],
+        'cmi.interactions.n.correct_responses._count' => [],
+        'cmi.interactions.n.correct_responses.n.pattern' => [],
+      ];
+      break;
+  }
+  return $data;
+}
+
+/**
+ * Implements hook_opigno_scorm_register_cmi_data().
+ */
+function opigno_scorm_activity_opigno_scorm_register_cmi_data($scorm, $scos, $scorm_version) {
+  $account = \Drupal::currentUser();
+
+  switch ($scorm_version) {
+    case '2004':
+      $data = [
+        'cmi.score.raw' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.score.raw', ''),
+        'cmi.score.min' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.score.min', ''),
+        'cmi.score.max' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.score.max', ''),
+        'cmi.score.scaled' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.score.scaled', ''),
+        'cmi.success_status' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.success_status', ''),
+        'cmi.objectives' => [],
+      ];
+      // Get last visited SCO.
+      $last_sco = opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'user.sco', '');
+      if ($last_sco != '') {
+        $data['cmi.suspend_data'] = opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.suspend_data.' . $last_sco, '');
+      }
+      else {
+        $data['cmi.suspend_data'] = opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.suspend_data', '');
+      }
+      break;
+
+    case '1.2':
+      $data = [
+        'cmi.core.score.raw' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.score.raw', ''),
+        'cmi.core.score.min' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.score.min', ''),
+        'cmi.core.score.max' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.score.max', ''),
+        'cmi.core.lesson_status' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.core.lesson_status', ''),
+        'cmi.suspend_data' => opigno_scorm_scorm_cmi_get($account->id(), $scorm->id, 'cmi.suspend_data', ''),
+        'cmi.objectives' => [],
+      ];
+      break;
+  }
+
+  // Fetch the objectives.
+  foreach ($scos as $sco) {
+    if (!empty($sco->attributes['objectives'])) {
+      foreach ($sco->attributes['objectives'] as $objective) {
+        $stored_objective = opigno_scorm_activity_load_objective($account->id(), $scorm->id, $objective['id']);
+        if ($scorm_version == '2004') {
+          $defaults = [
+            'id' => $objective['id'],
+            'score' => [
+              'scaled' => 0,
+              'raw' => 0,
+              'min' => 0,
+              'max' => 0,
+            ],
+            'success_status' => '',
+            'completion_status' => '',
+            'progress_measure' => '',
+            'description' => '',
+          ];
+        }
+        else {
+          $defaults = [
+            'id' => $objective['id'],
+            'score' => [
+              'raw' => 0,
+              'min' => 0,
+              'max' => 0,
+            ],
+            'status' => '',
+          ];
+        }
+
+        if (!empty($stored_objective)) {
+          $stored_objective = (array) $stored_objective;
+          $stored_objective += $defaults;
+        }
+        else {
+          $stored_objective = $defaults;
+        }
+
+        $data['cmi.objectives'][] = $stored_objective;
+      }
+    }
+  }
+
+  return $data;
+}
+
+/**
+ * Load all objective data for the given SCORM.
+ *
+ * Helper function to load objective CMI data that was stored. Pass the ID
+ * of the objective to fetch the data for it.
+ *
+ * @param int $uid
+ *   User ID.
+ * @param int $scorm_id
+ *   Scorm ID.
+ * @param string $objective_id
+ *   Objective ID.
+ *
+ * @return object|null
+ *   Objective.
+ */
+function opigno_scorm_activity_load_objective($uid, $scorm_id, $objective_id) {
+  $objectives = &drupal_static(__FUNCTION__);
+
+  if (!isset($objectives)) {
+    // We query the database ourselves here
+    // instead of relying on opigno_scorm_scorm_cmi_get(),
+    // as we need a LIKE query.
+    $result = db_select('opigno_scorm_scorm_cmi_data', 'o')
+      ->fields('o')
+      ->condition('o.uid', $uid)
+      ->condition('o.scorm_id', $scorm_id)
+      ->condition('o.cmi_key', 'cmi.objectives.%', 'LIKE')
+      ->execute();
+
+    while ($row = $result->fetchObject()) {
+      // Make sure this is one of ours.
+      if (preg_match('/^cmi\.objectives\.[0-9]+$/', $row->cmi_key)) {
+        $data = unserialize($row->value);
+
+        // Allow modules to alter the data.
+        $context = [
+          'uid' => $uid,
+          'scorm_id' => $scorm_id,
+          'original_value' => $data,
+        ];
+
+        $objectives[$data->id] = $data;
+      }
+    }
+  }
+
+  return isset($objectives[$objective_id]) ? $objectives[$objective_id] : NULL;
+}
+
+/**
+ * Implements hook_opigno_scorm_commit().
+ */
+function opigno_scorm_activity_opigno_scorm_commit($scorm, $sco_id, $data) {
+  $account = Drupal::currentUser();
+
+  // Store objectives and results.
+  if (!empty($data->cmi->objectives)) {
+    for ($i = 0, $len = count($data->cmi->objectives); $i < $len; $i++) {
+      opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, "cmi.objectives.$i", $data->cmi->objectives[$i]);
+    }
+  }
+
+  if (!empty($data->scorm_version)) {
+    switch ($data->scorm_version) {
+      case '2004':
+        // Store the score.
+        if (!empty($data->cmi->score)) {
+          foreach (['raw', 'min', 'max', 'scaled'] as $key) {
+            if (isset($data->cmi->score->{$key})) {
+              opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, "cmi.score.{$key}", $data->cmi->score->{$key});
+            }
+          }
+        }
+
+        // Store the success status.
+        if (!empty($data->cmi->success_status)) {
+          opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, 'cmi.success_status', $data->cmi->success_status);
+        }
+        break;
+
+      case '1.2':
+        // Store the score.
+        if (!empty($data->cmi->core->score)) {
+          foreach (['raw', 'min', 'max'] as $key) {
+            if (isset($data->cmi->core->score->{$key})) {
+              opigno_scorm_scorm_cmi_set($account->id(), $scorm->id, "cmi.core.score.{$key}", $data->cmi->core->score->{$key});
+            }
+          }
+        }
+        break;
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_scorm_activity_preprocess_opigno_scorm__player(&$variables) {
+  $variables['#attached']['library'][] = 'opigno_scorm_activity/opigno_scorm_activity.main';
+}

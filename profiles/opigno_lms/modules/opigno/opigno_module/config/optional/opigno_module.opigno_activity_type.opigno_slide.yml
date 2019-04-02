@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_slide
+label: Slide
+description: 'This makes possible to create a slide, using the rich HTML editor.'
+summary: null
+image: null

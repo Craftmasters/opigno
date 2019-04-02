@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+  enforced:
+    config:
+      - user.role.administrator
+id: learning_path-a416e6833
+label: 'Super administrator'
+weight: 2
+internal: true
+audience: outsider
+group_type: learning_path
+permissions_ui: false
+permissions: {  }

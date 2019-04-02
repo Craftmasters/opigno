@@ -1,0 +1,16 @@
+name: Opigno Calendar
+type: module
+description: Add opigno calendar event integration.
+dependencies:
+  - drupal:datetime_range
+  - opigno_calendar_event:opigno_calendar_event
+  - popup_field_group:popup_field_group
+  - opigno_learning_path:opigno_learning_path
+package: Opigno
+# core: 8.x
+
+# Information added by Drupal.org packaging script on 2019-01-18
+version: '8.x-1.1'
+core: '8.x'
+project: 'opigno_calendar'
+datestamp: 1547800100

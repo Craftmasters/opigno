@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_learning_path_forum
+    - group.type.learning_path
+    - taxonomy.vocabulary.forums
+id: group.learning_path.field_learning_path_forum
+field_name: field_learning_path_forum
+entity_type: group
+bundle: learning_path
+label: Forum
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      forums: forums
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

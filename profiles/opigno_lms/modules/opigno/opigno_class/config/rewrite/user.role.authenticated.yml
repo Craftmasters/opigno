@@ -1,0 +1,28 @@
+config_rewrite: replace
+langcode: en
+status: true
+dependencies: {  }
+id: authenticated
+label: 'Authenticated user'
+weight: -9
+is_admin: false
+permissions:
+  - 'access comments'
+  - 'access content'
+  - 'access editor'
+  - 'access shortcuts'
+  - 'access site-wide contact form'
+  - 'access user profiles'
+  - 'create forum content'
+  - 'delete own forum content'
+  - 'edit own forum content'
+  - 'post comments'
+  - 'search content'
+  - 'skip comment approval'
+  - 'take modules'
+  - 'use private messaging system'
+  - 'use text format basic_html'
+  - 'view ilt entities'
+  - 'view media'
+  - 'view own module results'
+  - 'view published module entities'

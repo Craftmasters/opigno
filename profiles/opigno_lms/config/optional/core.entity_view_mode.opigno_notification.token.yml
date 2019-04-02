@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_notification
+id: opigno_notification.token
+label: Token
+targetEntityType: opigno_notification
+cache: true

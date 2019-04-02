@@ -1,0 +1,12 @@
+route_callbacks:
+  - '\Drupal\ggroup\Routing\SubgroupRouteProvider::getRoutes'
+
+entity.group_content.subgroup_add_form:
+  path: '/group/{group}/subgroup/create/{group_type}'
+  defaults:
+    _controller: '\Drupal\ggroup\Controller\SubgroupWizardController::addForm'
+    _title_callback: '\Drupal\ggroup\Controller\SubgroupWizardController::addFormTitle'
+  requirements:
+    _subgroup_add_access: 'TRUE'
+  options:
+    _group_operation_route: 'TRUE'

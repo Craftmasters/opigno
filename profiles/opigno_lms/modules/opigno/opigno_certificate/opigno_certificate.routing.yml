@@ -1,0 +1,28 @@
+certificate.entity.view:
+  path: 'certificate/{entity_type}/{entity_id}'
+  defaults:
+    _controller: '\Drupal\opigno_certificate\Controller\CertificateController::viewEntity'
+    _title: 'Certificate'
+  requirements:
+    _custom_access: '\Drupal\opigno_certificate\Controller\CertificateController::viewAccess'
+
+certificate.entity.pdf:
+  path: 'certificate/{entity_type}/{entity_id}/pdf'
+  defaults:
+    _controller: '\Drupal\opigno_certificate\Controller\EntityPrintController::viewPrint'
+    _title: 'Entity Print'
+  requirements:
+    _custom_access: '\Drupal\opigno_certificate\Controller\CertificateController::viewAccess'
+
+opigno_certificate.settings:
+  path: 'admin/structure/opigno_certificate'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Opigno Certificate'
+  requirements:
+    _permission: 'administer certificates'
+  options:
+    _admin_route: TRUE
+    parameters:
+      account:
+        type: entity:user

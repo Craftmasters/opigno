@@ -1,0 +1,37 @@
+id: opigno_learning_path_course
+label: 'Opigno Group Learning Path (source: course)'
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+- 'Drupal 7'
+migration_group: opigno_migration
+source:
+  plugin: opigno_learning_path_course
+  node_type: course
+process:
+  type:
+    plugin: default_value
+    default_value: learning_path
+    default_bundle: learning_path
+  id: nid
+  vid: nid
+  label: title
+  uid: node_uid
+  field_learning_path_published: status
+  'field_learning_path_description/value': body
+  'field_learning_path_description/format':
+    plugin: default_value
+    default_value: full_html
+  field_certificate: field_certificate
+  field_learning_path_visibility: field_learning_path_visibility
+  field_requires_validation: field_requires_validation
+destination:
+  plugin: 'entity:group'
+migration_dependencies: null

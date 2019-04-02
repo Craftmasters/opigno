@@ -1,0 +1,11 @@
+opigno_ilt.create_form:
+  route_name: entity.opigno_ilt.create_form
+  title: 'Create Instructor-Led Training'
+  appears_on:
+    - entity.opigno_ilt.collection
+
+opigno_ilt_result.create_form:
+  route_name: entity.opigno_ilt_result.create_form
+  title: 'Create Instructor-Led Training Result'
+  appears_on:
+    - entity.opigno_ilt_result.collection

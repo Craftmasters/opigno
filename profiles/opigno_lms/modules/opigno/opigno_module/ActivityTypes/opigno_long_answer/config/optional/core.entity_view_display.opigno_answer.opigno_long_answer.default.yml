@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_answer.opigno_long_answer.opigno_body
+    - opigno_module.opigno_answer_type.opigno_long_answer
+  module:
+    - text
+id: opigno_answer.opigno_long_answer.default
+targetEntityType: opigno_answer
+bundle: opigno_long_answer
+mode: default
+content:
+  opigno_body:
+    weight: -3
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+hidden:
+  activity: true
+  module: true

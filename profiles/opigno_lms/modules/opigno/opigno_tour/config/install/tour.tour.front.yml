@@ -1,0 +1,53 @@
+langcode: en
+status: true
+id: front
+label: 'Front page tour'
+module: opigno_tour
+routes:
+  - route_name: view.frontpage.page_1
+tips:
+  front-start:
+    id: front-start
+    plugin: text
+    label: 'Opigno Tour'
+    body: 'Welcome to your new Opigno LMS platform. This short tour will present you the main features allowing you to get started.'
+    weight: 1
+    attributes:
+      data-id: header-left
+    location: right
+  front-admin:
+    id: front-admin
+    plugin: text
+    label: 'Admin interfaces'
+    body: 'Since you are in charge of some management tasks for this elearning platform, you can click on that button to access admin interfaces.'
+    weight: 2
+    attributes:
+      data-class: admin-opigno-block
+    location: bottom
+  front-user:
+    id: front-admin
+    plugin: text
+    label: 'User menu'
+    body: 'On this menu bar you will find some notifications. Clicking on your avatar makes possible to open the user menu (to consult and manage your profile).'
+    weight: 3
+    attributes:
+      data-class: user-block
+    location: bottom
+  front-dashboard:
+    id: front-dashboard
+    plugin: text
+    label: 'Customize dashboard'
+    body: 'You can customize your dashboard, just click on that button to do that.'
+    weight: 4
+    attributes:
+      data-class: manage-dashboard
+    location: left
+  front-catalogue:
+    id: front-catalogue
+    plugin: text
+    label: 'Catalogue'
+    body: 'Click on "Catalogue" to access the training catalogue.'
+    weight: 4
+    attributes:
+      data-class: catalogue
+    location: bottom

@@ -1,0 +1,247 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tincan_modules.module.
+ */
+
+use TinCan\Context;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\opigno_group_manager\Entity\OpignoGroupManagedContent;
+use Drupal\opigno_group_manager\OpignoGroupContext;
+use Drupal\opigno_tincan_api\OpignoTinCanApiStatements;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanActivityDefinitionTypes;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanVerbs;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_modules_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_modules module.
+    case 'help.page.opigno_tincan_modules':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Functionality for sending tincan statements for opigno modules.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * {@inheritdoc}
+ *
+ * Here tincan statement will be send when user starts a module.
+ */
+function opigno_tincan_modules_user_module_status_insert(EntityInterface $entity) {
+  /****
+   * - When user start a module
+   * Actor: user
+   * Verb: xAPI/launched
+   * Object: xAPI/module
+   * Result:
+   * Context: Course or Learning Path
+   */
+
+  // Check if Tincan PHP library is installed.
+  $has_library = opigno_tincan_api_tincanphp_is_installed();
+  if (!$has_library) {
+    \Drupal::logger('opigno_tincan')
+      ->notice('Tincan statements can not be send. Tincan PHP library is not installed.');
+    return;
+  };
+
+  $opigno_module = $entity->getModule();
+
+  // Statement creation.
+  $statement = OpignoTinCanApiStatements::statementBaseCreation(
+    OpignoTincanApiTinCanVerbs::$launched,
+    OpignoTincanApiTinCanActivityDefinitionTypes::$module,
+    $opigno_module
+  );
+
+  if ($statement === FALSE) {
+    return;
+  }
+
+  // Context creation.
+  $context = new Context();
+
+  // If there is a parent, set it.
+  $gid = OpignoGroupContext::getCurrentGroupId();
+
+  if (!$gid) {
+    return;
+  }
+
+  $managed_content = OpignoGroupManagedContent::loadByProperties(['group_id' => $gid]);
+
+  foreach ($managed_content as $content) {
+    $content_type_id = $content->getGroupContentTypeId();
+    $id = $content->getEntityId();
+    // Check if module is a part of Learning Path.
+    if ($opigno_module->id() == $id) {
+      $parent_id = $gid;
+      OpignoTinCanApiStatements::contextSetGrouping($context, [$parent_id], OpignoTincanApiTinCanActivityDefinitionTypes::$group);
+      break;
+    }
+    // Check if module is a part of Course.
+    elseif ($content_type_id == 'ContentTypeCourse') {
+      $course_id = _opigno_tincan_modules_is_module_in_course($content, $opigno_module->id());
+      if ($course_id) {
+        $parent_id = $course_id;
+        OpignoTinCanApiStatements::contextSetGrouping($context, [$parent_id], OpignoTincanApiTinCanActivityDefinitionTypes::$course);
+        break;
+      }
+    }
+  }
+  // Set language in statement context.
+  OpignoTinCanApiStatements::contextSetLanguage($context, $opigno_module->language()
+    ->getId());
+
+  $statement->setContext($context);
+
+  // Sending statement.
+  OpignoTinCanApiStatements::sendStatement($statement);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * {@inheritdoc}
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function opigno_tincan_modules_user_module_status_presave(EntityInterface $entity) {
+  /****
+   * - When user finish a module
+   * Actor: user
+   * Verb: xAPI/passed || xAPI/failed
+   * Object: xAPI/module
+   * Result: Get final module result
+   * Context: Course or Learning Path
+   */
+
+  // Check if Tincan PHP library is installed.
+  $has_library = opigno_tincan_api_tincanphp_is_installed();
+  if (!$has_library) {
+    \Drupal::logger('opigno_tincan')
+      ->notice('Tincan statements can not be send. Tincan PHP library is not installed.');
+    return;
+  };
+
+  /* @var $user_module_status UserModuleStatus */
+  $user_module_status = $entity;
+  $is_finished = $user_module_status->get('finished')->getValue()[0]['value'];
+  if ($is_finished) {
+
+    // If there is a parent, set it.
+    $gid = OpignoGroupContext::getCurrentGroupId();
+
+    if (!$gid) {
+      return;
+    }
+
+    // Know if the user has passed or failed this module.
+    $cid = OpignoGroupContext::getCurrentGroupContentId();
+    $group_content = OpignoGroupManagedContent::loadByProperties(['id' => $cid]);
+    $group_content = reset($group_content);
+    $required_score = $group_content->getSuccessScoreMin();
+
+    $user_percent_score = $user_module_status->getScore();
+    $passed = $user_percent_score >= $required_score;
+
+    // Statement creation.
+    $opigno_module = $user_module_status->getModule();
+    $statement = OpignoTinCanApiStatements::statementBaseCreation(
+      ($passed ? OpignoTincanApiTinCanVerbs::$passed : OpignoTincanApiTinCanVerbs::$failed),
+      OpignoTincanApiTinCanActivityDefinitionTypes::$module,
+      $opigno_module
+    );
+
+    if ($statement === FALSE) {
+      return;
+    }
+
+    // Context creation.
+    $context = new Context();
+
+    $managed_content = OpignoGroupManagedContent::loadByProperties(['group_id' => $gid]);
+
+    foreach ($managed_content as $content) {
+      $content_type_id = $content->getGroupContentTypeId();
+      $id = $content->getEntityId();
+      // Check if module is a part of Learning Path.
+      if ($opigno_module->id() == $id) {
+        $parent_id = $gid;
+        OpignoTinCanApiStatements::contextSetGrouping($context, [$parent_id], OpignoTincanApiTinCanActivityDefinitionTypes::$group);
+        break;
+      }
+      // Check if module is a part of Course.
+      elseif ($content_type_id == 'ContentTypeCourse') {
+        $course_id = _opigno_tincan_modules_is_module_in_course($content, $opigno_module->id());
+        if ($course_id) {
+          $parent_id = $course_id;
+          OpignoTinCanApiStatements::contextSetGrouping($context, [$parent_id], OpignoTincanApiTinCanActivityDefinitionTypes::$course);
+          break;
+        }
+      }
+    }
+
+    $language_id = $opigno_module->language()->getId();
+    OpignoTinCanApiStatements::contextSetLanguage($context, $language_id);
+
+    // Set result.
+    $score_max = $user_module_status->getMaxScore();
+    $start_time = $user_module_status->get('started')->value;
+    $end_time = $user_module_status->get('finished')->value;
+    $duration_s = $end_time - $start_time;
+    // Method calculateScore() returns raw result (not in percents).
+    $user_score = $user_module_status->calculateScore();
+    // TODO: issue: $user_score can be grater than $max_score (no logic).
+    if ($user_score > $score_max) {
+      $score_max = $user_score;
+    }; // must be deleted or implemented in other way.
+    $response = NULL;
+    OpignoTinCanApiStatements::setResult(
+      $statement,
+      $user_score,
+      $score_max,
+      NULL,
+      $passed,
+      $response,
+      $duration_s
+    );
+    // Set statement context.
+    $statement->setContext($context);
+
+    // Sending statement.
+    OpignoTinCanApiStatements::sendStatement($statement);
+  };
+  return $entity;
+}
+
+/**
+ * Check if module is a part of course.
+ */
+function _opigno_tincan_modules_is_module_in_course($group_content, $opigno_module_id) {
+
+  $course_id = $group_content->getEntityId();
+
+  $contents = OpignoGroupManagedContent::loadByGroupId($course_id);
+  foreach ($contents as $content) {
+    $id = $content->getEntityId();
+    if ($id == $opigno_module_id) {
+      return $course_id;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+}

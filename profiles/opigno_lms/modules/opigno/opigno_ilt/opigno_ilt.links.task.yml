@@ -1,0 +1,42 @@
+entity.opigno_ilt.canonical:
+  route_name: entity.opigno_ilt.canonical
+  base_route: entity.opigno_ilt.canonical
+  title: 'View'
+
+entity.opigno_ilt.edit_form:
+  route_name: entity.opigno_ilt.edit_form
+  base_route: entity.opigno_ilt.canonical
+  title: 'Edit'
+
+entity.opigno_ilt.delete_form:
+  route_name:  entity.opigno_ilt.delete_form
+  base_route:  entity.opigno_ilt.canonical
+  title: Delete
+  weight: 10
+
+opigno_ilt.score:
+  route_name:  opigno_ilt.score
+  base_route:  entity.opigno_ilt.canonical
+  title: Score
+  weight: 11
+
+entity.opigno_ilt_result.canonical:
+  route_name: entity.opigno_ilt_result.canonical
+  base_route: entity.opigno_ilt_result.canonical
+  title: 'View'
+
+entity.opigno_ilt_result.edit_form:
+  route_name: entity.opigno_ilt_result.edit_form
+  base_route: entity.opigno_ilt_result.canonical
+  title: 'Edit'
+
+entity.opigno_ilt_result.delete_form:
+  route_name:  entity.opigno_ilt_result.delete_form
+  base_route:  entity.opigno_ilt_result.canonical
+  title: Delete
+  weight: 10
+
+entity.opigno_ilt.settings:
+  route_name: opigno_ilt.settings
+  title: 'Settings'
+  base_route: opigno_ilt.settings

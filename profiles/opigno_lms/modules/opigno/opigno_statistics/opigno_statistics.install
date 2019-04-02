@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Statistics module.
+ */
+
+/**
+ * Creates database table for tracking of the user login events.
+ *
+ * On module install.
+ */
+function opigno_statistics_install() {
+  _opigno_statistics_create_user_login_table();
+}
+
+/**
+ * Creates database table for tracking of the user login events.
+ *
+ * For existing instances.
+ */
+function opigno_statistics_update_8001() {
+  _opigno_statistics_create_user_login_table();
+}
+
+/**
+ * Creates user login table.
+ */
+function _opigno_statistics_create_user_login_table() {
+  $schema = \Drupal::database()->schema();
+  $table_name = 'opigno_statistics_user_login';
+  if (!$schema->tableExists($table_name)) {
+    $table = [
+      'description' => 'Track user login events',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'uid' => [
+          'description' => 'User ID',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'date' => [
+          'description' => 'Date of login',
+          'type' => 'varchar',
+          'length' => 20,
+          'mysql_type' => 'datetime',
+          'not null' => TRUE,
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'uid' => ['uid'],
+      ],
+      'foreign keys' => [
+        'users' => ['uid' => 'uid'],
+      ],
+    ];
+    $schema->createTable($table_name, $table);
+  }
+}

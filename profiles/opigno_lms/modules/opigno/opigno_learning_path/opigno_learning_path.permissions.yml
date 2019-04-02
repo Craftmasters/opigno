@@ -1,0 +1,7 @@
+manage group content in any group:
+  title: 'Manage group content in any group'
+  description: 'Allows the user to manage group content in any group'
+
+manage group members in any group:
+  title: 'Manage group members in any group'
+  description: 'Allows the user to manage group members in any group'

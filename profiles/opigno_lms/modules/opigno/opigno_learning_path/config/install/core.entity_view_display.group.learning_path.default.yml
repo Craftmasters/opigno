@@ -1,0 +1,68 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group.learning_path.field_anonymous_visibility
+    - field.field.group.learning_path.field_certificate
+    - field.field.group.learning_path.field_learning_path_category
+    - field.field.group.learning_path.field_learning_path_description
+    - field.field.group.learning_path.field_learning_path_duration
+    - field.field.group.learning_path.field_learning_path_folder
+    - field.field.group.learning_path.field_learning_path_media_image
+    - field.field.group.learning_path.field_learning_path_published
+    - field.field.group.learning_path.field_learning_path_visibility
+    - field.field.group.learning_path.field_required_trainings
+    - field.field.group.learning_path.field_requires_validation
+    - group.type.learning_path
+  module:
+    - media
+    - text
+id: group.learning_path.default
+targetEntityType: group
+bundle: learning_path
+mode: default
+content:
+  field_learning_path_description:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_learning_path_media_image:
+    type: media_thumbnail
+    weight: 2
+    label: hidden
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
+    region: content
+  label:
+    label: hidden
+    type: string
+    weight: 0
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  changed: true
+  created: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_anonymous_visibility: true
+  field_certificate: true
+  field_learning_path_category: true
+  field_learning_path_duration: true
+  field_learning_path_enable_forum: true
+  field_learning_path_folder: true
+  field_learning_path_forum: true
+  field_learning_path_published: true
+  field_learning_path_visibility: true
+  field_lp_price: true
+  field_required_trainings: true
+  field_requires_validation: true
+  field_workspace: true
+  uid: true

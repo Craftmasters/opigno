@@ -1,0 +1,4 @@
+langcode: en
+description: ""
+availability_closed_message: "This \"[opigno_module:name]\" module is closed."
+availability_unavailable_message: "This \"[opigno_module:name]\" module is not yet open."

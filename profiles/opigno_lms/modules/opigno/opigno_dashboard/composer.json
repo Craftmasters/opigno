@@ -1,0 +1,14 @@
+{
+  "name": "drupal/opigno_dashboard",
+  "type": "drupal-module",
+  "description": "Opigno dashboard",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/opigno_dashboard",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/opigno_dashboard",
+    "source": "http://cgit.drupalcode.org/opigno_dashboard"
+  },
+  "require": { }
+}

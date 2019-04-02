@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_group_manager
+id: opigno_group_link.token
+label: Token
+targetEntityType: opigno_group_link
+cache: true

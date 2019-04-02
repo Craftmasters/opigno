@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_long_answer
+label: 'Long answer'
+description: 'Long answer question let the students fill-in a text, that will be manually scored by the teacher.'
+summary: null
+image: null

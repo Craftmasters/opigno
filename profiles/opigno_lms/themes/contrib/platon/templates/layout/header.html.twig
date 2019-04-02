@@ -1,0 +1,253 @@
+<header id="site-header">
+  <div class="container d-flex align-items-center">
+    {% if page.branding %}
+      <div id="header-left">
+        {{ page.branding }}
+      </div>
+    {% endif %}
+    {% if logged_in %}
+      <div id="header-right" class="ml-auto d-flex">
+        {% if page.admin_opigno %}
+          <div class="admin-opigno-block d-none d-md-block dropdown">
+            <a href="#" class="d-flex align-items-center" data-toggle="dropdown">
+              <span class="picto"></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <div class="info d-flex">
+                <div class="flex-1">
+                  <div><strong class="text-uppercase">{{ 'administration'|t }}</strong></div>
+                </div>
+                <button class="close-dropdown">close</button>
+              </div>
+              <div class="px-4 d-flex menu-wrapper">
+                {{ page.admin_opigno }}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+        <div class="user-ilts dropdown d-none d-md-block ml-3">
+          <a href="#" class="d-flex align-items-center" data-toggle="dropdown">
+            <span class="picto"></span>
+            {% if upcoming_ilts_count %}
+              <div class="unread">{{ upcoming_ilts_count }}</div>
+            {% endif %}
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="info d-flex">
+              <div class="flex-1">
+                <div><strong class="text-uppercase">{{ 'Instructor-Led Training'|t }}</strong></div>
+              </div>
+              <button class="close-dropdown">close</button>
+            </div>
+            {% if upcoming_ilts_count %}
+              <div id="ilts-wrapper">
+                {% for ilt in upcoming_ilts %}
+                  <a href="{{ ilt['link'] }}" class="dropdown-item">
+                    <span>{{ ilt['title'] }}</span>
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div id="ilts-wrapper-empty">
+                <span>{{ 'No upcoming ILT'|t }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="user-live-meetings dropdown d-none d-md-block ml-3">
+          <a href="#" class="d-flex align-items-center" data-toggle="dropdown">
+            <span class="picto"></span>
+            {% if upcoming_live_meetings_count %}
+              <div class="unread">{{ upcoming_live_meetings_count }}</div>
+            {% endif %}
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="info d-flex">
+              <div class="flex-1">
+                <div><strong class="text-uppercase">{{ 'Live Meeting'|t }}</strong></div>
+              </div>
+              <button class="close-dropdown">close</button>
+            </div>
+            {% if upcoming_live_meetings_count %}
+              <div id="live-meetings-wrapper">
+                {% for meeting in upcoming_live_meetings %}
+                  <a href="{{ meeting['link'] }}" class="dropdown-item">
+                    <span>{{ meeting['title'] }}</span>
+                  </a>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div id="live-meetings-wrapper-empty">
+                <span>{{ 'No upcoming live meeting'|t }}</span>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="user-notifications dropdown ml-3">
+          <a href="{{ path('view.opigno_notifications.page_all') }}" class="d-flex align-items-center" data-toggle="dropdown">
+            <span class="picto"></span>
+            {% if notifications_unread_count %}
+              <div class="unread">{{ notifications_unread_count }}</div>
+            {% endif %}
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="info d-flex">
+              <div class="flex-1">
+                <div><strong class="text-uppercase">{{ 'notifications'|t }}</strong></div>
+              </div>
+              <button class="close-dropdown">close</button>
+            </div>
+            <a id="read-all-notifications" class="mark-as-read" href="#">{{ 'Mark as all read'|t }}</a>
+            <div id="notifications-wrapper">{{ notifications_unread }}</div>
+            <a id="show-all-notifications" class="dropdown-item primary text-center" href="{{ path('view.opigno_notifications.page_all') }}">
+              <span>{{ 'See all notifications'|t }}</span>
+            </a>
+            {{ attach_library('opigno_notification/opigno_notification') }}
+          </div>
+        </div>
+        <div class="user-messages dropdown ml-3">
+          <a href="{{ path('private_message.private_message_page') }}" class="d-flex align-items-center" data-toggle="dropdown">
+            <span class="picto"></span>
+            {% if unread_thread_count %}
+              <div class="unread">{{ unread_thread_count }}</div>
+            {% endif %}
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="info d-flex">
+              <div class="flex-1">
+                <div><strong class="text-uppercase">{{ 'messages'|t }}</strong></div>
+              </div>
+              <button class="close-dropdown">close</button>
+            </div>
+            {{ private_messages }}
+            <a class="dropdown-item primary text-center" href="{{ path('private_message.private_message_page') }}">
+              <span>{{ 'See all messages'|t }}</span>
+            </a>
+          </div>
+        </div>
+        <div class="user-block ml-3 dropdown">
+          <a href="{{ url('entity.user.canonical', {'user': user.id}) }}" class="d-flex align-items-center" data-toggle="dropdown">
+            <span class="picto" {% if user_picture %}style="background-image:url('{{ user_picture }}')"{% endif %}></span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="info d-flex">
+              <div class="flex-1">
+                <div><strong class="text-uppercase">{{ user.username }}</strong></div>
+                <div class="user-status text-uppercase">{{ 'online'|t }}</div>
+              </div>
+              <button class="close-dropdown">close</button>
+            </div>
+            <a class="dropdown-item" href="{{ url('entity.user.canonical', {'user': user.id}) }}">
+              <span>{{ 'User profile'|t }}</span>
+            </a>
+            <a class="dropdown-item" href="{{ url('entity.user.edit_form', {'user': user.id}) }}">
+              <span>{{ 'Settings'|t }}</span>
+            </a>
+            <a class="dropdown-item" href="https://www.opigno.org" target="_blank">
+              <span>{{ 'Help'|t }}</span>
+            </a>
+            {% if is_admin %}
+              <a class="dropdown-item about" href="#about" data-toggle="modal" data-target="#aboutModal">
+                <span>{{ 'About'|t }}</span>
+              </a>
+            {% endif %}
+            <a class="dropdown-item primary text-center" href="{{ url('user.logout') }}">
+              <span>{{ 'Logout'|t }}</span>
+            </a>
+          </div>
+        </div>
+        <button class="navbar-toggler"></button>
+      </div>
+    {% endif %}
+  </div>
+  <div class="search-trigger d-flex align-items-center">
+    <a href="#">
+      <div class="picto search">{{ 'search'|t }}</div>
+    </a>
+  </div>
+  <div id="search-form" style="display: none;">
+      {% if opigno_search_form is defined %}
+        {{ opigno_search_form }}
+      {% else %}
+        {{ search_form }}
+      {% endif %}
+  </div>
+</header>
+
+{% if is_admin %}
+  <div class="modal" id="aboutModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="flex-1">
+            <div><strong class="text-uppercase">{{ 'About'|t }}</strong></div>
+          </div>
+          <button type="button" class="close-dropdown" data-dismiss="modal">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex">
+            <div class="left-col mr-4">
+              <img src="{{ opigno_logo }}" alt="{{ 'opigno logo'|t }}">
+            </div>
+            <div class="right-col">
+              <p class="text mb-4">
+                {{ 'Opigno™ is a Trademark of Connect-i Sàrl, based in Préverenges, Switzerland. For more information regarding Opigno™ please consult the website'|t }} <a href="https://www.opigno.org" target="_blank">www.opigno.org</a>.
+              </p>
+              <p class="version">
+                <span class="mr-3">{{ 'Version :'|t }}</span>
+                {% if opigno_lms_release %}
+                  <span class="{{ opigno_lms_updates }}">Opigno {{ opigno_lms_release }}</span> {# for green/red icon use class: ok / nok #}
+                {% else %}
+                  <span>{{ 'N/A'|t }}</span>
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% if page.menu %}
+  <div id="menu-wrapper" class="container" role="complementary">
+    <div class="bg-faded">
+      {{ page.menu }}
+      <div class="d-md-none">
+        <nav id="mobile-menu">
+          <ul>
+            <li>
+              <a href="{{ url('view.search_content.page_1') }}" class="search {% if route_name == 'view.search_content.page_1' %}is-active{% endif %}">
+                {{ 'Search'|t }}
+              </a>
+            </li>
+            {% if logged_in %}
+              <li>
+                <a href="{{ url('entity.user.canonical', {'user': user.id}) }}" class="user {% if route_name == 'entity.user.canonical' %}is-active{% endif %}">
+                  <span>{{ 'User profile'|t }}</span>
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('entity.user.edit_form', {'user': user.id}) }}" class="administration {% if route_name == 'entity.user.edit_form' %}is-active{% endif %}">
+                  <span>{{ 'Settings'|t }}</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.opigno.org" target="_blank" class="help">
+                  <span>{{ 'Help'|t }}</span>
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('user.logout') }}" class="logout">
+                  <span>{{ 'Logout'|t }}</span>
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,23 @@
+# Schema for the configuration files of the "Opigno Moxtra" module.
+
+opigno_moxtra.settings:
+  type: config_object
+  label: "Opigno Moxtra Settings"
+  mapping:
+    status:
+      type: boolean
+      label: "Status"
+    org_id:
+      type: string
+      label: "Organization id"
+    client_id:
+      type: string
+      label: "Client id"
+
+field.field.*.*.*.third_party.opigno_calendar_event:
+  type: mapping
+  label: "Opigno Calendar Event settings"
+  mapping:
+    embedded_widget:
+      type: integer
+      label: "Embedded widget option"

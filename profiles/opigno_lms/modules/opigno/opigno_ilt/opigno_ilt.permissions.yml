@@ -1,0 +1,34 @@
+administer ilt entities:
+  title: 'Administer ILT entities'
+  restrict access: TRUE
+
+view ilt entities:
+  title: 'View ILT entities'
+
+add ilt entities:
+  title: 'Add ILT entities'
+
+edit ilt entities:
+  title: 'Edit ILT entities'
+
+delete ilt entities:
+  title: 'Delete ILT entities'
+
+score ilt entities:
+  title: 'Score ILT entities'
+
+administer ilt result entities:
+  title: 'Administer ILT Result entities'
+  restrict access: TRUE
+
+view ilt result entities:
+  title: 'View ILT Result entities'
+
+add ilt result entities:
+  title: 'Add ILT Result entities'
+
+edit ilt result entities:
+  title: 'Edit ILT Result entities'
+
+delete ilt result entities:
+  title: 'Delete ILT Result entities'

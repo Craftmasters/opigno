@@ -1,0 +1,11 @@
+opigno_course.course-content:
+  path: '/group/{group}/course-content'
+  defaults:
+    _form: '\Drupal\opigno_course\Form\CourseContentForm'
+    _title: 'Course content'
+  requirements:
+    _custom_access: '\Drupal\opigno_course\Form\CourseContentForm::access'
+  options:
+    parameters:
+      group:
+       type: entity:group

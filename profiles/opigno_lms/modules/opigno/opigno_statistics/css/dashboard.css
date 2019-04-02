@@ -1,0 +1,39 @@
+.users-per-day-title {
+  color: #585857;
+  font-size: 16px;
+  font-weight: normal;
+  margin: 0;
+  text-align: center;
+}
+
+.users-per-day {
+  width: calc(100% - 300px);
+  height: 320px;
+  font: 8px sans-serif;
+}
+
+@media screen and (max-width: 768px) {
+  .users-per-day {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+.users-per-day line {
+  stroke: #70706f;
+}
+
+.users-per-day text {
+  fill: #9d9c9c;
+}
+
+.users-per-day path {
+  stroke: #5bb4d8;
+  stroke-width: 2;
+  fill: none;
+}
+
+.users-per-day circle {
+  stroke: none;
+  fill: #5bb4d8;
+}

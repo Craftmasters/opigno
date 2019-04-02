@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tour.module.
+ */
+
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Url;
+use Drupal\opigno_tour\OpignoTourFunctions;
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function opigno_tour_preprocess_page(&$variables) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if (OpignoTourFunctions::checkRouteTour($route_name)) {
+    $uid = $variables['user']->id();
+    $tour = \Drupal::request()->query->get('tour');
+    $viewed = OpignoTourFunctions::isPageUserViewed($route_name, $uid);
+
+    if (!$tour && !$viewed) {
+      // If user firstly viewing current page(route).
+      // Save user viewed current page(route).
+      OpignoTourFunctions::savePageUserViewed($route_name, $uid);
+
+      // Merge route params.
+      $params = \Drupal::routeMatch()->getRawParameters()->all();
+      $params = array_merge($params, ['tour' => 1]);
+      // Reload page with "tour=1" parameter.
+      $url = Url::fromRoute($route_name, $params, ['absolute' => TRUE]);
+      $response = new RedirectResponse($url->toString());
+      $response->send();
+      return;
+    }
+  }
+}
+
+/**
+ * Adds Tour popup styling.
+ *
+ * Implements hook_page_attachments().
+ */
+function opigno_tour_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'opigno_tour/tour_styling';
+}

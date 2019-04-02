@@ -1,0 +1,5 @@
+certificate.add_page:
+  route_name: entity.opigno_certificate.add_page
+  title: 'Add certificate'
+  appears_on:
+    - view.certificates.page_1

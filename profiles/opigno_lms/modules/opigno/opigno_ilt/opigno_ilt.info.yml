@@ -1,0 +1,16 @@
+name: Opigno Instructor-Led Training
+type: module
+description: Opigno Instructor-Led Training.
+# core: 8.x
+package: Opigno
+dependencies:
+  - drupal:datetime_range
+  - group:group
+  - opigno_calendar:opigno_calendar
+  - opigno_calendar_event:opigno_calendar_event
+
+# Information added by Drupal.org packaging script on 2019-01-18
+version: '8.x-1.1'
+core: '8.x'
+project: 'opigno_ilt'
+datestamp: 1547800142

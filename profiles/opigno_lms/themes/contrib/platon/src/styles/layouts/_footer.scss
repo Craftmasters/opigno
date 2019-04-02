@@ -1,0 +1,18 @@
+#site-footer {
+  background-color: $footer-background-color;
+  min-height: $footer-height;
+  border-top: 10px solid $footer-border-color;
+  color: $footer-font-color;
+  padding: 1rem 0;
+  font-size: 0.7em;
+
+  ul:not(.contextual-links) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    a {
+      color: inherit;
+    }
+  }
+}

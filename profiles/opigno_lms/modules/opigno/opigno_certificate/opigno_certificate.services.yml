@@ -1,0 +1,5 @@
+services:
+  opigno_certificate.event_subscriber:
+    class: '\Drupal\opigno_certificate\EventSubscriber\EventSubscriber'
+    tags:
+      - { name: 'event_subscriber' }

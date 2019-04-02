@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - h5p
+    - opigno_module
+id: opigno_activity.opigno_h5p
+field_name: opigno_h5p
+entity_type: opigno_activity
+type: h5p
+settings: {  }
+module: h5p
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,61 @@
+app-panel {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background-color: #fff;
+  box-shadow: 0 0 5px 5px #eee;
+  padding: 2rem;
+  overflow: auto;
+}
+
+.trigger-btn {
+  text-align: right;
+  margin-bottom: 1rem;
+}
+
+.dashboard-column-wrapper {
+  min-height: 500px;
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0;
+}
+
+.dashboard-column-wrapper.panel-open {
+  margin-right: calc(400px);
+}
+
+.dashboard-column-wrapper .dashboard-column {
+  flex: 1;
+  padding: 0 10px;
+}
+
+.dashboard-column-wrapper.panel-open .dashboard-column {
+  margin: 0 6px;
+}
+
+.dashboard-column-wrapper .dashboard-column:first-child {
+  padding-left: 0;
+}
+
+.dashboard-column-wrapper.panel-open .dashboard-column:first-child {
+  margin-left: 0;
+}
+
+.dashboard-column-wrapper .dashboard-column:last-child {
+  padding-right: 0;
+}
+
+.dashboard-column-wrapper.panel-open .dashboard-column:last-child {
+  margin-right: 0;
+}
+
+.dashboard-column-wrapper .dashboard-column.wide-col {
+  flex: 2;
+}
+
+.dashboard-column-wrapper.panel-open .dashboard-column {
+  border: 2px dashed #ddd;
+}

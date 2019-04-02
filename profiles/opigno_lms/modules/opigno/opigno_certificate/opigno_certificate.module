@@ -1,0 +1,210 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_certificate.module.
+ */
+
+use Drupal\Core\Render\Element;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\opigno_certificate\FieldStorageDefinition;
+
+/**
+ * Implements hook_entity_bundle_info().
+ */
+function opigno_certificate_entity_bundle_info() {
+  $bundles['opigno_certificate']['wysiwyg']['label'] = t('Wysiwyg');
+  $bundles['opigno_certificate']['template']['label'] = t('Template');
+  return $bundles;
+}
+
+/**
+ * Implements hook_entity_field_storage_info().
+ */
+function opigno_certificate_entity_field_storage_info(EntityTypeInterface $entity_type) {
+  if ($entity_type->id() == 'opigno_certificate') {
+    $fields['body'] = FieldStorageDefinition::create('text_long')
+      ->setLabel(t('Body'))
+      ->setName('body')
+      ->setTargetEntityTypeId($entity_type->id());
+    $fields['view_mode'] = FieldStorageDefinition::create('view_mode_selector')
+      ->setLabel(t('View mode'))
+      ->setName('view_mode')
+      ->setTargetEntityTypeId($entity_type->id());
+
+    return $fields;
+  }
+}
+
+/**
+ * Implements hook_entity_bundle_field_info().
+ */
+function opigno_certificate_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle) {
+  $fields = [];
+  if ($entity_type->id() === 'opigno_certificate' && $bundle == 'wysiwyg') {
+    $fields['body'] = FieldStorageDefinition::create('text_long')
+      ->setLabel(t('Body'))
+      ->setRequired(TRUE)
+      ->setCardinality(1)
+      ->setTranslatable(FALSE)
+      ->setTargetbundle($bundle)
+      ->setDisplayOptions('form', [
+        'type' => 'text_textarea',
+        'label' => 'hidden',
+        'settings' => [
+          'placeholder' => 'Message',
+        ],
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'text_textfield',
+        'settings' => [],
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+  }
+
+  if ($entity_type->id() == 'opigno_certificate' && $bundle == 'template') {
+    $fields['view_mode'] = FieldStorageDefinition::create('view_mode_selector')
+      ->setLabel(t('View mode'))
+      ->setRequired(TRUE)
+      ->setCardinality(1)
+      ->setTranslatable(FALSE)
+      ->setTargetbundle($bundle)
+      ->setDisplayOptions('form', [
+        'type' => 'opigno_certificate_view_mode_selector_select',
+        'label' => 'hidden',
+        'settings' => [],
+      ])
+      ->setDisplayOptions('view', [
+        'label' => 'hidden',
+        'type' => 'hidden',
+        'settings' => [],
+        'weight' => 0,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', FALSE);
+  }
+  return $fields;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_certificate_theme() {
+  return [
+    'opigno_certificate' => [
+      'render element' => 'elements',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function opigno_certificate_theme_suggestions_opigno_certificate(array $variables) {
+  $suggestions = [];
+
+  /** @var \Drupal\opigno_certificate\CertificateInterface $opigno_certificate */
+  $opigno_certificate = $variables['elements']['#opigno_certificate'];
+
+  $view_mode = $variables['elements']['#view_mode'];
+  if ($view_mode == 'default') {
+    $view_mode = 'full';
+  }
+  $sanitized_view_mode = strtr($view_mode, '.', '_');
+
+  $suggestions[] = 'opigno_certificate__' . $sanitized_view_mode;
+  $suggestions[] = 'opigno_certificate__' . $opigno_certificate->bundle();
+  $suggestions[] = 'opigno_certificate__' . $opigno_certificate->bundle() . '__' . $sanitized_view_mode;
+  $suggestions[] = 'opigno_certificate__' . $opigno_certificate->id();
+  $suggestions[] = 'opigno_certificate__' . $opigno_certificate->id() . '__' . $sanitized_view_mode;
+
+  return $suggestions;
+}
+
+/**
+ * Implements template_preprocess_HOOK().
+ */
+function template_preprocess_opigno_certificate(array &$variables) {
+  /** @var \Drupal\opigno_certificate\CertificateInterface $opigno_certificate */
+  $opigno_certificate = $variables['elements']['#opigno_certificate'];
+
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $referencing_entity */
+  $referencing_entity = $opigno_certificate->referencing_entity->entity;
+
+  // Provide the referencing entity context.
+  if ($referencing_entity) {
+    $variables['referencing_entity'] = $referencing_entity;
+    if ($opigno_certificate->getViewModeSelectorField()) {
+      $variables['content']['referencing_entity'] = [
+        '#markup' => $referencing_entity->label(),
+      ];
+    }
+  }
+
+  // Set today's date for completion date, modules referencing certificates
+  // should set this in their own preprocess.
+  $variables['completed_on'] = \Drupal::service('date.formatter')->format(\Drupal::time()->getRequestTime(), NULL, 'd/M/Y');
+
+  $variables['awarded_to'] = \Drupal::currentUser()->getDisplayName();
+
+  // Helpful $content variable for templates.
+  foreach (Element::children($variables['elements']) as $key) {
+    $variables['content'][$key] = $variables['elements'][$key];
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_certificate_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (in_array($form_id, ['opigno_certificate_wysiwyg_add_form', 'opigno_certificate_wysiwyg_edit_form'])) {
+    $form['body']['widget'][0]['#format'] = 'opigno_certificate_wysiwyg';
+    $form['field-comments'] = [
+      '#type' => 'details',
+      '#title' => t('Body tokens'),
+      '#open' => TRUE,
+    ];
+
+    $form['field-comments']['tokens'] = [
+      '#type' => 'item',
+      '#title' => t('Tokens'),
+      '#markup' => '<p>The following tokens are available, and make possible to have some information about user data, training\'s name, completion date automatically inserted into the certificate when it is issued.</p>
+<ul>
+<li>Training title - [opigno_certificate:referencing_entity]</li>
+<li>Training completed on date - [opigno_certificate:created]</li>
+<li>User who completed training - [current-user:display-name]</li>
+<li>Certificate title - [opigno_certificate:label]</li>
+<li>Certificate author - [opigno_certificate:uid:entity:display-name]</li>
+</ul>',
+    ];
+  }
+
+  // Make field uid required.
+  $array_form_ids = [
+    'opigno_certificate_template_add_form',
+    'opigno_certificate_template_edit_form',
+    'opigno_certificate_wysiwyg_edit_form',
+    'opigno_certificate_wysiwyg_add_form',
+  ];
+  if (in_array($form_id, $array_form_ids)) {
+    $form['uid']['widget'][0]['target_id']['#required'] = TRUE;
+  };
+}
+
+/**
+ * Implements hook_filter_info_alter().
+ */
+function opigno_certificate_preprocess_filter_tips(&$variables) {
+  // @todo: the filter tips don't appear to be available in a regular alter
+  // hook, but if there is one that would be a better place to alter them. On
+  // the other hand, swapping out the plugin to change the filter tips seems
+  // overly intrusive for a text change.
+  if (isset($variables['tips']['Certificate WYSIWYG']) && !$variables['long']) {
+    // @todo: a more complete list of tokens here.
+    $variables['tips']['Certificate WYSIWYG']['list']['token_filter']['tip'] = t('Use tokens like [opigno_certificate:label] for the title for the opigno_certificate and [opigno_certificate:referencing_entity:label] for the training title.');
+  }
+}

@@ -1,0 +1,6 @@
+opigno_video.image_popup_render:
+  path: '/opigno_video/render/{fid}'
+  defaults:
+    _controller: '\Drupal\opigno_video\Controller\ImagePopup::render'
+  requirements:
+    _permission: 'access content'

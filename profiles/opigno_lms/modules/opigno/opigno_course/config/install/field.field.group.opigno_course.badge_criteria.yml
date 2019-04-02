@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.badge_criteria
+    - group.type.opigno_course
+  module:
+    - options
+id: group.opigno_course.badge_criteria
+field_name: badge_criteria
+entity_type: group
+bundle: opigno_course
+label: 'Badge criteria'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: finished
+default_value_callback: ''
+settings: {  }
+field_type: list_string

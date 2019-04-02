@@ -1,0 +1,15 @@
+name: Opigno Class
+type: module
+description: Adds the classes to your Opigno Instance. Works well with Learning Path.
+# core: 8.x
+package: Opigno
+dependencies:
+  - group:group
+  - drupal:image
+  - config_rewrite:config_rewrite
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_class'
+datestamp: 1550773094

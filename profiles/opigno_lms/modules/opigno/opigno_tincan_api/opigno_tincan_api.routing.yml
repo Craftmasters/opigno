@@ -1,0 +1,7 @@
+opigno_tincan_api.settings_form:
+  path: /admin/opigno/system/tincan
+  defaults:
+    _title: 'TinCan LRS'
+    _form: \Drupal\opigno_tincan_api\Form\OpignoTincanApiSettingsForm
+  requirements:
+    _permission: 'edit opigno tincan api settings'

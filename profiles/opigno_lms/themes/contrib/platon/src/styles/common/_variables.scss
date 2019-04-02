@@ -1,0 +1,90 @@
+/** General colors */
+$very-light-gray: #f2f2f0;
+$light-gray: #f8f7f5;
+$medium-gray: #ececeb;
+$dark-gray: #58585a;
+$darken-gray: #3c3c3b;
+$light-blue: #88c1e6;
+$dark-blue: #009ee0;
+$deep-blue: #0a71b4;
+$leaf-green: #5aa449;
+$blood-red: #ea645b;
+$blue: #5bb4d8;
+$light-blue: #95d5f4;
+$green: #c2e76b;
+$red: #ef7971;
+
+/** Header */
+$header-background-color: $darken-gray;
+$header-height: 115px;
+$header-font-color: #9d9d9c;
+$header-font-color-hover: #dadada;
+$header-picto-size: 25px;
+$header-user-picto-size: 38px;
+$header-search-height: 60px;
+$header-search-width: 500px;
+$header-search-color: #b3b3b2;
+$header-mobile-breakpoint: sm;
+$header-margin-bottom: 1.75rem;
+
+/** Navigation */
+$menu-margin-bottom: 3rem;
+$menu-pictos: (
+  '<front>': 'picto-home',
+  'catalog': 'picto-catalogue',
+  'catalogue': 'picto-catalogue',
+  'private_messages': 'picto-messages',
+  'opigno/calendar': 'picto-calendar',
+  'achievements': 'picto-achievements',
+  'statistics/dashboard': 'picto-statistics'
+);
+
+/** Footer */
+$footer-background-color: #1f3b71;
+$footer-border-color: $light-blue;
+$footer-height: 100px;
+$footer-font-color: #fff;
+$footer-margin-top: 3rem;
+
+/** Content */
+$content-mobile-breakpoint: sm;
+
+/** Frontpage */
+$frontpage-block-gap: 20px;
+$frontpage-block-x-offset: -20%;
+$frontpage-block-y-offset: 80px;
+$dashboard-panel-width: 400px;
+
+/** Table */
+$table-spacing: 0;
+
+/** Bootstrap overrides */
+$enable-rounded: false;
+$btn-transition: 0;
+$input-border-color: $medium-gray;
+$form-text-margin-top: 0;
+$headings-font-weight: 600;
+$h1-font-size: 40px;
+$font-family-base: 'Source Sans Pro', sans-serif;
+$table-border-width: 1px;
+$body-bg: #fff;
+$pagination-border-width: 0;
+$dropdown-bg: #fff;
+$link-color: $dark-blue;
+$input-btn-border-width: 0;
+$input-bg: darken($light-gray, 5%);
+$dropdown-padding-y: 0;
+$dropdown-item-padding-x: 1rem;
+$modal-content-border-width: 0;
+$modal-backdrop-bg: transparent;
+$spacer: 1rem;
+$spacers: (
+  0: 0,
+  1: ($spacer * .25),
+  2: ($spacer * .5),
+  3: $spacer,
+  4: ($spacer * 1.5),
+  5: ($spacer * 3),
+  6: ($spacer * 5),
+  7: ($spacer * 7)
+);

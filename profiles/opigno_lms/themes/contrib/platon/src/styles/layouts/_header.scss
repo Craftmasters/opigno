@@ -1,0 +1,503 @@
+#site-header {
+  background: $header-background-color;
+  color: #fff;
+  padding: 0;
+  height: $header-height;
+  position: relative;
+  z-index: 10;
+
+  button.navbar-toggler {
+    @include svg-picto('picto-menu-white');
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0;
+    background-size: 2rem;
+    padding: 0;
+    box-shadow: none;
+
+    &.open {
+      @include svg-picto('picto-close-white');
+    }
+
+    @include media-breakpoint-up(breakpoint-next($header-mobile-breakpoint)) {
+      display: none;
+    }
+  }
+
+  #header-left {
+    a {
+      display: inline-block;
+
+      img {
+        max-height: calc(#{$header-height} - 1.5rem);
+        width: 110px;
+      }
+    }
+  }
+
+  #header-right {
+    .picto {
+      height: $header-picto-size;
+    }
+
+    .unread {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      background-color: $red;
+      border: 1px solid;
+      border-radius: 100%;
+      color: #fff;
+      text-decoration: none;
+      position: absolute;
+      top: 7px;
+      transform: translate(50%, -50%);
+    }
+
+    .user-block,
+    .user-messages,
+    .user-notifications {
+      @include media-breakpoint-down($header-mobile-breakpoint) {
+        display: none;
+      }
+
+      a[data-toggle] {
+        position: relative;
+
+        .picto {
+          width: $header-user-picto-size;
+          height: $header-user-picto-size;
+        }
+      }
+    }
+
+    .admin-opigno-block {
+      @include media-breakpoint-down(md) {
+        position: static;
+      }
+
+      a[data-toggle] {
+        .picto {
+          @include svg-picto('picto-admin-opigno');
+          width: $header-user-picto-size;
+          height: $header-user-picto-size;
+          background-size: 32px;
+        }
+      }
+
+      h2 {
+        font-size: 1rem;
+        text-transform: uppercase;
+        margin-bottom: 1em;
+      }
+
+      nav > ul:not(.contextual-links) {
+        margin-left: -1.5rem;
+        max-width: 100vw;
+        display: flex;
+        flex-direction: row;
+        min-width: 500px;
+
+        > li {
+          padding-left: 1.5rem;
+
+          + li {
+            margin-top: 0;
+          }
+
+          > a {
+            display: block;
+            color: inherit;
+            font-size: 1rem;
+            text-transform: uppercase;
+            margin-bottom: 1em;
+            font-weight: 600;
+            text-decoration: none;
+            pointer-events: none;
+            min-height: 48px;
+          }
+
+          ul {
+            li {
+              + li {
+                margin-top: 10px;
+              }
+
+              a {
+                @include make-button($light-gray, $light-blue, inherit);
+              }
+            }
+          }
+        }
+      }
+
+      ul:not(.contextual-links) {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+    }
+
+    .user-block {
+      a[data-toggle] {
+        .picto {
+          border: 2px solid $header-font-color;
+          border-radius: 100%;
+          overflow: hidden;
+          background-image: url('../../images/picto-user.png');
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: cover;
+        }
+      }
+    }
+
+    .user-ilts {
+      a[data-toggle] {
+        .picto {
+          @include svg-picto('picto-ilt');
+          width: $header-user-picto-size;
+          height: $header-user-picto-size;
+          background-size: 32px;
+        }
+
+        .unread {
+          right: 1px;
+        }
+      }
+    }
+
+    .user-live-meetings {
+      a[data-toggle] {
+        .picto {
+          @include svg-picto('picto-live-meeting');
+          width: $header-user-picto-size;
+          height: $header-user-picto-size;
+          background-size: 32px;
+        }
+
+        .unread {
+          right: 1px;
+        }
+      }
+    }
+
+    .user-notifications {
+      a[data-toggle] {
+        .picto {
+          @include svg-picto(picto-user-notifications);
+          background-size: 26px;
+        }
+
+        .unread {
+          right: 9px;
+        }
+      }
+    }
+
+    .user-messages {
+      a[data-toggle] {
+        .picto {
+          @include svg-picto(picto-user-messages);
+          background-size: 32px;
+        }
+
+        .unread {
+          right: 4px;
+        }
+      }
+    }
+
+    .dropdown {
+      .dropdown-menu {
+        padding: 0;
+        border: 0;
+        box-shadow: 0 0 20px 2px rgba(0, 0, 0, .2);
+        padding-bottom: 1rem;
+        margin: 0;
+        top: 38px !important;
+        min-width: 300px;
+        left: auto !important;
+        transform: translate(-100%, 38px)!important;
+        margin-left: 38px;
+
+        @include media-breakpoint-down(md) {
+          left: 0 !important;
+          margin-left: 0;
+          transform: translate(0, 0) !important;
+          top: $header-height !important;
+        }
+
+        @include media-breakpoint-down(sm) {
+          display: none;
+        }
+
+        .views-row + .views-row {
+          margin-top: 10px;
+        }
+
+        .info {
+          min-height: calc(#{$header-height} - .5rem);
+          padding: 3rem 2rem 0;
+          border-bottom: 1px solid;
+          margin-bottom: 47px;
+
+          .close-dropdown {
+            @include svg-picto(picto-close-black);
+            width: 15px;
+            height: 1.5rem;
+            padding: 0;
+          }
+
+          .user-status {
+            color: #9faf5b;
+            font-size: 0.625rem;
+
+            &::before {
+              content: '';
+              display: inline-block;
+              width: 8px;
+              height: 8px;
+              @include svg-picto(picto-user-status);
+              font-size: 1em;
+              margin-right: 0.5em;
+            }
+          }
+        }
+
+        .mark-as-read {
+          background-color: $light-gray;
+          text-decoration: underline;
+          display: block;
+          color: inherit;
+          padding: 0.75rem 2rem;
+          margin-top: -47px;
+          margin-bottom: 47px;
+          font-style: italic;
+        }
+
+        a.dropdown-item:not(.primary) {
+          @include make-button($light-gray, $light-blue);
+          width: calc(100% - 1rem);
+
+          + a.dropdown-item {
+            margin-top: 0.5rem;
+          }
+        }
+
+        a.dropdown-item.primary {
+          background-color: #898988;
+          color: #fff;
+          margin-top: 2rem!important;
+          padding: 0.75rem 2rem;
+
+          &:hover {
+            background-color: $green;
+          }
+        }
+      }
+    }
+
+    .user-notifications.dropdown .dropdown-menu {
+      left: 108px !important;
+    }
+
+    .user-messages.dropdown .dropdown-menu {
+      left: 54px !important;
+    }
+
+    div#notifications-wrapper {
+      max-height: 400px;
+      overflow: auto;
+    }
+  }
+
+  .search-trigger {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    @include media-breakpoint-down($header-mobile-breakpoint) {
+      display: none !important;
+    }
+
+    a {
+      .picto.search {
+        height: $header-picto-size;
+        min-width: $header-picto-size;
+        @include svg-picto(picto-search);
+      }
+
+      &.open {
+        display: none;
+
+        .picto.search {
+          @include svg-picto(picto-search-close);
+        }
+      }
+    }
+  }
+
+  #search-form {
+    min-height: $header-search-height;
+    display: flex;
+    position: absolute;
+    left: 50%;
+    z-index: 10;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    form {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+
+      .form-group {
+        margin-bottom: 0;
+      }
+
+      input[type="search"] {
+        border: 0;
+        width: $header-search-width;
+        max-width: 100%;
+        text-align: center;
+        background-color: transparent;
+        color: $header-search-color;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 1.5rem;
+        transition: 0s;
+
+        &:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0 30px $header-background-color inset;
+        }
+
+        &:-webkit-autofill {
+          -webkit-text-fill-color: $header-search-color !important;
+        }
+      }
+
+      .form-actions {
+        display: none;
+      }
+    }
+  }
+
+  .view-display-id-block_last {
+    background-color: transparent;
+
+    .view-content {
+      background-color: transparent;
+
+      .views-row {
+        @include make-button($light-gray, $light-blue);
+        border-left: 0;
+
+        &:hover::before {
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .user-picture {
+          margin: 0 10px 0 0;
+        }
+
+        .created,
+        .field-pm-subject,
+        .username {
+          margin: 0 0 0 75px;
+        }
+      }
+    }
+  }
+}
+
+div#aboutModal {
+  position: absolute;
+
+  .left-col {
+    flex: 1 0 auto;
+    max-width: 200px;
+  }
+
+  .modal-dialog {
+    margin-top: $header-height;
+
+    @each $breakpoint, $width in $grid-breakpoints {
+      $container-max-width: map-get($container-max-widths, $breakpoint);
+
+      @include media-breakpoint-up($breakpoint) {
+        @if $container-max-width {
+          margin-right: calc(#{$grid-gutter-width / 2} + 50vw - #{$container-max-width / 2});
+        }
+
+        @if not $container-max-width {
+          margin-right: $grid-gutter-width / 2;
+        }
+      }
+    }
+
+    body.toolbar-fixed & {
+      margin-top: calc(#{$header-height} + 39px);
+    }
+
+    body.toolbar-fixed.toolbar-tray-open.toolbar-horizontal & {
+      margin-top: calc(#{$header-height} + 79px);
+    }
+  }
+
+  .modal-content {
+    box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .modal-header {
+    min-height: calc(115px - .5rem);
+    padding: 3rem 2rem 0;
+    border-bottom: 1px solid;
+    margin-bottom: 47px;
+    align-items: flex-start;
+
+    .close-dropdown {
+      @include svg-picto(picto-close-black);
+      width: 15px;
+      height: 1.5rem;
+      padding: 0;
+    }
+  }
+
+  .version span {
+    &.nok,
+    &.ok {
+      &::before {
+        content: '';
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        vertical-align: bottom;
+        border-radius: 100%;
+        margin-right: 0.5rem;
+      }
+    }
+
+    &.ok {
+      &::before {
+        @include svg-picto(picto-ok-white);
+        background-color: #c2d66d;
+        background-size: 50%;
+      }
+    }
+
+    &.nok {
+      &::before {
+        @include svg-picto(picto-close-white);
+        background-color: #ea5547;
+        background-size: 45%;
+      }
+    }
+  }
+}

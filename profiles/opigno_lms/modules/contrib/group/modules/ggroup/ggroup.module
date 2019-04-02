@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Enables Subgroup functionality.
+ */
+
+use Drupal\group\Entity\GroupTypeInterface;
+use Drupal\group\Entity\GroupContentInterface;
+use Drupal\ggroup\GroupRoleInheritanceInterface;
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function ggroup_entity_type_alter(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  // Add the subgroup creation wizard steps as entity forms.
+  $entity_types['group']->setFormClass('ggroup-form', 'Drupal\ggroup\Form\SubgroupFormStep1');
+  $entity_types['group_content']->setFormClass('ggroup-form', 'Drupal\ggroup\Form\SubgroupFormStep2');
+
+  // Make sure circular references cannot be created with subgroups.
+  $entity_types['group_content']->addConstraint('GroupSubgroup');
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function ggroup_group_type_insert(GroupTypeInterface $group_type) {
+  \Drupal::service('plugin.manager.group_content_enabler')->clearCachedDefinitions();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function ggroup_group_content_insert(GroupContentInterface $group_content) {
+  $plugin = $group_content->getContentPlugin();
+  $entity_type = $plugin->getEntityTypeId();
+
+  if ($entity_type !== 'group') {
+    return;
+  }
+
+  \Drupal::service('ggroup.group_hierarchy_manager')->addSubgroup($group_content);
+
+  // Rebuild role inheritance cache.
+  \Drupal::service('ggroup.group_role_inheritance')->rebuild();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function ggroup_group_content_delete(GroupContentInterface $group_content) {
+  $plugin = $group_content->getContentPlugin();
+  $entity_type = $plugin->getEntityTypeId();
+
+  if ($entity_type !== 'group') {
+    return;
+  }
+
+  \Drupal::service('ggroup.group_hierarchy_manager')->removeSubgroup($group_content);
+
+  // Remove role inheritance cache.
+  \Drupal::service('ggroup.group_role_inheritance')->rebuild();
+}

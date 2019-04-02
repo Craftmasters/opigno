@@ -1,0 +1,8 @@
+
+opigno_tincan_activities.h5p_tincan_relay:
+  path: 'ajax/opigno-tincan-api/relay'
+  defaults:
+    _controller: '\Drupal\opigno_tincan_activities\Controller\H5pTincanRelayController::h5pTincanStatementRelay'
+    _title: 'h5pTincanStatementRelay'
+  requirements:
+    _permission: 'access content'

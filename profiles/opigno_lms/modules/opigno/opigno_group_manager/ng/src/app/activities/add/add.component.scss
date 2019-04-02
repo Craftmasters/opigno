@@ -1,0 +1,22 @@
+.activity-add {
+  position: fixed;
+  z-index: 100;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 1rem;
+  background-color: #fff;
+  box-shadow: 0 0 5px 2px #ddd;
+  overflow-y: auto;
+  width: 500px;
+  max-width: 100%;
+
+  &.create {
+    left: 400px;
+    width: auto;
+
+    @media (max-width:768px) {
+      left: 0;
+    }
+  }
+}

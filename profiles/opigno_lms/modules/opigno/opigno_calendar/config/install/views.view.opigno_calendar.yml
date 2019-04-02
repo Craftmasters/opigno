@@ -1,0 +1,990 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - calendar
+    - datetime
+    - datetime_range
+    - opigno_calendar
+    - opigno_calendar_event
+    - user
+id: opigno_calendar
+label: 'Opigno calendar'
+module: views
+description: 'A calendar view of all the Opigno calendar events.'
+tag: ''
+base_table: opigno_calendar_event_field_data
+base_field: id
+core: 8.x
+display:
+  default:
+    display_plugin: default
+    id: default
+    display_title: Master
+    position: 0
+    display_options:
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+        options: {  }
+      query:
+        type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_comment: ''
+          query_tags: {  }
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Apply
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      pager:
+        type: calendar
+        options:
+          exclude_display: 1
+      style:
+        type: calendar
+        options:
+          calendar_type: month
+          mini: '0'
+          month_name_size: '99'
+          name_size: '3'
+          with_weekno: '0'
+          max_items: '0'
+          max_items_behavior: more
+          groupby_times: hour
+          groupby_times_custom: null
+          theme_style: '1'
+          groupby_field: ''
+          multiday_theme: '0'
+          multiday_hidden: {  }
+          granularity_links:
+            day: ''
+            week: ''
+      row:
+        type: calendar_row
+        options:
+          colors:
+            legend: type
+            calendar_colors_type:
+              article: '#ffffff'
+              page: '#ffffff'
+            taxonomy_field: ''
+            calendar_colors_vocabulary: {  }
+      fields:
+        title:
+          id: title
+          table: opigno_calendar_event_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: opigno_calendar_event
+          entity_field: created
+          plugin_id: field
+        date_daterange:
+          id: date_daterange
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: datetime_default
+          settings:
+            timezone_override: ''
+            format_type: medium
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
+      filters:
+        status:
+          value: '1'
+          table: opigno_calendar_event_field_data
+          field: status
+          plugin_id: boolean
+          entity_type: opigno_calendar_event
+          entity_field: status
+          id: status
+          expose:
+            operator: ''
+          group: 1
+      sorts:
+        date_daterange_value:
+          id: date_daterange_value
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          order: ASC
+          exposed: false
+          expose:
+            label: ''
+          granularity: second
+          plugin_id: datetime
+      header:
+        calendar_header:
+          id: calendar_header
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: 1
+          content: '{{ arguments.date_daterange_value_year_month }}'
+          pager_embed: 0
+          plugin_id: calendar_header
+        calendar_header_1:
+          id: calendar_header_1
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: 'Calendar Pager'
+          empty: true
+          tokenize: 1
+          content: ''
+          pager_embed: 1
+          plugin_id: calendar_header
+      footer: {  }
+      empty: {  }
+      relationships: {  }
+      arguments: {  }
+      display_extenders: {  }
+      css_class: view-opigno-calendar
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - user.permissions
+      tags: {  }
+  month_block:
+    display_plugin: block
+    id: month_block
+    display_title: 'Month block'
+    position: 5
+    display_options:
+      display_extenders: {  }
+      allow:
+        items_per_page: false
+      block_description: 'Opigno calendar block'
+      title: Calendar
+      defaults:
+        title: false
+        arguments: false
+        pager: true
+        link_display: false
+        link_url: false
+        use_ajax: false
+        fields: false
+      arguments:
+        date_daterange_value_year_month:
+          id: date_daterange_value_year_month
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange_value_year_month
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: date
+          default_argument_options: {  }
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: true
+          validate:
+            type: calendar
+            fail: 'not found'
+          validate_options:
+            replacement_format: 'F Y'
+          operator: '='
+          formula:
+            operator: range_intersects
+          plugin_id: datetime_range_year_month
+      link_display: page_month
+      link_url: ''
+      display_description: ''
+      use_ajax: true
+      fields:
+        id:
+          id: id
+          table: opigno_calendar_event_field_data
+          field: id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: true
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: number_integer
+          settings:
+            thousand_separator: ''
+            prefix_suffix: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: opigno_calendar_event
+          entity_field: id
+          plugin_id: field
+        title:
+          id: title
+          table: opigno_calendar_event_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: true
+            path: '{{ field_calendar_event_group }}'
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: opigno_calendar_event
+          entity_field: created
+          plugin_id: field
+        date_daterange:
+          id: date_daterange
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: true
+            text: '<div class="time">{{ date_daterange }}</div>'
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: opigno_calendar_time_range
+          settings:
+            timezone_override: ''
+            date_format: 'd/m/Y, H:i'
+            separator: '-'
+            time_separator: ', '
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
+    cache_metadata:
+      max-age: 0
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }
+  page_day:
+    display_plugin: page
+    id: page_day
+    display_title: Day
+    position: 3
+    display_options:
+      display_extenders: {  }
+      display_description: ''
+      style:
+        type: calendar
+        options:
+          calendar_type: day
+          mini: '0'
+          name_size: '3'
+          with_weekno: '0'
+          max_items: '0'
+          max_items_behavior: more
+          groupby_times: hour
+          groupby_times_custom: null
+          theme_style: '1'
+          groupby_field: ''
+          multiday_theme: '1'
+          multiday_hidden: {  }
+      defaults:
+        style: false
+        row: false
+        arguments: false
+        header: false
+      row:
+        type: calendar_row
+        options:
+          colors:
+            legend: type
+            calendar_colors_type:
+              article: '#ffffff'
+              page: '#ffffff'
+            taxonomy_field: ''
+            calendar_colors_vocabulary: {  }
+      path: opigno/calendar/day
+      menu:
+        type: tab
+        title: Day
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
+        menu_name: main
+      arguments:
+        date_daterange_value_full_date:
+          id: date_daterange_value_full_date
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange_value_full_date
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: date
+          default_argument_options: {  }
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: true
+          validate:
+            type: calendar
+            fail: 'not found'
+          validate_options:
+            replacement_format: 'l, F j, Y'
+          operator: '='
+          formula:
+            operator: range_intersects
+          plugin_id: datetime_full_date
+      header:
+        calendar_header:
+          id: calendar_header
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: 1
+          content: '{{ arguments.date_daterange_value_full_date }}'
+          pager_embed: 0
+          plugin_id: calendar_header
+        calendar_header_1:
+          id: calendar_header_1
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: 'Calendar Pager'
+          empty: true
+          tokenize: 1
+          content: ''
+          pager_embed: 1
+          plugin_id: calendar_header
+    cache_metadata:
+      max-age: 0
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }
+  page_month:
+    display_plugin: page
+    id: page_month
+    display_title: Month
+    position: 1
+    display_options:
+      display_extenders: {  }
+      path: opigno/calendar
+      display_description: ''
+      menu:
+        type: 'default tab'
+        title: Month
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
+        menu_name: main
+      tab_options:
+        type: none
+        title: Calendar
+        description: ''
+        weight: 0
+      arguments:
+        date_daterange_value_year_month:
+          id: date_daterange_value_year_month
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange_value_year_month
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: date
+          default_argument_options: {  }
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: true
+          validate:
+            type: calendar
+            fail: 'not found'
+          validate_options:
+            replacement_format: 'F Y'
+          operator: '='
+          formula:
+            operator: range_intersects
+          plugin_id: datetime_year_month
+      header:
+        calendar_header:
+          id: calendar_header
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: 1
+          content: '{{ arguments.date_daterange_value_year_month }}'
+          pager_embed: 0
+          plugin_id: calendar_header
+        calendar_header_1:
+          id: calendar_header_1
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: 'Calendar Pager'
+          empty: true
+          tokenize: 1
+          content: ''
+          pager_embed: 1
+          plugin_id: calendar_header
+      defaults:
+        arguments: false
+        header: false
+    cache_metadata:
+      max-age: 0
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }
+  page_week:
+    display_plugin: page
+    id: page_week
+    display_title: Week
+    position: 2
+    display_options:
+      display_extenders: {  }
+      display_description: ''
+      style:
+        type: calendar
+        options:
+          calendar_type: week
+          mini: '0'
+          name_size: '3'
+          with_weekno: '0'
+          max_items: '0'
+          max_items_behavior: more
+          groupby_times: hour
+          groupby_times_custom: null
+          theme_style: '1'
+          groupby_field: ''
+          multiday_theme: '1'
+          multiday_hidden: {  }
+      defaults:
+        style: false
+        row: false
+        arguments: false
+        header: false
+      row:
+        type: calendar_row
+        options:
+          colors:
+            legend: type
+            calendar_colors_type:
+              article: '#ffffff'
+              page: '#ffffff'
+            taxonomy_field: ''
+            calendar_colors_vocabulary: {  }
+      path: opigno/calendar/week
+      menu:
+        type: tab
+        title: Week
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
+        menu_name: main
+      arguments:
+        date_daterange_value_year_week:
+          id: date_daterange_value_year_week
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange_value_year_week
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: date
+          default_argument_options: {  }
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: true
+          validate:
+            type: calendar
+            fail: 'not found'
+          validate_options:
+            replacement_format: 'F j, Y'
+          operator: '='
+          formula:
+            operator: range_intersects
+          plugin_id: datetime_year_week
+      header:
+        calendar_header:
+          id: calendar_header
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: 1
+          content: 'Week of {{ arguments.date_daterange_value_year_week }}'
+          pager_embed: 0
+          plugin_id: calendar_header
+        calendar_header_1:
+          id: calendar_header_1
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: 'Calendar Pager'
+          empty: true
+          tokenize: 1
+          content: ''
+          pager_embed: 1
+          plugin_id: calendar_header
+    cache_metadata:
+      max-age: 0
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }
+  page_year:
+    display_plugin: page
+    id: page_year
+    display_title: Year
+    position: 4
+    display_options:
+      display_extenders: {  }
+      display_description: ''
+      style:
+        type: calendar
+        options:
+          calendar_type: year
+          mini: '0'
+          name_size: '3'
+          with_weekno: '0'
+          max_items: '0'
+          max_items_behavior: more
+          groupby_times: hour
+          groupby_times_custom: null
+          theme_style: '1'
+          groupby_field: ''
+          multiday_theme: '1'
+          multiday_hidden: {  }
+      defaults:
+        style: false
+        row: false
+        arguments: false
+        header: false
+      row:
+        type: calendar_row
+        options:
+          colors:
+            legend: type
+            calendar_colors_type:
+              article: '#ffffff'
+              page: '#ffffff'
+            taxonomy_field: ''
+            calendar_colors_vocabulary: {  }
+      arguments:
+        date_daterange_value_year:
+          id: date_daterange_value_year
+          table: opigno_calendar_event__date_daterange
+          field: date_daterange_value_year
+          relationship: none
+          group_type: group
+          admin_label: ''
+          default_action: default
+          exception:
+            value: all
+            title_enable: false
+            title: All
+          title_enable: false
+          title: ''
+          default_argument_type: date
+          default_argument_options: {  }
+          default_argument_skip_url: false
+          summary_options:
+            base_path: ''
+            count: true
+            items_per_page: 25
+            override: false
+          summary:
+            sort_order: asc
+            number_of_records: 0
+            format: default_summary
+          specify_validation: true
+          validate:
+            type: calendar
+            fail: 'not found'
+          validate_options:
+            replacement_format: 'Y'
+          operator: '='
+          formula:
+            operator: range_intersects
+          plugin_id: datetime_year
+      header:
+        calendar_header:
+          id: calendar_header
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: 1
+          content: '{{ arguments.date_daterange_value_year }}'
+          pager_embed: 0
+          plugin_id: calendar_header
+        calendar_header_1:
+          id: calendar_header_1
+          table: views
+          field: calendar_header
+          relationship: none
+          group_type: group
+          admin_label: 'Calendar Pager'
+          empty: true
+          tokenize: 1
+          content: ''
+          pager_embed: 1
+          plugin_id: calendar_header
+      path: opigno/calendar/year
+      menu:
+        type: tab
+        title: Year
+        description: ''
+        expanded: false
+        parent: ''
+        weight: 0
+        context: '0'
+        menu_name: main
+    cache_metadata:
+      max-age: 0
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - url
+        - user.permissions
+      tags: {  }

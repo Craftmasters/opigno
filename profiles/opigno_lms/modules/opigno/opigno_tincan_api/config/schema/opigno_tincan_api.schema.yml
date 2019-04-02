@@ -1,0 +1,10 @@
+opigno_tincan_api.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    opigno_tincan_api_endpoint:
+      type: string
+    opigno_tincan_api_username:
+      type: string
+    opigno_tincan_api_password:
+      type: string

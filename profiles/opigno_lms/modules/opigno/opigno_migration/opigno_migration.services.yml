@@ -1,0 +1,5 @@
+services:
+  opigno_migration.subscriber:
+    class: Drupal\opigno_migration\EventSubscriber\GroupsMigrateSubscriber
+    tags:
+    - { name: event_subscriber }

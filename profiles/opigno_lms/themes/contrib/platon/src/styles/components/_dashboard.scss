@@ -1,0 +1,413 @@
+app-root.dashboard {
+  position: static;
+
+  .trigger-btn {
+    @include media-breakpoint-down(sm) {
+      display: none !important;
+    }
+  }
+
+  button.manage-dashboard {
+    background-color: #e596c0!important;
+    color: #fff!important;
+    text-transform: uppercase;
+
+    &:hover {
+      background-color: #ee6fbb!important;
+    }
+
+    &::before {
+      @extend .picto-pencil;
+      content: '';
+      height: 1em;
+      width: 1em;
+      display: inline-block;
+      margin-right: 0.25em;
+      vertical-align: top;
+      position: relative;
+      top: 2px;
+    }
+  }
+
+  app-panel {
+    $paddingX: 2rem;
+    width: $dashboard-panel-width;
+    position: absolute;
+    top: 115px;
+    bottom: auto;
+    box-shadow: 0 0 15px 0 #ccc;
+    padding-left: $paddingX;
+    padding-right: $paddingX;
+    padding-bottom: 1rem;
+
+    .toolbar-vertical & {
+      top: calc(39px + 115px);
+    }
+
+    .toolbar-tray-open.toolbar-horizontal & {
+      top: calc(39px + 39px + 115px);
+    }
+
+    h3 {
+      text-transform: uppercase;
+      font-size: 1.3rem;
+    }
+
+    button.close-dashboard {
+      float: right;
+      background-color: transparent!important;
+      @extend .picto-close-black;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 1rem;
+      height: 1.375rem;
+      font-size: 0;
+      padding: 0;
+    }
+
+    section.layout {
+      background-color: #f6f6f6;
+      border-top: 1px solid #b2b2b2;
+      padding: 1.5rem 0;
+      margin: 1.75rem #{-$paddingX};
+      padding-left: $paddingX;
+      padding-right: $paddingX;
+      display: flex;
+      align-items: center;
+
+      p {
+        margin-bottom: 0;
+        margin-right: 1.5rem;
+        font-style: italic;
+      }
+
+      .radio {
+        display: inline-block;
+        flex: 1 0 2rem;
+        max-width: 2rem;
+        height: 2rem !important;
+        margin-right: 1.5rem;
+        outline: none;
+        border: 0;
+        background-color: transparent;
+        background-repeat: no-repeat;
+        box-shadow: none;
+        font-size: 0;
+        padding: 0;
+
+        @for $i from 1 through 4 {
+          &#layout-#{$i} {
+            @extend .picto-layout-#{$i};
+
+            &.active,
+            &:hover {
+              @extend .picto-layout-#{$i}-hover;
+            }
+          }
+        }
+      }
+    }
+
+    section.add-blocks {
+      .blocks {
+        margin-left: -$paddingX;
+
+        .block {}
+      }
+    }
+
+    section.reinit {
+      margin-left: -$paddingX;
+      margin-right: -$paddingX;
+      margin-top: 3rem;
+
+      p {
+        padding-left: $paddingX;
+        padding-right: $paddingX;
+      }
+
+      button {
+        width: 100%;
+        text-align: center;
+        text-transform: uppercase;
+        padding: 1rem;
+      }
+    }
+  }
+
+  .dashboard-column {
+    @include media-breakpoint-down(md) {
+      flex: 1 0 50% !important;
+      max-width: 50%;
+      margin-bottom: 33px;
+    }
+
+    @include media-breakpoint-down(sm) {
+      flex: 1 0 100% !important;
+      max-width: 100%;
+      margin-bottom: 33px;
+    }
+
+    &:nth-child(even) {
+      @include media-breakpoint-down(md) {
+        padding-right: 0 !important;
+        padding-left: 10px !important;
+      }
+      @include media-breakpoint-down(sm) {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
+
+    &:nth-child(odd) {
+      @include media-breakpoint-down(md) {
+        padding-left: 0 !important;
+        padding-right: 10px !important;
+      }
+      @include media-breakpoint-down(sm) {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
+  }
+
+  .dashboard-column-wrapper.panel-open {
+    @each $grid-breakpoint in map-keys($grid-breakpoints) {
+      @include media-breakpoint-down($grid-breakpoint) {
+        margin-right: calc(#{$dashboard-panel-width} - ((100vw - #{map-get($container-max-widths, $grid-breakpoint)}) / 2));
+      }
+    }
+
+    .dashboard-column {
+      border: 1px dashed #1d1d1b!important;
+      background-color: #f7f6f6;
+    }
+  }
+}
+
+// Admin view blocks
+.dashboard-block {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 !important;
+  background-color: #fff !important;
+
+  .blocks.panel & {
+    background-color: #f6f6f6 !important;
+  }
+
+  &.gu-mirror {
+    background-color: #fff !important;
+    color: inherit !important;
+
+    &::before {
+      width: 2px!important;
+      background-color: #ff5440;
+    }
+
+    .handle {
+      display: none;
+    }
+  }
+
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #ff5440;
+    transition: width 0.2s;
+  }
+
+  .blocks.panel &::before {
+    background-color: #95d5f4;
+  }
+
+  .blocks.panel &:hover {
+    color: #fff;
+
+    &::before {
+      width: 100%;
+    }
+
+    .handle {
+      @extend .picto-plus-white;
+    }
+  }
+
+  .handle {
+    @extend .picto-plus-grey;
+    float: none;
+    background-size: 20px;
+    background-repeat: no-repeat;
+    background-position: 20px 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: auto;
+    z-index: 1;
+
+    .dashboard-column & {
+      background-image: none;
+    }
+  }
+
+  .title {
+    position: relative;
+    padding: 1rem 1.5rem;
+    width: 100%;
+
+    .add-blocks & {
+      padding: 1rem 1rem 1rem 56px;
+    }
+  }
+
+  button.remove {
+    @extend .picto-close-black;
+    position: relative;
+    z-index: 1;
+    background-size: 14px;
+    background-repeat: no-repeat;
+    background-position: center;
+    font-size: 0;
+    background-color: transparent !important;
+    width: 14px;
+    height: 14px;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    box-sizing: content-box;
+  }
+}
+
+// User view blocks
+.dashboard-drupal-block {
+  background-color: #f7f6f6;
+  $block-padding: 1rem 1.5rem;
+
+  div[data-contextual-id] {
+    display: none;
+  }
+
+  h2 {
+    background-color: #5bb4d8;
+    color: #fff;
+    font-size: 20px;
+    text-transform: uppercase;
+    padding: $block-padding;
+    margin-bottom: 0;
+  }
+
+  > .views-element-container > div:not(.contextual) {
+    padding: $block-padding;
+  }
+
+  + .dashboard-drupal-block {
+    margin-top: 33px;
+  }
+}
+
+div#block-dashboard-views-block-latest-active-trainings-block,
+div#block-dashboard-views-block-opigno-notifications-block-unread-dashboard,
+div#block-dashboard-views-block-private-message-block-dashboard,
+div#block-dashboard-views-block-opigno-group-members-block-pending {
+  h2 {
+    &::before {
+      content: '';
+      background-size: contain;
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      vertical-align: top;
+      margin-right: 0.75rem;
+    }
+  }
+
+  .view-content {
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    margin-left: -1.5rem;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-bottom: 0;
+    }
+
+    ul li {
+      a {
+        @include make-button(#fff, $light-blue);
+        color: $body-color;
+      }
+
+      + li {
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
+div#block-dashboard-views-block-latest-active-trainings-block {
+  .views-row {
+    @include make-button(#fff, $light-blue);
+    padding: 0;
+    color: $body-color;
+
+    .views-field-label {
+      a {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+        padding: 0.75rem 6rem 0.75rem 2rem;
+        position: relative;
+        z-index: 1;
+      }
+    }
+
+    .views-field-opigno-lp-progress {
+      position: absolute;
+      right: 22px;
+      top: 50%;
+      z-index: 0;
+      transform: translateY(-50%);
+
+      .field-content {
+        .text {
+          text-align: right;
+          font-size: 0.9375rem;
+        }
+
+        .chart {
+          width: 65px;
+          height: 2px;
+          background-color: #dadada;
+
+          .bar {
+            height: 2px;
+            background-color: #efa693;
+          }
+        }
+      }
+    }
+
+    + .views-row {
+      margin-top: 10px;
+    }
+  }
+}
+
+div#block-dashboard-views-block-opigno-notifications-block-unread-dashboard h2::before {
+  @include svg-picto(picto-dashboard-notifications);
+}
+
+div#block-dashboard-views-block-latest-active-trainings-block h2::before,
+div#block-dashboard-views-block-private-message-block-dashboard h2::before {
+  @include svg-picto(picto-dashboard-trainings);
+}

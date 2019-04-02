@@ -1,0 +1,33 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_calendar_event.field_calendar_event_members
+    - opigno_calendar_event.type.opigno_calendar_event
+  module:
+    - opigno_calendar_event
+third_party_settings:
+  opigno_calendar_event:
+    embedded_widget: 0
+id: opigno_calendar_event.opigno_calendar_event.field_calendar_event_members
+field_name: field_calendar_event_members
+entity_type: opigno_calendar_event
+bundle: opigno_calendar_event
+label: Members
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:user'
+  handler_settings:
+    include_anonymous: false
+    filter:
+      type: _none
+    target_bundles: null
+    sort:
+      field: name
+      direction: ASC
+    auto_create: false
+field_type: entity_reference

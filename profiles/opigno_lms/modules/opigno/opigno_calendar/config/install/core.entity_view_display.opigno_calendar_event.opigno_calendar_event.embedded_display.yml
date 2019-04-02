@@ -1,0 +1,31 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.opigno_calendar_event.embedded_display
+    - field.field.opigno_calendar_event.opigno_calendar_event.field_calendar_event_members
+    - opigno_calendar_event.type.opigno_calendar_event
+  module:
+    - datetime_range
+id: opigno_calendar_event.opigno_calendar_event.embedded_display
+targetEntityType: opigno_calendar_event
+bundle: opigno_calendar_event
+mode: embedded_display
+content:
+  date_daterange:
+    type: daterange_default
+    weight: 0
+    region: content
+    label: above
+    settings:
+      separator: '-'
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+hidden:
+  description: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_calendar_event_members: true
+  title: true

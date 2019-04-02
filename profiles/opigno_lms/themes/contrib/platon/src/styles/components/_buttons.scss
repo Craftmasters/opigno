@@ -1,0 +1,55 @@
+[type="reset"],
+[type="submit"],
+a.button,
+button:not([class*="h5p-"]),
+html [type="button"]:not([class*="h5p-"]) {
+  @extend .btn;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:not([class*="btn-"]):not([class*="mat-"]):not(.link):not(.close):not(.trigger):not(.toolbar-icon) {
+    @extend .btn-light;
+  }
+
+  &.link {
+    @extend .btn-link;
+    padding: 0;
+    border: 0;
+    line-height: inherit;
+    vertical-align: unset;
+    font-family: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  & + .button {
+    margin-left: 1rem;
+  }
+}
+
+.btn-group {
+  & + .button {
+    margin-left: 1rem;
+  }
+}
+
+a.button#edit-delete {
+  @extend .btn-outline-danger;
+}
+
+input#edit-preview {
+  @extend .btn-outline-success;
+}
+
+a.button {
+  @extend .btn;
+  @extend .btn-link;
+}

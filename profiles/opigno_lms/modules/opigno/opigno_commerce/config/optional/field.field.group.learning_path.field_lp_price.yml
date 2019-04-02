@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+  - field.storage.group.field_lp_price
+  - group.type.learning_path
+id: group.learning_path.field_lp_price
+field_name: field_lp_price
+entity_type: group
+bundle: learning_path
+label: 'LP price'
+description: 'The price you want to sell this training for. If left empty, the training will be available free of charge.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: float

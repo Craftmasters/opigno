@@ -1,0 +1,36 @@
+langcode: en
+status: true
+dependencies:
+  config:
+  - field.field.media.tft_file.opigno_moxtra_recording_link
+  - field.field.media.tft_file.tft_file
+  - field.field.media.tft_file.tft_folder
+  - field.field.media.tft_file.tft_members
+  - media.type.tft_file
+  module:
+  - opigno_video
+id: media.tft_file.default
+targetEntityType: media
+bundle: tft_file
+mode: default
+content:
+  tft_file:
+    weight: 0
+    label: above
+    settings:
+      width: 220
+      height: 220
+    third_party_settings: {  }
+    type: opigno_tft_formatter
+    region: content
+hidden:
+  created: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  name: true
+  opigno_moxtra_recording_link: true
+  tft_folder: true
+  tft_members: true
+  thumbnail: true
+  uid: true

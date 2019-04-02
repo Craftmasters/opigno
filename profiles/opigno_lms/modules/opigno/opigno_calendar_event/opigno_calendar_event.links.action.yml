@@ -1,0 +1,10 @@
+entity.opigno_calendar_event_type.add_form:
+  route_name: entity.opigno_calendar_event_type.add_form
+  title: 'Add calendar event type'
+  appears_on:
+    - entity.opigno_calendar_event_type.collection
+entity.opigno_calendar_event.add_page:
+  route_name: entity.opigno_calendar_event.add_page
+  title: 'Add calendar event'
+  appears_on:
+    - view.opigno_calendar_events.admin

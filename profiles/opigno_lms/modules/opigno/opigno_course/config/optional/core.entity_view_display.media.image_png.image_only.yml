@@ -1,0 +1,33 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.image_only
+    - field.field.media.image_png.field_media_image
+    - image.style.thumbnail
+    - media.type.image_png
+  module:
+    - image
+id: media.image_png.image_only
+targetEntityType: media
+bundle: image_png
+mode: image_only
+content:
+  thumbnail:
+    type: image
+    weight: 0
+    label: hidden
+    settings:
+      image_style: thumbnail
+      image_link: ''
+    region: content
+    third_party_settings: {  }
+hidden:
+  created: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_media_image: true
+  langcode: true
+  name: true
+  uid: true

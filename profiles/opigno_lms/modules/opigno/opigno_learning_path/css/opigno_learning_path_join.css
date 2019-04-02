@@ -1,0 +1,20 @@
+#join-group-form-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#join-group-form-wrapper {
+  background-color: #fff;
+  max-width: calc(100% - 30px);
+  width: 800px;
+  padding: 2rem;
+  box-shadow: 0 0 5px 5px #ddd;
+}

@@ -1,0 +1,254 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Moxtra module.
+ */
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+
+/**
+ * Creates the collaborative workspace field in a training groups.
+ */
+function opigno_moxtra_install() {
+  $config_path = drupal_get_path('module', 'opigno_moxtra')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.group.field_workspace');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.group.learning_path.field_workspace');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}
+
+/**
+ * Creates the opigno_moxtra_workspace entity type.
+ */
+function opigno_moxtra_update_8001() {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_moxtra_workspace')) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+    $entity_type_manager->clearCachedDefinitions();
+
+    $definition = $entity_type_manager->getDefinition('opigno_moxtra_workspace');
+    $entity_definition_update_manager->installEntityType($definition);
+  }
+}
+
+/**
+ * Creates the collaborative workspace field in training groups.
+ */
+function opigno_moxtra_update_8002() {
+  $config_path = drupal_get_path('module', 'opigno_moxtra')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  $data = $storage->read('field.storage.group.field_workspace');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.group.learning_path.field_workspace');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}
+
+/**
+ * Creates the members field in workspaces.
+ */
+function opigno_moxtra_update_8003() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Members'))
+    ->setDescription(t('The members of the Workspace entity.'))
+    ->setSetting('target_type', 'user')
+    ->setSetting('handler', 'default')
+    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('members', 'opigno_moxtra_workspace', 'opigno_moxtra_workspace', $field);
+}
+
+/**
+ * Creates the opigno_moxtra_meeting entity type.
+ */
+function opigno_moxtra_update_8004() {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_moxtra_meeting')) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+    $entity_type_manager->clearCachedDefinitions();
+
+    $definition = $entity_type_manager->getDefinition('opigno_moxtra_meeting');
+    $entity_definition_update_manager->installEntityType($definition);
+  }
+}
+
+/**
+ * Creates the training field in the meetings.
+ */
+function opigno_moxtra_update_8005() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Related training'))
+    ->setDescription(t('The related training of the Meeting entity.'))
+    ->setSettings([
+      'target_type' => 'group',
+      'handler' => 'default:group',
+      'handler_settings' => [
+        'target_bundles' => [
+          'learning_path' => 'learning_path',
+        ],
+        'sort' => [
+          'field' => '_none',
+        ],
+      ],
+    ]);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('training', 'opigno_moxtra_meeting', 'opigno_moxtra_meeting', $field);
+}
+
+/**
+ * Creates the calendar event field in the meetings.
+ */
+function opigno_moxtra_update_8006() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Related calendar event'))
+    ->setDescription(t('The related calendar event of the Meeting entity.'))
+    ->setSettings([
+      'target_type' => 'opigno_calendar_event',
+      'handler' => 'default',
+    ]);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('calendar_event', 'opigno_moxtra_meeting', 'opigno_moxtra_meeting', $field);
+}
+
+/**
+ * Creates the opigno_moxtra_meeting_result entity type.
+ */
+function opigno_moxtra_update_8007() {
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_moxtra_meeting_result')) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+    $entity_type_manager->clearCachedDefinitions();
+
+    $definition = $entity_type_manager->getDefinition('opigno_moxtra_meeting_result');
+    $entity_definition_update_manager->installEntityType($definition);
+  }
+}
+
+/**
+ * Creates the live meeting calendar event type.
+ */
+function opigno_moxtra_update_8008() {
+  $config_path = drupal_get_path('module', 'opigno_moxtra')
+    . '/config/install';
+  $storage = new FileStorage($config_path);
+
+  $config_storage = \Drupal::service('config.storage');
+  $data = $storage->read('opigno_calendar_event.type.meeting_calendar_event');
+  $config_storage->write('opigno_calendar_event.type.meeting_calendar_event', $data);
+
+  $data = $storage->read('field.storage.opigno_calendar_event.field_meeting');
+  if (!FieldStorageConfig::loadByName($data['entity_type'], $data['field_name'])) {
+    FieldStorageConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.opigno_calendar_event.meeting_calendar_event.field_meeting');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+
+  $data = $storage->read('field.field.opigno_calendar_event.meeting_calendar_event.field_calendar_event_members');
+  if (!FieldConfig::loadByName($data['entity_type'], $data['bundle'], $data['field_name'])) {
+    FieldConfig::create($data)->save();
+  }
+}
+
+/**
+ * Creates the notified members field in the meetings.
+ */
+function opigno_moxtra_update_8009() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Notified Members'))
+    ->setDescription(t('Members of the Meeting entity that received notification by email.'))
+    ->setSettings([
+      'target_type' => 'user',
+      'handler' => 'default',
+    ])
+    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('notified_members', 'opigno_moxtra_meeting', 'opigno_moxtra_meeting', $field);
+}
+
+/**
+ * Creates the auto_register field in workspaces.
+ */
+function opigno_moxtra_update_8010() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Automatically register'))
+    ->setDescription(t('Automatically register all users of that training.'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(TRUE)
+    ->setDefaultValue(TRUE)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'weight' => 2,
+    ]);
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('auto_register', 'opigno_moxtra_workspace', 'opigno_moxtra_workspace', $field);
+}
+
+/**
+ * Creates the training field in the meetings.
+ */
+function opigno_moxtra_update_8011() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Training'))
+    ->setDescription(t('The related Training of the Workspace entity.'))
+    ->setSettings([
+      'target_type' => 'group',
+      'handler' => 'default:group',
+      'handler_settings' => [
+        'target_bundles' => [
+          'learning_path' => 'learning_path',
+        ],
+        'sort' => [
+          'field' => '_none',
+        ],
+      ],
+      'default_value' => 0,
+    ])
+    ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('training', 'opigno_moxtra_workspace', 'opigno_moxtra_workspace', $field);
+}

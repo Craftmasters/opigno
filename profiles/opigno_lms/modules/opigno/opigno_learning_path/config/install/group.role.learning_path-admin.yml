@@ -1,0 +1,36 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+id: learning_path-admin
+label: Admin
+weight: -7
+internal: false
+audience: member
+group_type: learning_path
+permissions_ui: true
+permissions:
+  0: 'access content overview'
+  1: 'administer group'
+  2: 'delete group'
+  3: 'edit group'
+  4: 'administer members'
+  5: 'update own group_membership content'
+  6: 'leave group'
+  7: 'view group_membership content'
+  8: 'view group'
+  9: 'access group_node overview'
+  19: 'tft access file tree'
+  20: 'tft add a file to any term'
+  21: 'tft add child terms'
+  22: 'administer tft'
+  23: 'tft archive child terms'
+  24: 'tft delete child terms'
+  25: 'tft reorder terms'
+  26: 'view all results'
+  27: 'view own results'
+  28: 'edit all results'
+  29: 'edit own results'
+  30: 'delete all results'
+  31: 'delete own results'

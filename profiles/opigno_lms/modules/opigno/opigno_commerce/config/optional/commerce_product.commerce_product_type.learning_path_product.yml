@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: learning_path_product
+label: 'Learning Path product'
+description: ''
+variationType: learning_path_product
+injectVariationFields: true
+traits: {  }
+locked: false

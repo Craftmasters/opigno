@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_file_upload
+    - opigno_module
+id: opigno_activity.opigno_evaluation_method
+field_name: opigno_evaluation_method
+entity_type: opigno_activity
+type: opigno_evaluation_method
+settings: {  }
+module: opigno_file_upload
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

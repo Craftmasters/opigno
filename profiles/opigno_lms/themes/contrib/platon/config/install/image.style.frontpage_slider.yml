@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies: {  }
+name: frontpage_slider
+label: 'Frontpage slider'
+effects:
+  26b63ddc-caf1-42e3-8e9d-3ba3ad277aa6:
+    uuid: 26b63ddc-caf1-42e3-8e9d-3ba3ad277aa6
+    id: image_scale
+    weight: 1
+    data:
+      width: 1600
+      height: 900
+      upscale: false

@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies: {  }
+id: user_manager
+label: 'User manager'
+weight: -6
+is_admin: null
+permissions:
+  - 'access media_entity_browser_groups entity browser pages'
+  - 'administer users'
+  - 'create image media'
+  - 'create opigno_class group'
+  - 'delete any image media'
+  - 'delete own image media'
+  - 'dropzone upload files'
+  - 'edit any image media'
+  - 'edit own image media'
+  - 'manage group members in any group'
+  - 'message all groups'
+  - 'message anyone regardless of groups'
+  - 'score ilt entities'

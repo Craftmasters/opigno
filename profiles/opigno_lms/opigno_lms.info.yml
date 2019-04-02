@@ -1,0 +1,128 @@
+name: Opigno LMS
+type: profile
+description: 'Install Opigno with commonly used features pre-configured.'
+# core: 8.x
+# version: 8.x-1.4
+distribution:
+  name: "Opigno LMS"
+dependencies:
+  - automated_cron
+  - better_exposed_filters
+  - block
+  - block_content
+  - breakpoint
+  - calendar
+  - calendar_datetime
+  - ckeditor
+  - color
+  - comment
+  - config
+  - config_rewrite
+  - contact
+  - contextual
+  - ctools
+  - datetime
+  - datetime_range
+  - dblog
+  - dropzonejs
+  - dynamic_page_cache
+  - editor
+  - embed
+  - entity
+  - entity_browser
+  - entity_browser_entity_form
+  - entity_embed
+  - entity_print
+  - entity_reference_revisions
+  - field
+  - field_group
+  - field_ui
+  - file
+  - filter
+  - ggroup
+  - group
+  - h5p
+  - h5peditor
+  - help
+  - history
+  - image
+  - inline_entity_form
+  - link
+  - mailsystem
+  - media
+  - media_entity_browser
+  - menu_ui
+  - mimemail
+  - multiselect
+  - node
+  - opigno_calendar
+  - opigno_calendar_event
+  - opigno_calendar_event_group
+  - opigno_catalog
+  - opigno_certificate
+  - opigno_class
+  - opigno_course
+  - opigno_dashboard
+  - opigno_file_upload
+  - opigno_forum
+  - opigno_group_manager
+  - opigno_h5p
+  - opigno_ilt
+  - opigno_learning_path
+  - opigno_long_answer
+  - opigno_messaging
+  - opigno_module
+  - opigno_module_group
+  - opigno_moxtra
+  - opigno_notification
+  - opigno_scorm
+  - opigno_scorm_activity
+  - opigno_search
+  - opigno_statistics
+  - opigno_tincan_activities
+  - opigno_tincan_activity
+  - opigno_tincan_api
+  - opigno_tincan_badges
+  - opigno_tincan_courses
+  - opigno_tincan_ilt
+  - opigno_tincan_learning_path
+  - opigno_tincan_live_meeting
+  - opigno_tincan_modules
+  - opigno_tour
+  - opigno_video
+  - options
+  - page_cache
+  - path
+  - pdf
+  - popup_field_group
+  - private_message
+  - quickedit
+  - rdf
+  - search
+  - search_api
+  - shortcut
+  - system
+  - taxonomy
+  - text
+  - tft
+  - token
+  - token_filter
+  - toolbar
+  - tour
+  - update
+  - user
+  - video
+  - view_mode_selector
+  - views_role_based_global_text
+  - views_templates
+  - views_ui
+  - forum
+themes:
+  - platon
+  - seven
+
+# Information added by Drupal.org packaging script on 2019-03-21
+version: '8.x-1.4'
+core: '8.x'
+project: 'opigno_lms'
+datestamp: 1553175803

@@ -1,0 +1,19 @@
+services:
+  access_check.ggroup.add:
+    class: Drupal\ggroup\Access\SubgroupAddAccessCheck
+    tags:
+      - { name: access_check, applies_to: _subgroup_add_access }
+  ggroup.event_subscriber:
+    class: Drupal\ggroup\EventSubscriber\GroupEventSubscriber
+    arguments: ['@ggroup.group_hierarchy_manager']
+    tags:
+      - {name: event_subscriber}
+  ggroup.group_hierarchy_manager:
+    class: Drupal\ggroup\GroupHierarchyManager
+    arguments: ['@ggroup.group_graph_storage', '@entity_type.manager', '@group.membership_loader', '@ggroup.group_role_inheritance']
+  ggroup.group_role_inheritance:
+    class: Drupal\ggroup\GroupRoleInheritance
+    arguments: ['@ggroup.group_graph_storage', '@entity_type.manager', '@cache.default']
+  ggroup.group_graph_storage:
+    class: Drupal\ggroup\Graph\SqlGroupGraphStorage
+    arguments: ['@database']

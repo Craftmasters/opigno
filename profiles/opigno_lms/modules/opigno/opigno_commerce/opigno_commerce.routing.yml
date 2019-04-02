@@ -1,0 +1,13 @@
+
+opigno_commerce.subscribe_with_payment:
+  path: '/group/{group}/subscribe'
+  defaults:
+    _controller: '\Drupal\opigno_commerce\Controller\SubscribeWithPaymentController::subscribeWithPayment'
+    _title_callback: '\Drupal\opigno_commerce\Controller\SubscribeWithPaymentController::formTitleCallback'
+  requirements:
+    _permission: 'access checkout'
+    _user_is_logged_in: 'TRUE'
+  options:
+    parameters:
+      group:
+        type: entity:group

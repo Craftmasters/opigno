@@ -1,0 +1,28 @@
+id: opigno_module_lesson
+label: 'Opigno Group module (source: lesson)'
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+- 'Drupal 7'
+migration_group: opigno_migration
+source:
+  plugin: opigno_module_lesson
+  node_type: quiz
+process:
+  type:
+    plugin: default_value
+    default_value: learning_path
+  id: nid
+  vid: nid
+  name: title
+  uid: node_uid
+destination:
+  plugin: 'entity:opigno_module'
+migration_dependencies: null

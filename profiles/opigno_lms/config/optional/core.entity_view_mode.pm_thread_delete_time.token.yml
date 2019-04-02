@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - private_message
+id: pm_thread_delete_time.token
+label: Token
+targetEntityType: pm_thread_delete_time
+cache: true

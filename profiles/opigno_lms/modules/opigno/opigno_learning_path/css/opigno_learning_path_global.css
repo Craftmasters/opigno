@@ -1,0 +1,23 @@
+html.inIframe footer#site-footer,
+html.inIframe header#site-header,
+html.inIframe #menu-wrapper,
+html.inIframe [id*="block-"][id*="-breadcrumbs"],
+html.inIframe h1,
+html.inIframe #toolbar-administration,
+html.inIframe .alert {
+  display: none !important;
+}
+
+html.inIframe .lp-content-item-errors .alert {
+  display: block !important;
+}
+
+html.inIframe body {
+  padding-top: 0 !important;
+}
+
+html.inIframe .container {
+  max-width: none;
+  /* padding-right: 0;
+  padding-left: 0; */
+}

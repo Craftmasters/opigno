@@ -1,0 +1,74 @@
+platon.settings:
+  type: theme_settings
+  label: 'Platon theme settings'
+  mapping:
+    platon_home_page_settings:
+      type: mapping
+      label: 'Platon home page settings'
+      mapping:
+        platon_use_home_page_markup:
+          type: boolean
+          label: 'Platon use home page markup'
+        platon_home_page_slides:
+          type: mapping
+          label: 'Platon home page slides'
+          mapping:
+            1:
+              type: platon_slide_option
+            2:
+              type: platon_slide_option
+            3:
+              type: platon_slide_option
+    platon_menu_source:
+      type: string
+      label: 'Platon menu source'
+    platon_menu_show_for_anonymous:
+      type: boolean
+      label: 'Platon menu show for anonymous'
+    logo:
+      type: mapping
+      label: 'Logo'
+      mapping:
+        path:
+          type: string
+        use_default:
+          type: boolean
+
+platon_slide_option:
+  type: mapping
+  label: 'Slide'
+  mapping:
+    platon_home_page_markup_wrapper:
+      type: mapping
+      label: 'Platon home page markup wrapper'
+      mapping:
+        value:
+          type: string
+        format:
+          type: string
+    platon_home_page_image_path:
+      type: string
+      label: 'Platon home page image path'
+
+condition.plugin.group_type:
+  type: mapping
+  mapping:
+    id:
+      type: string
+      label: 'Id'
+    group_types:
+      type: mapping
+      label: 'Group types'
+      mapping:
+        learning_path:
+          type: string
+          label: 'Learning path'
+    negate:
+      type: boolean
+      label: 'Negate'
+    context_mapping:
+      type: mapping
+      mapping:
+        group:
+          type: string
+          label: 'Group'

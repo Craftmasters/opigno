@@ -1,0 +1,123 @@
+body.page-calendar-event-add-opigno_calendar_event,
+body[class*="page-calendar-event-"][class*="-edit"] {
+  .field--name-displayed,
+  .field--name-field-article,
+  .field--name-field-calendar-event-group {
+    display: none;
+  }
+
+  .form-item-field-calendar-event-members,
+  div#edit-members {
+    @extend .form-group;
+
+    .form-item-training {
+      @include media-breakpoint-up(md) {
+        margin-left: $form-label-width;
+      }
+    }
+
+    > .form-element-wrapper,
+    > div#members {
+      @include media-breakpoint-up(md) {
+        margin-left: $form-label-width;
+      }
+
+      .multiselect-wrapper {
+        .multiselect-available {
+          width: 45%;
+
+          @include media-breakpoint-down(md) {
+            width: 100%;
+          }
+        }
+
+        .multiselect-btns {
+          margin-left: -4px;
+          margin-top: 100px;
+          float: left;
+          width: 10%;
+
+          @include media-breakpoint-down(md) {
+            margin-left: 0;
+            margin-top: 0;
+            float: none;
+            width: 100%;
+          }
+
+          > ul {
+            margin: 0;
+            width: 100%;
+
+            @include media-breakpoint-down(md) {
+              left: 0;
+              top: 0;
+              margin: 1rem 0 1.5rem;
+            }
+
+            li {
+              height: 23px;
+              margin: 10px auto 0;
+              width: 32px;
+              cursor: pointer;
+
+              &.multiselect-remove {
+                background: url('../../images/arrow-left.png');
+
+                @include media-breakpoint-down(md) {
+                  transform: rotate(90deg);
+                }
+              }
+
+              &.multiselect-add {
+                background: url('../../images/arrow-right.png');
+
+                @include media-breakpoint-down(md) {
+                  transform: rotate(90deg);
+                }
+              }
+            }
+          }
+        }
+
+        .multiselect-selected {
+          width: 45%;
+          margin-left: -4px;
+
+          @include media-breakpoint-down(md) {
+            width: 100%;
+            margin-left: 0;
+          }
+        }
+
+        .multiselect-available,
+        .multiselect-selected {
+          label {
+            display: block;
+          }
+
+          select {
+            width: 100%;
+            border: 0;
+          }
+        }
+
+        .multiselect-available.form-multiselect option,
+        .multiselect-selected.form-multiselect option {
+          padding: 0 15px;
+        }
+      }
+    }
+  }
+}
+
+body.page-opigno-calendar {
+  .next-link a::before {
+    content: '';
+    @include svg-picto('picto-calendar-add');
+    display: inline-block;
+    vertical-align: top;
+    width: 1rem;
+    height: 1.2rem;
+    margin-right: 0.5rem;
+  }
+}

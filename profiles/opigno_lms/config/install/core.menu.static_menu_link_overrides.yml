@@ -1,0 +1,43 @@
+definitions:
+  contact__site_page:
+    enabled: true
+    menu_name: footer
+    parent: ''
+    weight: 0
+    expanded: false
+  standard__front_page:
+    weight: -50
+    menu_name: main
+    parent: ''
+    enabled: true
+    expanded: false
+  opigno_admin__dashboard_management:
+    menu_name: opigno-admin
+    parent: opigno_admin.global_settings
+    weight: -49
+    expanded: false
+    enabled: true
+  opigno_admin__global_settings:
+    menu_name: opigno-admin
+    parent: ''
+    weight: -50
+    expanded: true
+    enabled: true
+  opigno_admin__collaborative_features:
+    menu_name: opigno-admin
+    parent: ''
+    weight: -45
+    expanded: true
+    enabled: true
+  opigno_admin__training_contents:
+    menu_name: opigno-admin
+    parent: ''
+    weight: -42
+    expanded: true
+    enabled: true
+  opigno_admin__user_and_class_managments:
+    menu_name: opigno-admin
+    parent: ''
+    weight: -36
+    expanded: true
+    enabled: true

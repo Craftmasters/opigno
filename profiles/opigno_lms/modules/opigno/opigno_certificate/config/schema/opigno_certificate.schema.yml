@@ -1,0 +1,9 @@
+# Schema for the configuration files of the Opigno Certificate module.
+
+filter_settings.token_filter:
+  type: filter
+  label: 'Token filter'
+  mapping:
+    replace_empty:
+      type: boolean
+      label: 'Replace empty'

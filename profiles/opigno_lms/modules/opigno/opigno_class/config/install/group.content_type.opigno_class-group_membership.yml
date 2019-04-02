@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.opigno_class
+  module:
+    - user
+_core: {  }
+id: opigno_class-group_membership
+label: 'Class: Group membership'
+description: 'Adds users to groups as members.'
+group_type: opigno_class
+content_plugin: group_membership
+plugin_config:
+  group_cardinality: 0
+  entity_cardinality: 1
+  use_creation_wizard: true

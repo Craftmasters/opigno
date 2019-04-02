@@ -1,0 +1,16 @@
+name: Opigno Forum
+type: module
+description: Opigno Forum.
+# core: 8.x
+package: Opigno
+dependencies:
+  - drupal:forum
+  - group:group
+  - drupal:taxonomy
+  - opigno_learning_path:opigno_learning_path
+
+# Information added by Drupal.org packaging script on 2019-01-18
+version: '8.x-1.1'
+core: '8.x'
+project: 'opigno_forum'
+datestamp: 1547800131

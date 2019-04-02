@@ -1,0 +1,14 @@
+name: Calendar
+type: module
+description: 'Provides a Views plugin to display views containing dates as Calendars.'
+dependencies:
+  - calendar_datetime
+  - views
+  - views_templates
+package: Date/Time
+core: 8.x
+
+# Information added by drush on 2018-01-04
+version: '8.x-1.x-dev'
+project: 'calendar'
+datestamp: 1515077644

@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_answer.opigno_file
+    - opigno_module.opigno_answer_type.opigno_file_upload
+  module:
+    - file
+id: opigno_answer.opigno_file_upload.opigno_file
+field_name: opigno_file
+entity_type: opigno_answer
+bundle: opigno_file_upload
+label: Upload
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'txt doc docx xls xlsx ppt pptx pdf odt ods odp'
+  max_filesize: ''
+  description_field: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: file

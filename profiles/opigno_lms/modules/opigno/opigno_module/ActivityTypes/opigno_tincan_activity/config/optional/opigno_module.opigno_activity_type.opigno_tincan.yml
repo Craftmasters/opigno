@@ -1,0 +1,6 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_tincan
+label: 'Tincan package'
+description: 'This makes possible to load a TinCan package developed outside Opigno, and containing an activity.'

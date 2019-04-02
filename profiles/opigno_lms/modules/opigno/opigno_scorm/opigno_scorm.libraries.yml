@@ -1,0 +1,12 @@
+opigno-scorm-player:
+  version: 1.x
+  css:
+    theme:
+      css/opigno_scorm.player.css: {}
+  js:
+    js/lib/api-2004.js: {}
+    js/lib/api-1.2.js: {}
+    js/lib/player.js: {}
+    js/opigno_scorm.player.js: {}
+  dependencies:
+    - core/drupal.ajax

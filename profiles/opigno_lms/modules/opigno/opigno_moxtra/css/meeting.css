@@ -1,0 +1,25 @@
+.moxtra-meeting-banner {
+  background-color: #9ec48e;
+  color: #fff;
+  font-size: 16px;
+  margin: 0 0 20px;
+  padding: 25px 30px 20px;
+}
+
+.moxtra-meeting-banner-text::before {
+  content: '';
+  display: inline-block;
+  background-image: url('../img/meeting-banner-icon.png');
+  width: 46px;
+  height: 43px;
+  margin-right: 30px;
+  vertical-align: middle;
+}
+
+.moxtra-meeting-banner a,
+.moxtra-meeting-banner a:link,
+.moxtra-meeting-banner a:visited,
+.moxtra-meeting-banner a:hover,
+.moxtra-meeting-banner a:active {
+  color: #fff;
+}

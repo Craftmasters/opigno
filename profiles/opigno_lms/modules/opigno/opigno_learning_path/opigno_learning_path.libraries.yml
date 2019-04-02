@@ -1,0 +1,149 @@
+# manage_app:
+#   version: VERSION
+#   js:
+#     ng/dist/inline.bundle.js: {}
+#     ng/dist/polyfills.bundle.js: {}
+#     ng/dist/styles.bundle.js: {}
+#     ng/dist/vendor.bundle.js: {}
+#     ng/dist/main.bundle.js: {}
+#   css:
+#     theme:
+#       https://fonts.googleapis.com/icon?family=Material+Icons: { type: external }
+#
+global:
+  version: VERSION
+  js:
+    js/opigno_learning_path_global.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+  css:
+    theme:
+      css/opigno_learning_path_global.css: {}
+
+ajax_form:
+  version: VERSION
+  js:
+    js/opigno_learning_path_iframe.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+join:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_learning_path_join.css: {}
+  js:
+    js/opigno_learning_path_join.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+delete:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_learning_path_delete.css: {}
+  js:
+    js/opigno_learning_path_delete.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+member_add:
+  version: VERSION
+  css:
+    theme:
+      css/opingo_learning_path_member_add.css: {}
+  js:
+    js/opingo_learning_path_member_add.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+create_member:
+  version: VERSION
+  css:
+    theme:
+      css/opingo_learning_path_create_member.css: {}
+  js:
+    js/opingo_learning_path_create_member.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+member_overview:
+  version: VERSION
+  css:
+    theme:
+      css/opingo_learning_path_member_overview.css: {}
+  js:
+    js/opingo_learning_path_member_overview.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+training_content:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_learning_path_training_content.css: {}
+  js:
+    js/opigno_learning_path_training_content.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+achievements:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_learning_path_achievements.css: {}
+  js:
+    js/opigno_learning_path_achievements.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+    - core/drupal.ajax
+
+creation_steps:
+  version: VERSION
+  css:
+    theme:
+      css/creation_steps.css: {}
+
+steps_block:
+  version: VERSION
+  css:
+    theme:
+      css/steps_block.css: {}
+
+training_main_page:
+  version: 1.x
+  js:
+    js/opigno_learning_path_training_main_page.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+
+opigno_dropzonejs_widgets:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_dropzonejs_widgets.css: {}
+  js:
+    js/opigno_dropzonejs_widgets.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings

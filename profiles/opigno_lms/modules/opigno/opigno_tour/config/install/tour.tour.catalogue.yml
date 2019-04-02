@@ -1,0 +1,44 @@
+langcode: en
+status: true
+id: catalogue
+label: 'Catalogue tour'
+module: opigno_tour
+routes:
+  - route_name: view.opigno_training_catalog.training_catalogue
+tips:
+  catalogue-filter:
+    id: catalogue-filter
+    plugin: text
+    label: 'Filter'
+    body: 'Here you can filter the trainings to show only the ones you are registered to, or the ones assigned to a specific category.'
+    weight: 1
+    attributes:
+      data-id: edit-opigno-group-membership--wrapper
+    location: right
+  catalogue-actions:
+    id: catalogue-actions
+    plugin: text
+    label: 'Add a training'
+    body: 'You can click here to add your first training.'
+    weight: 2
+    attributes:
+      data-class: block-local_actions_block a.button-action
+    location: top
+  catalogue-display:
+    id: catalogue-display
+    plugin: text
+    label: 'Display mode'
+    body: 'You can select the display mode you prefer.'
+    weight: 3
+    attributes:
+      data-class: view-opigno-training-catalog a.btn
+    location: left
+  catalogue-start-training:
+    id: catalogue-start-training
+    plugin: text
+    label: 'Start training'
+    body: 'Click here to learn more about the training, or resume it (in case you already started it).'
+    weight: 4
+    attributes:
+      data-class: views-field-opigno-lp-take-link
+    location: top

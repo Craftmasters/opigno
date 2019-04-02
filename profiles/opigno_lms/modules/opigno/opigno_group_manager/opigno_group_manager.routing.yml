@@ -1,0 +1,215 @@
+### MANAGER ###
+opigno_group_manager.manager.index:
+  path: '/group/{group}/manager'
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::index'
+    _title: 'Group manager'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      account:
+        type: entity:user
+
+opigno_group_manager.manager.get_items:
+  path: '/group/{group}/get-items'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::getItems'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.get_positions:
+  path: '/group/{group}/get-positions/{mainItem}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::getPositions'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.set_positions:
+  path: '/group/{group}/set-positions/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::setPositions'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.create_item:
+  path: '/group/{group}/create-item/{mainItem}'
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::createItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.update_entities:
+  path: '/group/{group}/update-entities'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::updateEntities'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.add_item:
+  path: '/group/{group}/add-item/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::addItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.delete_item:
+  path: '/group/{group}/remove-item/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::removeItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.add_link:
+  path: '/group/{group}/add-link/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::addLink'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.update_link:
+  path: '/group/{group}/update-link/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::updateLink'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.remove_link:
+  path: '/group/{group}/remove-link/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::removeLink'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.get_available_items:
+  path: '/group/{group}/get-available-items/{mainItem}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::getAvailableItems'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.get_available_item_types:
+  path: '/group/{group}/get-item-types'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::getItemTypes'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.update_item_mandatory:
+  path: '/group/{group}/update-mandatory'
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::updateItemMandatory'
+    item: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_group_manager.manager.update_item_minscore:
+  path: '/group/{group}/update-min-score'
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::updateItemMinScore'
+    item: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+# Update/edit node form
+opigno_group_manager.manager.get_item_form:
+  path: '/group/{group}/item-form/{type}/{item}'
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\OpignoGroupManagerController::getItemForm'
+    item: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      type:
+        type: string
+
+# Info card
+opigno_group_manager.manager.hide_info_card:
+  path: '/opigno-group-manager/hide-info-card'
+  defaults:
+    _controller: '\Drupal\opigno_group_manager\Controller\InfoCardController::hideInfoCard'
+  requirements:
+    # Accessible for all.
+    _access: 'TRUE'
+    _permission: 'access content'

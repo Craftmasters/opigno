@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="http://opigno-d8:8888/themes/platon/dist/styles/main.css?oxcrvz">
+  <script type="text/javascript">
+    window.appConfig = {
+      columns: 3,
+      positions: [[], [], [], []],
+      apiBaseUrl: 'http://opigno-d8:8888',
+      getPositioningUrl: '/opigno_dashboard/get-positioning',
+      setPositioningUrl: '/opigno_dashboard/set-positioning',
+      getBlocksContentUrl: '/opigno_dashboard/get-blocks',
+      defaultConfig: '{"1":[{"admin_label":"Latest active trainings","id":"views_block:latest_active_trainings-block"}, {"admin_label":"Private Message: Dashboard - Last Threads","id":"views_block:private_message-block_dashboard"}],"2":[{"admin_label":"Opigno calendar block","id":"views_block:opigno_calendar-month_block"},{"admin_label":"Opigno Notifications: Dashboard - Unread Notifications","id":"views_block:opigno_notifications-block_unread_dashboard"}],"3":[]}',
+      locales: {
+        manageYourDashboard: 'Manage your dashboard',
+        remove: 'remove',
+        close: 'close',
+        layout: 'Layout',
+        oneColumn: '1 column',
+        twoColumns: '2 columns',
+        asymColumns: '1/3-2/3 columns',
+        threeColumns: '3 columns',
+        addBlocks: 'Add blocks by dragging them below into the canvas',
+        restoreYourDashboard: 'Restore your dashboard to default:',
+        restoreToDefault: 'restore to default'
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <app-root class="dashboard">Loading dashboard...</app-root>
+</body>
+
+</html>

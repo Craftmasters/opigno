@@ -1,0 +1,60 @@
+opigno_h5p.main:
+  js:
+    js/opigno_h5p.js: {}
+  dependencies:
+    - core/jquery
+    - core/ajax
+
+opigno_h5p.true-false:
+  version: 1.x
+  css:
+    base:
+      css/true-false.css: {}
+      css/shared-styles.css: {}
+
+opigno_h5p.matching:
+  version: 1.x
+  css:
+    theme:
+      css/matching.css: {}
+      css/shared-styles.css: {}
+
+opigno_h5p.choice:
+  version: 1.x
+  css:
+    theme:
+      css/choice.css: {}
+      css/shared-styles.css: {}
+
+opigno_h5p.compound:
+  version: 1.x
+  css:
+    theme:
+      css/compound.css: {}
+      css/shared-styles.css: {}
+
+opigno_h5p.fill-in:
+  version: 1.x
+  css:
+    theme:
+      css/fill-in.css: {}
+      css/shared-styles.css: {}
+
+opigno_h5p.long-choice:
+  version: 1.x
+  css:
+    theme:
+      css/long-choice.css: {}
+      css/shared-styles.css: {}
+
+opigno_h5p.all-libraries:
+  version: 1.x
+  css:
+    theme:
+      css/shared-styles.css: {preprocess: false}
+      css/long-choice.css: {preprocess: false}
+      css/fill-in.css: {preprocess: false}
+      css/compound.css: {preprocess: false}
+      css/choice.css: {preprocess: false}
+      css/matching.css: {preprocess: false}
+      css/true-false.css: {preprocess: false}

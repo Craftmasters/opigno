@@ -1,0 +1,13 @@
+name: H5P Editor
+type: module
+description: 'Create and modify interactive HTML5 packages on your site.'
+package: H5P
+# core: 8.x
+dependencies:
+  - h5p:h5p
+
+# Information added by Drupal.org packaging script on 2018-11-22
+version: '8.x-1.0-rc11'
+core: '8.x'
+project: 'h5p'
+datestamp: 1542888510

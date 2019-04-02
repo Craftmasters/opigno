@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_migration.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Database\Database;
+
+/**
+ * @file
+ * Contains custom hooks and functions.
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_migration_form_alter(&$form, FormStateInterface &$form_state, $form_id) {
+  if ($form_id == 'migrate_drupal_ui_incremental_form' || $form_id == 'migrate_drupal_ui_idconflict_form') {
+    $form['#submit'][0] = 'opigno_migration_credit_form_submit';
+  }
+
+  if ($form_id == 'migrate_drupal_ui_credential_form') {
+    try {
+      $has_connection = (bool) Database::getConnection('default', 'legacy')->schema();
+    }
+    catch (\Exception $e) {
+      drupal_set_message($e->getMessage(), 'error');
+      unset($form['actions']);
+      return;
+    }
+
+    $connection = Database::getConnection('default', 'legacy');
+    $connection_options = $connection->getConnectionOptions();
+
+    $form['database']['settings']['mysql']['host']['#default_value'] = $connection_options['host'];
+    $form['database']['settings']['mysql']['host']['#attributes']['readonly'] = 'readonly';
+    $form['database']['settings']['mysql']['database']['#default_value'] = $connection_options['database'];
+    $form['database']['settings']['mysql']['database']['#attributes']['readonly'] = 'readonly';
+    $form['database']['settings']['mysql']['username']['#default_value'] = $connection_options['username'];
+    $form['database']['settings']['mysql']['username']['#attributes']['readonly'] = 'readonly';
+    $form['database']['settings']['mysql']['password']['#default_value'] = $connection_options['password'];
+    $form['database']['settings']['mysql']['password']['#type'] = 'hidden';
+  }
+}
+
+/**
+ * Custom submit for credit form.
+ */
+function opigno_migration_credit_form_submit($form, FormStateInterface $form_state) {
+  $form_state->setRedirect('opigno_migration.upgrade_review');
+}

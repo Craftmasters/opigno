@@ -1,0 +1,21 @@
+opigno_scorm.scorm_sco:
+  path: '/opigno-scorm/player/sco/{opigno_scorm_sco}'
+  defaults:
+    _controller: '\Drupal\opigno_scorm\Controller\OpignoScormController::scormIntegrateSco'
+    _title: 'Integrate sco'
+  requirements:
+    _access: 'TRUE'
+    opigno_scorm_sco: \d+
+  options:
+    _admin_route: FALSE
+opigno_scorm.scorm_commit:
+  path: '/opigno-scorm/scorm/{opigno_scorm_id}/{opigno_scorm_sco_id}/commit'
+  defaults:
+    _controller: '\Drupal\opigno_scorm\Controller\OpignoScormController::scormCommit'
+    _title: 'Scorm commit'
+  requirements:
+    _access: 'TRUE'
+    opigno_scorm_id: \d+
+    opigno_scorm_sco_id: \d+
+  options:
+    _admin_route: FALSE

@@ -1,0 +1,26 @@
+entity.opigno_calendar_event.canonical:
+  route_name: entity.opigno_calendar_event.canonical
+  base_route: entity.opigno_calendar_event.canonical
+  title: 'View'
+entity.opigno_calendar_event.edit_form:
+  route_name: entity.opigno_calendar_event.edit_form
+  base_route: entity.opigno_calendar_event.canonical
+  title: 'Edit'
+entity.opigno_calendar_event.delete_form:
+  route_name: entity.opigno_calendar_event.delete_form
+  base_route: entity.opigno_calendar_event.canonical
+  title: 'Delete'
+  weight: 10
+entity.opigno_calendar_event_type.edit_form:
+  title: 'Edit'
+  route_name: entity.opigno_calendar_event_type.edit_form
+  base_route: entity.opigno_calendar_event_type.edit_form
+entity.opigno_calendar_event_type.delete_form:
+  title: 'Delete'
+  route_name: entity.opigno_calendar_event_type.delete_form
+  base_route: entity.opigno_calendar_event_type.edit_form
+  weight: 10
+entity.opigno_calendar_event_type.collection:
+  title: 'Overview'
+  route_name: entity.opigno_calendar_event_type.collection
+  base_route: entity.opigno_calendar_event_type.collection

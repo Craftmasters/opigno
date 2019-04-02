@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_notification.module.
+ */
+
+use Drupal\opigno_notification\Entity\OpignoNotification;
+
+/**
+ * Adds notification.
+ *
+ * @param int $uid
+ *   Notification receiver user id.
+ * @param string $message
+ *   Notification message.
+ *
+ * @return \Drupal\opigno_notification\OpignoNotificationInterface
+ *   Created notification.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function opigno_set_message($uid, $message) {
+  $user = \Drupal::currentUser();
+
+  if ($user->isAnonymous()) {
+    \Drupal::messenger()->addMessage($message);
+    return NULL;
+  }
+  else {
+    $notification = OpignoNotification::create();
+    $notification->setUser($uid);
+    $notification->setMessage($message);
+    $notification->save();
+    return $notification;
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view().
+ */
+function opigno_notification_preprocess_views_view(&$vars) {
+  // Attach js & css to view.
+  if (isset($vars['view_array']['#name'])
+    && $vars['view_array']['#name'] === 'opigno_notification') {
+    $vars['#attached']['library'][] = 'opigno_notification/view';
+  }
+}

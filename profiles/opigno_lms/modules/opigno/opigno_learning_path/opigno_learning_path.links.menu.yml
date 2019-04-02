@@ -1,0 +1,74 @@
+opigno_learning_path.opigno_admin_index:
+  title: Opigno
+  route_name: opigno_learning_path.opigno_admin_index
+  parent: system.admin_config
+  description: 'Opigno package settings.'
+
+opigno_learning_path.learning_path_settings:
+  title: Learning Path
+  route_name: opigno_learning_path.learning_path_settings
+  parent: opigno_learning_path.opigno_admin_index
+  description: 'Learning Path Group type settings.'
+
+# Opigno-admin menu
+opigno_admin.global_settings:
+  title: Global settings
+  description: 'Global settings'
+  route_name: <none>
+  menu_name: opigno-admin
+  weight: -50
+
+opigno_admin.training_contents:
+  title: Training contents
+  description: 'Training contents'
+  route_name: <none>
+  menu_name: opigno-admin
+  weight: -42
+
+opigno_admin.overall_settings:
+  title: Overall settings
+  description: 'Overall settings'
+  route_name: opigno_learning_path.learning_path_settings
+  parent: opigno_admin.training_contents
+  menu_name: opigno-admin
+  weight: -41
+
+opigno_admin.manage_categories:
+  title: Manage categories
+  description: 'Manage categories'
+  route_name: entity.taxonomy_vocabulary.overview_form
+  route_parameters: { taxonomy_vocabulary: 'learning_path_category' }
+  parent: opigno_admin.training_contents
+  menu_name: opigno-admin
+  weight: -40
+
+opigno_admin.manage_modules:
+  title: Manage modules
+  description: 'Manage modules'
+  route_name: entity.opigno_module.collection
+  parent: opigno_admin.training_contents
+  menu_name: opigno-admin
+  weight: -39
+
+opigno_admin.manage_groups:
+  title: Manage groups
+  description: 'Manage groups'
+  route_name: entity.group.collection
+  parent: opigno_admin.training_contents
+  menu_name: opigno-admin
+  weight: -38
+
+opigno_admin.manage_activities:
+  title: Manage activities
+  description: 'Manage activities'
+  route_name: entity.opigno_activity.collection
+  parent: opigno_admin.training_contents
+  menu_name: opigno-admin
+  weight: -37
+
+opigno_admin.opigno_module_settings:
+  title: 'Modules settings'
+  description: 'Modules settings'
+  route_name: opigno_module.settings
+  parent: opigno_admin.training_contents
+  weight: -36

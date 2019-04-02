@@ -1,0 +1,7 @@
+core:
+  version: VERSION
+  js:
+    js/popup_field_group.js: {}
+  dependencies:
+    - core/jquery.once
+    - core/drupal.dialog

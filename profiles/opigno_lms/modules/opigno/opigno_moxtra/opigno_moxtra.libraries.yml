@@ -1,0 +1,54 @@
+moxtra.js:
+  version: VERSION
+  header: true
+  js:
+    https://www.moxtra.com/api/js/moxtra-latest.js: { type: external, attributes: { id: moxtrajs } }
+
+meeting:
+  version: VERSION
+  css:
+    theme:
+      css/meeting.css: {}
+
+meeting_form:
+  version: VERSION
+  css:
+    theme:
+      css/meeting_form.css: {}
+  js:
+    js/meeting_form.js: {}
+  dependencies:
+    - core/jquery
+
+meeting_scheduled:
+  version: VERSION
+  js:
+    js/meeting_scheduled.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+meeting_started:
+  version: VERSION
+  js:
+    js/meeting_started.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+settings_form:
+  version: VERSION
+  css:
+    theme:
+      css/settings_form.css: {}
+
+workspace:
+  version: VERSION
+  js:
+    js/workspace.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings

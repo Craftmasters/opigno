@@ -1,0 +1,41 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_activity.opigno_slide.opigno_body
+    - field.field.opigno_activity.opigno_slide.opigno_slide_pdf
+    - opigno_module.opigno_activity_type.opigno_slide
+  module:
+    - media
+    - user
+id: opigno_activity.opigno_slide.default
+targetEntityType: opigno_activity
+bundle: opigno_slide
+mode: default
+content:
+  name:
+    label: above
+    type: string
+    weight: 0
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    region: content
+  opigno_slide_pdf:
+    type: entity_reference_entity_view
+    weight: 4
+    label: above
+    settings:
+      view_mode: embedded_display
+      link: false
+    third_party_settings: {  }
+    region: content
+  uid:
+    label: hidden
+    type: author
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  opigno_body: true

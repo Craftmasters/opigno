@@ -1,0 +1,22 @@
+id: opigno_pm_thread_delete_time
+label: Opigno PM Threads Delete Time
+migration_group: opigno_migration
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_pm_thread_delete_time
+  key: default
+process:
+  owner: owner
+  delete_time:
+    plugin: default_value
+    source: delete_time
+    default_value: 0
+destination:
+  plugin: entity:pm_thread_delete_time
+migration_dependencies:
+  required:
+    - opigno_users
+    - opigno_pm_message

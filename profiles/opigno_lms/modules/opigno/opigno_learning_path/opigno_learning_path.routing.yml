@@ -1,0 +1,714 @@
+### LEARNING PATH MANAGER ###
+#opigno_learning_path.manager.index:
+#  path: '/group/{group}/learning-path/manager'
+#  defaults:
+#    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::index'
+#    _title: 'Learning Path manager'
+#  requirements:
+#    _user_is_logged_in: 'TRUE'
+#    _custom_access: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::access'
+#  options:
+#    parameters:
+#      group:
+#        type: entity:group
+#      account:
+#        type: entity:user
+
+opigno_learning_path.manager.get_items:
+  path: '/group/{group}/learning-path/get-items/{mainItem}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::getItems'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.get_positions:
+  path: '/group/{group}/learning-path/get-positions/{mainItem}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::getPositions'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.set_positions:
+  path: '/group/{group}/learning-path/set-positions/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::setPositions'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.create_item:
+  path: '/group/{group}/learning-path/create-item/{mainItem}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::createItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.update_item:
+  path: '/group/{group}/learning-path/update-item/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::updateItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.add_item:
+  path: '/group/{group}/learning-path/add-item/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::addItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.delete_item:
+  path: '/group/{group}/learning-path/remove-item/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::removeItem'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.add_link:
+  path: '/group/{group}/learning-path/add-link/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::addLink'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.update_link:
+  path: '/group/{group}/learning-path/update-link/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::updateLink'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.remove_link:
+  path: '/group/{group}/learning-path/remove-link/{mainItem}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::removeLink'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.get_available_items:
+  path: '/group/{group}/learning-path/get-available-items/{mainItem}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::getAvailableItems'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.get_available_item_types:
+  path: '/group/{group}/learning-path/get-item-types/{mainItem}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::getItemTypes'
+    mainItem: null
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      mainItem:
+        type: entity:node
+
+opigno_learning_path.manager.update_item_mandatory:
+  path: '/group/{group}/learning-path/update-mandatory'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::updateItemMandatory'
+    item: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.update_item_minscore:
+  path: '/group/{group}/learning-path/update-min-score'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::updateItemMinScore'
+    item: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+# Update/edit node form
+opigno_learning_path.manager.get_item_form:
+  path: '/group/{group}/learning-path/item-form/{type}/{item}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::getItemForm'
+    item: null
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      type:
+        type: string
+
+opigno_learning_path.manager.publish:
+  path: '/group/{group}/learning-path/publish'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::publish'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.manager.unpublish:
+  path: '/group/{group}/learning-path/unpublish'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathManagerController::unpublish'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+### STEPS ###
+opigno_learning_path.steps.start:
+  path: '/group/{group}/learning-path/start'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathStepsController::start'
+    _title: 'Learning Path start'
+  requirements:
+    _entity_access: 'group.take'
+    _custom_access: '\Drupal\opigno_learning_path\Controller\LearningPathStepsController::startAccess'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.steps.next:
+  path: '/group/{group}/learning-path/nextstep/{parent_content}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathStepsController::nextStep'
+    _title: 'Next'
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      parent_content:
+       type: entity:opigno_group_content
+
+opigno_learning_path.steps.finish:
+  path: '/group/{group}/learning-path/finish'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathStepsController::finish'
+    _title: 'Finished'
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.steps.steps:
+  path: '/group/{group}/learning-path/steps'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathStepsController::listSteps'
+    _title: 'Steps'
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.content_steps:
+  path: '/group/{group}/content-steps/{current}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathStepsController::contentSteps'
+    _title: 'Steps'
+  requirements:
+    _entity_access: 'group.take'
+    current: \d+
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+### RESULTS ###
+opigno_learning_path.results:
+  path: '/group/{group}/learning-path/results'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathResults::results'
+    _title: 'Results'
+    mode: 'results'
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.results.delete:
+  path: '/group/{group}/learning-path/results/{result}/delete'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathResults::delete'
+    _title: 'Results'
+    mode: 'delete'
+  requirements:
+    _entity_access: 'result.delete'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      account:
+       type: entity:user
+      result:
+        type: entity:learning_path_result
+
+#TODO: Maybe change ROOT url from /group/ to /learning-path/ ?
+
+opigno_learning_path.opigno_admin_index:
+  path: '/admin/config/opigno'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Opigno'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+
+opigno_learning_path.learning_path_settings:
+  path: 'admin/config/opigno/learning-path-settings'
+  base_route_name: opigno_learning_path.opigno_admin_index
+  defaults:
+    _form: '\Drupal\opigno_learning_path\Form\LearningPathAdminSettingsForm'
+    _title: 'Learning Path settings'
+  requirements:
+    _permission: 'access administration pages'
+  options:
+    _admin_route: TRUE
+
+### Learning path content ###
+### Learning path courses ###
+opigno_learning_path.learning_path_courses:
+  path: 'group/{group}/inner-courses'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::coursesIndex'
+    _title: 'Learning Path courses'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      account:
+        type: entity:user
+
+opigno_learning_path.courses.get_items:
+  path: 'group/{group}/courses/get-items'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::getCourses'
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+### Learning path modules ###
+opigno_learning_path.learning_path_modules:
+  path: 'group/{group}/inner-modules'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::modulesIndex'
+    _title: 'Learning Path modules'
+  requirements:
+    _entity_access: 'group.update'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      account:
+        type: entity:user
+
+opigno_learning_path.modules.get_items:
+  path: 'group/{group}/modules/get-items'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::getModules'
+  requirements:
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+opigno_learning_path.modules.get_activities:
+  path: 'group/{opigno_module}/get-activities'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::getModuleActivities'
+  requirements:
+    _entity_access: 'opigno_module.view'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+
+opigno_learning_path.modules.update_activity:
+  path: 'group/{opigno_module}/update-activity'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::updateActivity'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+
+opigno_learning_path.modules.delete_activity:
+  path: 'group/{opigno_module}/delete-activity'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathContentController::deleteActivity'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+
+opigno_learning_path.membership.add_user_to_training_autocomplete:
+  path: '/group/{group}/learning-path/members/add-user-to-training-autocomplete'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::addUserToTrainingAutocomplete'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.add_user_to_class_autocomplete:
+  path: '/group/{group}/learning-path/members/add-user-to-class-autocomplete'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::addUserToClassAutocomplete'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.find_users_in_group_autocomplete:
+  path: '/group/{group}/learning-path/members/find-users-in-group'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::findUsersInGroupAutocomplete'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.create_member:
+  path: '/group/{group}/learning-path/members/create-member'
+  defaults:
+    _form: '\Drupal\opigno_learning_path\Form\LearningPathCreateMemberForm'
+    _title: 'Create new members'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.create_user:
+  path: '/group/{group}/learning-path/members/create-user'
+  defaults:
+    _form: '\Drupal\opigno_learning_path\Form\LearningPathCreateUserForm'
+    _title: '2/2 create a new user'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.create_class:
+  path: '/group/{group}/learning-path/members/create-class'
+  defaults:
+    _form: '\Drupal\opigno_learning_path\Form\LearningPathCreateClassForm'
+    _title: 'Create a new class'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.create_member_modal:
+  path: '/group/{group}/learning-path/members/create-member-modal'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::createMembersFormModal'
+    _title: 'Create new members'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.create_user_modal:
+  path: '/group/{group}/learning-path/members/create-user-modal'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::createUserFormModal'
+    _title: '2/2 create a new user'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.create_class_modal:
+  path: '/group/{group}/learning-path/members/create-class-modal'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::createClassFormModal'
+    _title: 'Create a new class'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.delete_user:
+  path: '/group/{group}/learning-path/members/delete-user'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::deleteUser'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.delete_class:
+  path: '/group/{group}/learning-path/members/delete-class'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::deleteClass'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.toggle_role:
+  path: '/group/{group}/learning-path/members/toggle-role'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::toggleRole'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.validate:
+  path: '/group/{group}/learning-path/members/validate'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathMembershipController::validate'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.membership.overview:
+  path: '/group/{group}/members'
+  defaults:
+    _form: '\Drupal\opigno_learning_path\Form\LearningPathMembersForm'
+    _title: 'Group overview'
+  requirements:
+    _entity_access: 'group.administer members'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.achievements:
+  path: '/achievements/{page}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathAchievementController::index'
+    _title: 'My Achievements'
+    page: 0
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    page: '[0-9]+'
+  options:
+    parameters:
+      account:
+       type: entity:user
+
+opigno_learning_path.achievements.page_ajax:
+  path: '/ajax/achievements/{page}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathAchievementController::page_ajax'
+    page: 0
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    page: '[0-9]+'
+  options:
+    parameters:
+      account:
+       type: entity:user
+
+opigno_learning_path.achievements.training_steps_ajax:
+  path: '/ajax/achievements/training-steps/{group}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathAchievementController::training_steps_ajax'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      account:
+       type: entity:user
+
+opigno_learning_path.achievements.course_module_panel_ajax:
+  path: '/ajax/achievements/module-panel/{training}/{course}/{opigno_module}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathAchievementController::course_module_panel_ajax'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    parameters:
+      training:
+       type: entity:group
+      course:
+       type: entity:group
+      opigno_module:
+       type: entity:opigno_module
+      account:
+       type: entity:user
+
+opigno_learning_path.achievements.training_module_panel_ajax:
+  path: '/ajax/achievements/module-panel/{group}/{opigno_module}'
+  defaults:
+    _controller: '\Drupal\opigno_learning_path\Controller\LearningPathAchievementController::training_module_panel_ajax'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    parameters:
+      group:
+       type: entity:group
+      opigno_module:
+       type: entity:opigno_module
+      account:
+       type: entity:user

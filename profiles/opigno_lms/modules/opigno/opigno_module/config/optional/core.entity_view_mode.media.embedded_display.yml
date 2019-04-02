@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media
+id: media.embedded_display
+label: 'Embedded display'
+targetEntityType: media
+cache: true

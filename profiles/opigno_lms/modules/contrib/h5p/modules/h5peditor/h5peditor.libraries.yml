@@ -1,0 +1,10 @@
+h5peditor:
+  version: 1.0
+  license:
+    - name: MIT
+    - gpl-compatible: TRUE
+  js:
+    scripts/application.js: {}
+  dependencies:
+    - core/jquery
+    - h5peditor/h5peditor.assets

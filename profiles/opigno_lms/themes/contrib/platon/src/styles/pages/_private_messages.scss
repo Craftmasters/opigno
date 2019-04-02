@@ -1,0 +1,194 @@
+#block-platon-content #private-message-page {
+  background-color: $light-gray;
+  padding: 3.75rem 3rem;
+  position: relative;
+  @include media-breakpoint-down(sm) {
+    padding: 3.75rem 15px 15px;
+  }
+
+  #private-message-add-form,
+  .field-pm-subject,
+  .private-message-recipients,
+  .private-messages {
+    padding: 0;
+  }
+
+  #private-message-add-form #edit-actions {
+    margin: 3rem -3rem -3rem;
+    @include media-breakpoint-down(sm) {
+      margin: 3rem -15px -15px;
+    }
+  }
+
+  #private-message-add-form #edit-message-0-format {
+    border-bottom: 1px solid #ccc;
+  }
+
+  div#load-previous-messages-button-wrapper {
+    margin-bottom: 2rem;
+  }
+
+  .private-message .owner .username {
+    margin-top: 1rem;
+  }
+
+  .private-message-thread-messages {
+    .user-picture-wrapper {
+      text-align: center;
+
+      .user-picture {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto;
+        border-radius: 100%;
+        border: 2px solid #70706f;
+        @include svg-picto(picto-avatar);
+        background-position: center bottom;
+        background-size: 48px;
+
+        &.with-image {
+          border-color: $blue;
+          background-size: cover;
+          background-position: center;
+        }
+      }
+    }
+  }
+
+  .private_message_thread_delete_link_wrapper {
+    $picto-size: 21px;
+
+    position: absolute;
+    top: calc((3.75rem - #{$picto-size}) / 2);
+    right: 3rem;
+
+    a {
+      @include svg-picto(picto-trash);
+      display: block;
+      width: $picto-size;
+      height: $picto-size;
+    }
+  }
+
+  &::before {
+    content: '';
+    display: block;
+    height: 1px;
+    background-color: #1d1d1b;
+    margin: 0 0 1rem;
+  }
+
+  .private-messages > div {
+    &:nth-child(odd) {
+      .message {
+        order: 1;
+        margin-left: 30px;
+      }
+    }
+
+    &:nth-child(even) {
+      .message {
+        order: -1;
+        margin-right: 30px;
+      }
+    }
+  }
+
+  .private-message {
+    display: flex;
+    margin-bottom: 2.25rem;
+
+    .created {}
+
+    .owner {}
+
+    .message {
+      background-color: #fff;
+      padding: 2rem 1.25rem;
+      flex: 1;
+
+      .date {
+        color: #b3b3b2;
+        margin-bottom: 1rem;
+      }
+
+      > *:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .filter-guidelines {
+    display: none;
+  }
+
+  .private-message-recipients {
+    position: relative;
+    font-size: 25px;
+    margin-bottom: 1em!important;
+    display: block;
+    overflow: hidden;
+    max-height: 37px;
+
+    &.short {
+      padding-right: 25px;
+    }
+
+    .expander {
+      position: absolute;
+      right: 5px;
+      top: 0;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+  }
+
+  form .form-wrapper > .js-text-format-wrapper {
+    margin-left: 0;
+  }
+
+  form .form-wrapper > .js-text-format-wrapper .js-form-type-textarea > label {
+    float: none;
+    margin-left: 0;
+    font-weight: 700;
+  }
+}
+
+#private-message-add-form {
+  #edit-actions input {
+    font-weight: 400;
+    margin-bottom: 1rem;
+    flex: 1 0 100%;
+    background-color: $green !important;
+    color: #fff;
+
+    &:hover {
+      text-decoration: none;
+      background-color: darken($green, 5%) !important;
+    }
+  }
+
+  #edit-message-0-format {
+    border-bottom: 1px solid #ccc;
+  }
+
+  div#edit-message-0-format-guidelines {
+    display: none;
+  }
+
+  .multiselect-wrapper select.form-multiselect {
+    border: 0;
+  }
+}
+
+.view-private-message .view-content {
+  max-height: none;
+}
+
+.view-private-message .views-row:hover::before {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}

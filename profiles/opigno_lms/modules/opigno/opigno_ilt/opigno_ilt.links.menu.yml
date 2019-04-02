@@ -1,0 +1,26 @@
+entity.opigno_ilt.collection:
+  title: 'Instructor-Led Trainings'
+  route_name: entity.opigno_ilt.collection
+  parent: system.admin_content
+  description: 'Lists Instructor-Led Trainings'
+
+entity.opigno_ilt_result.collection:
+  title: 'Instructor-Led Trainings Results'
+  route_name: entity.opigno_ilt_result.collection
+  parent: system.admin_content
+  description: 'Lists Instructor-Led Trainings Results'
+
+# Opigno-admin menu
+opigno_admin.manage:
+  title: 'Manage and score ILT'
+  description: 'Manage and score ILT'
+  route_name: entity.opigno_ilt.collection
+  parent: opigno_admin.user_and_class_managments
+  menu_name: opigno-admin
+  weight: -33
+
+opigno_ilt.settings:
+  title: 'Instructor-Led Trainings Settings'
+  description: 'Instructor-Led Trainings entity settings'
+  route_name:  opigno_ilt.settings
+  parent: system.admin_structure

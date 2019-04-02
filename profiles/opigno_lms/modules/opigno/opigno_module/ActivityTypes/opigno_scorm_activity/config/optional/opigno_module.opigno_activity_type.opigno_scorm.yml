@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_scorm
+label: 'Scorm package'
+description: 'This makes possible to load a SCORM package developed outside Opigno, and containing an activity. Opigno is compliant with SCORM 1.2 and 2004.'
+summary: null
+image: null

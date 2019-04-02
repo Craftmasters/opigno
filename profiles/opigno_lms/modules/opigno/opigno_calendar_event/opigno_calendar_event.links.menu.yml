@@ -1,0 +1,5 @@
+entity.opigno_calendar_event_type.collection:
+  title: 'Calendar event types'
+  parent: system.admin_structure
+  description: 'Create and manage fields, forms, and display settings for your calendar events.'
+  route_name: entity.opigno_calendar_event_type.collection

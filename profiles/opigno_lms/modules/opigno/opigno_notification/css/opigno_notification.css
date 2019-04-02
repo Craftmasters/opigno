@@ -1,0 +1,16 @@
+.dashboard-drupal-block .view-footer {
+  margin-top: 2rem !important;
+  margin-left: -1.5em;
+  margin-right: -1.5em;
+  background-color: #898988;
+}
+.dashboard-drupal-block .view-footer a.see-more {
+  display: block;
+  padding: 1rem 1rem;
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.dashboard-drupal-block .view-footer a.see-more:hover {
+  background-color: #c2e76b;
+}

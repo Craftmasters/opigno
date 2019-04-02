@@ -1,0 +1,22 @@
+administer certificates:
+  title: 'Administer certificates'
+  restrict access: true
+
+add certificate entities:
+  title: 'Create new Certificate entities'
+  description: 'Create new Certificate entities'
+
+delete certificate entities:
+  title: 'Delete Certificate entities'
+
+edit certificate entities:
+  title: 'Edit Certificate entities'
+
+access certificate overview:
+  title: 'Access the Certificate overview page'
+
+view published certificate entities:
+  title: 'View published Certificate entities'
+
+view unpublished certificate entities:
+  title: 'View unpublished Certificate entities'

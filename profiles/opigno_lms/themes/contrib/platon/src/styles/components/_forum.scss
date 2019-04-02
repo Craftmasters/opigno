@@ -1,0 +1,231 @@
+body.page-node-add-forum,
+body.page-node-forum[class*="-edit"],
+body.page-node-forum[class*="-delete"],
+body[class*="page-comment-"][class*="-edit"],
+body[class*="page-comment-"][class*="-delete"] {
+  .faded-form-wrapper {
+    border-top: 0;
+    background-color: transparent;
+    padding: 0;
+  }
+}
+
+form.comment-comment-forum-delete-form,
+form.comment-comment-forum-form,
+form.node-forum-delete-form,
+form.node-forum-edit-form,
+form.node-forum-form {
+  background-color: $light-gray;
+  padding: $form-padding $form-padding 1rem;
+
+  details[data-drupal-selector="edit-author"],
+  .field--name-status,
+  .field--name-taxonomy-forums,
+  .vertical-tabs,
+  .form-item-shadow {
+    display: none;
+  }
+
+  .form-actions {
+    // background-color: #dadada !important;
+
+    input#edit-preview {
+      display: none;
+    }
+  }
+}
+
+article[typeof="schema:Discussion"] {
+  background-color: $light-gray;
+  padding: $form-padding;
+
+  article[typeof="schema:Person"] {
+    float: left;
+    margin-right: 1rem;
+    min-height: 5rem;
+    margin-bottom: 1rem;
+  }
+
+  .submitted,
+  .taxonomy-forums {
+    font-style: italic;
+  }
+
+  .body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  input#edit-preview {
+    display: none;
+  }
+
+  .comment-forum {
+    margin-top: 2rem;
+    padding-left: 10rem;
+    padding-top: 3rem;
+    border-top: 1px solid;
+
+    + ul.links {
+      display: none;
+    }
+
+    > h2 {
+      padding-top: 2rem;
+    }
+
+    > article {
+      border-bottom: 1px solid;
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+
+      article[typeof="schema:Person"] + p {
+        font-style: italic;
+        margin-bottom: 0;
+
+        + a {
+          display: none;
+        }
+      }
+
+      .comment-body {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+      }
+    }
+
+    h3 {
+      font-size: inherit;
+      font-style: italic;
+      font-weight: 400;
+
+      a {
+        color: inherit;
+      }
+    }
+
+    ul.links {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      li {
+        display: inline-block;
+
+        + li {
+          margin-left: 0.5rem;
+        }
+
+        a {
+          display: block;
+          width: 1.75rem;
+          height: 1.75rem;
+          font-size: 0;
+          background-size: 1rem;
+
+          &[href*="delete"] {
+            @include svg-picto('picto-message-delete', false);
+            background-color: #ff5440;
+          }
+
+          &[href*="edit"] {
+            @include svg-picto('picto-message-edit', false);
+            background-color: #ee6fbb;
+          }
+        }
+      }
+    }
+
+    > article:first-child {
+      margin-top: 2rem;
+    }
+
+    form {
+      border: 1px solid;
+      padding: $form-padding $form-padding 1rem;
+
+      .form-actions {
+        margin-left: -$form-padding;
+        margin-right: -$form-padding;
+        display: flex;
+
+        input[type="submit"].button--primary {
+          flex: 1 0 auto;
+          text-transform: uppercase;
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+body[class*="page-forum-"] {
+  li.action-links {
+    display: block;
+    background: #f7f6f6;
+    margin: 0 0 0.75rem;
+
+    a {
+      display: inline-block;
+      background-color: #dadada !important;
+      padding: 0.75rem 2rem;
+
+      &:hover {
+        background-color: darken(#dadada, 5%) !important;
+      }
+    }
+  }
+
+  table {
+    color: #70706f;
+
+    thead {
+      // display: none;
+    }
+
+    tbody {
+      tr {
+        &:nth-child(odd) {
+          background-color: #f7f6f6;
+        }
+
+        &:hover {
+          background-color: transparentize(#95d5f4, 0.8);
+        }
+
+        td {
+          .forum__title {
+            > div:first-child {
+              text-transform: uppercase;
+              font-weight: 700;
+            }
+
+            > div:last-child {
+              font-style: italic;
+              color: #70706f;
+              font-size: 0.9em;
+            }
+          }
+
+          &.forum__last-reply {
+            font-style: italic;
+
+            .author {
+              display: block;
+            }
+
+            .time {
+              display: block;
+              font-size: 0.9em;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+# Opigno-admin menu
+opigno_admin.user_and_class_managments:
+  title: User and class management
+  description: 'User and class management'
+  route_name: <none>
+  menu_name: opigno-admin
+  weight: -36
+
+opigno_admin.manage_classes:
+  title: Manage classes
+  description: 'Manage classes'
+  route_name: view.opigno_classes.all
+  parent: opigno_admin.user_and_class_managments
+  menu_name: opigno-admin
+  weight: -34
+
+opigno_admin.manage_users:
+  title: Manage users
+  description: 'Manage users'
+  route_name: view.user_admin_people.page_1
+  parent: opigno_admin.user_and_class_managments
+  menu_name: opigno-admin
+  weight: -35

@@ -1,0 +1,272 @@
+opigno_module.add:
+  path: 'opigno_module/add'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\LearningPathController::addIndex'
+    _title: 'Add module'
+  requirements:
+    _entity_create_access: opigno_module
+  options:
+    parameters:
+      account:
+        type: entity:user
+
+opigno_module.edit:
+  path: 'opigno_module/{opigno_module}/edit'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\LearningPathController::editIndex'
+    _title: 'Edit module'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      account:
+        type: entity:user
+
+opigno_module.modules:
+  path: 'opigno_module/{opigno_module}/inner-modules'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\LearningPathController::modulesIndex'
+    _title: 'Manage activities'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      account:
+        type: entity:user
+
+opigno_module.activities_bank:
+  path: 'opigno_module/{opigno_module}/activities-bank'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\LearningPathController::activitiesBank'
+    _title: 'Manage activities'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      account:
+        type: entity:user
+
+opigno_module.activities_bank_lpm:
+  path: 'opigno_module/{opigno_module}/activities-bank-lpm'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::activitiesBankLPM'
+    _title: 'add activities'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      account:
+        type: entity:user
+
+opigno_module.activities_bank_lpm.checked_activities:
+  path: 'ajax/activities-bank-lpm/checked-activities'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::ajaxCheckedActivities'
+  requirements:
+    _permission: 'administer module entities'
+
+# Main admin menu page.
+opigno_module.opigno_settings:
+  path: 'admin/structure/opigno-module'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Opigno module'
+  requirements:
+    _permission: 'administer module entities'
+  options:
+    _admin_route: TRUE
+    parameters:
+      account:
+        type: entity:user
+
+opigno_module.opigno_activities_browser:
+  path: 'module/{opigno_module}/activities'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\ActivitiesBrowserController::content'
+    _title_callback: '\Drupal\opigno_module\Controller\ActivitiesBrowserController::formTitleCallback'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    _admin_route: TRUE
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      account:
+        type: entity:user
+
+opigno_module.my_results:
+  path: 'module/{opigno_module}/my-results'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleController::userResults'
+    _title: 'My Results'
+  requirements:
+    _permission: 'view own module results'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+
+# Group routes.
+opigno_module.group.answer_form:
+  path: 'group/{group}/module/{opigno_module}/answer/{opigno_activity}'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleController::moduleQuestionAnswerForm'
+    _title_callback: '\Drupal\opigno_module\Controller\OpignoModuleController::moduleQuestionAnswerFormTitle'
+  requirements:
+    _permission: 'take modules'
+    _entity_access: 'group.take'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      opigno_module:
+        type: entity:opigno_module
+      opigno_activity:
+        type: entity:opigno_activity
+
+opigno_module.take_module:
+  path: 'group/{group}/module/{opigno_module}/take'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleController::takeModule'
+    _title: 'Module'
+  requirements:
+    _permission: 'take modules'
+  options:
+    parameters:
+      group:
+        type: entity:group
+      opigno_module:
+        type: entity:opigno_module
+
+# Module result page.
+opigno_module.module_result:
+  path: 'module/{opigno_module}/result/{user_module_status}'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleController::userResult'
+  requirements:
+    _entity_access: 'user_module_status.view'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      user_module_status:
+        type: entity:user_module_status
+
+# Module result form.
+opigno_module.module_result_form:
+  path: 'module/{opigno_module}/results/{user_module_status}'
+  defaults:
+    _form: '\Drupal\opigno_module\Form\ModuleResultForm'
+    _title_callback: '\Drupal\opigno_module\Form\ModuleResultForm::formTitle'
+  requirements:
+    _entity_access: 'user_module_status.view'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      user_module_status:
+        type: entity:user_module_status
+
+# Update/edit activity form
+opigno_module.manager.get_item_form:
+  path: '/module/{opigno_module}/item-form/{type}/{item}'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::getItemForm'
+    item: null
+  requirements:
+    _custom_access: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::accessItemForm'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      type:
+        type: string
+
+opigno_module.manager.add_module_activity:
+  path: '/module/{opigno_module}/add-activity/{opigno_activity}'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::addActivityToModule'
+  requirements:
+    _entity_access: 'opigno_module.update'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+      opigno_activity:
+        type: entity:opigno_activity
+
+opigno_module.manager.get_activity_types:
+  path: '/module/manager/get-activity-types'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::getActivityTypes'
+  requirements:
+    _custom_access: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::accessActivitiesOverview'
+
+opigno_module.manager.get_activities_list:
+  path: '/module/manager/get-activities-list'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::getActivitiesList'
+  requirements:
+    _custom_access: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::accessActivitiesOverview'
+
+opigno_module.manager.update_activity_weight:
+  path: '/module/manager/update-weight'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::activityUpdateWeight'
+  requirements:
+    _custom_access: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::accessActivityUpdateWeight'
+
+opigno_module.manager.get_activity_preview:
+  path: '/module/manager/activity-preview/{opigno_activity}'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::getActivityPreview'
+  requirements:
+    _custom_access: '\Drupal\opigno_module\Controller\OpignoModuleManagerController::accessActivitiesOverview'
+  options:
+    parameters:
+      opigno_activity:
+        type: entity:opigno_activity
+
+opigno_module.add_external_package:
+  path: 'module/{opigno_module}/add-external-package'
+  defaults:
+    _form: '\Drupal\opigno_module\Form\AddExternalPackageForm'
+    _title: 'Add external package'
+  requirements:
+    _entity_create_access: opigno_activity
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+
+opigno_module.add_external_package_ppt:
+  path: 'module/{opigno_module}/add-external-package/ppt'
+  defaults:
+    _form: '\Drupal\opigno_module\Form\AddExternalPackageForm'
+    _title: 'Add external package'
+    mode: 'ppt'
+  requirements:
+    _entity_create_access: opigno_activity
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module
+
+opigno_module.get_previous_module:
+  path: 'module/{opigno_module}/get-previous'
+  defaults:
+    _controller: '\Drupal\opigno_module\Controller\OpignoModuleController::moduleGetPrevious'
+  requirements:
+    _permission: 'take modules'
+  options:
+    parameters:
+      opigno_module:
+        type: entity:opigno_module

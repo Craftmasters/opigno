@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_product
+    - group
+id: commerce_product.field_learning_path_id
+field_name: field_learning_path_id
+entity_type: commerce_product
+type: entity_reference
+settings:
+  target_type: group
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

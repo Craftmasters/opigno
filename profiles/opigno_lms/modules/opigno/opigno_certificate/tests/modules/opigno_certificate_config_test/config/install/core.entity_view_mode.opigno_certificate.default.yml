@@ -1,0 +1,9 @@
+langcode: en
+status: false
+dependencies:
+  module:
+    - opigno_certificate
+id: opigno_certificate.default
+label: 'Default'
+targetEntityType: opigno_certificate
+cache: true

@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.private_message
+  module:
+    - system
+    - views
+  theme:
+    - platon
+id: views_block__private_message_block_all
+theme: platon
+region: sidebar_first
+weight: 0
+provider: null
+plugin: 'views_block:private_message-block_all'
+settings:
+  id: 'views_block:private_message-block_all'
+  label: ''
+  provider: views
+  label_display: '0'
+  views_label: ''
+  items_per_page: none
+  context_mapping: {  }
+visibility:
+  request_path:
+    id: request_path
+    pages: "/private_messages\r\n/private_messages/*\r\n/private_message/*"
+    negate: false
+    context_mapping: {  }

@@ -1,0 +1,169 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+$gridX: 300px;
+$gridY: 315px;
+$gapX: 22px;
+$gapY: 116px;
+
+app-root {
+  position: relative;
+}
+
+label.mat-button-toggle-label {
+  margin-bottom: 0;
+}
+
+.lateral-panel {
+  button.close {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+  }
+}
+
+iframe {
+  border: 0;
+  min-height: 100vh;
+}
+
+.gu-mirror {
+  position: fixed!important;
+  margin: 0!important;
+  z-index: 9999!important;
+  opacity: 0.8;
+}
+
+.gu-hide {
+  display: none!important;
+}
+
+.gu-unselectable {
+  user-select: none!important;
+}
+
+.gu-transit {
+  z-index: 15;
+}
+
+.gu-transit .drag-and-drop-item {
+  box-shadow: none!important;
+  opacity: 0.2;
+  border: 5px dashed;
+}
+
+.gh-fork {
+  position: fixed;
+  top: 0;
+  right: 0;
+  border: 0;
+}
+
+table.drag-and-drop-wrapper {
+  width: auto;
+  border-spacing: 0;
+  margin: 0;
+  border-collapse: collapse;
+}
+
+table.drag-and-drop-wrapper td.drag-and-drop-bag {
+  vertical-align: top;
+  padding: 0;
+  background-color: transparent!important;
+  border-left: $gapX solid;
+  border-right: $gapX solid;
+  border-top: 0 solid;
+  border-bottom: $gapY solid;
+  /*border-color: #fcfcfc;*/
+  border-color: transparent;
+  min-width: $gridX;
+  width: $gridX;
+  height: $gridY;
+  box-sizing: content-box;
+  position: relative;
+}
+
+table.drag-and-drop-wrapper td.drag-and-drop-bag.first {
+  border-left: 0;
+}
+
+table.drag-and-drop-wrapper td.drag-and-drop-bag.last {
+  /*border-right: 0;*/
+}
+
+table.drag-and-drop-wrapper tr.first td.drag-and-drop-bag {
+  border-top: 0;
+}
+
+table.drag-and-drop-wrapper tr.last td.drag-and-drop-bag {
+  /*border-bottom: 0;*/
+}
+
+table.drag-and-drop-wrapper td.drag-and-drop-bag .drag-and-drop-item {
+  cursor: move;
+  width: $gridX;
+  height: $gridY;
+  box-sizing: border-box;
+  position: absolute;
+}
+/*
+ * note that styling gu-mirror directly is a bad practice because it's too generic.
+ * you're better off giving the draggable elements a unique class and styling that directly!
+ */
+.drag-and-drop-bag td,
+.gu-mirror {
+  background-color: rgba(0, 0, 0, 0.2);
+  transition: opacity 0.4s ease-in-out;
+}
+
+.gu-mirror {
+  cursor: grabbing;
+}
+
+.handle {
+  padding: 0 5px;
+  margin-right: 5px;
+  background-color: rgba(0, 0, 0, 0.4);
+  cursor: move;
+}
+
+nested-repeat-example .drag-and-drop-bag span {
+  display: block;
+  padding: 8px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+  opacity: 0.8;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
+}
+
+.gu-hide {
+  display: none !important;
+}
+
+.gu-unselectable {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+.gu-transit {
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+}
+
+.ic-drag-handle-black-24px {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMDAwMDAwIiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+ICAgIDxkZWZzPiAgICAgICAgPHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBpZD0iYSIvPiAgICA8L2RlZnM+ICAgIDxjbGlwUGF0aCBpZD0iYiI+ICAgICAgICA8dXNlIG92ZXJmbG93PSJ2aXNpYmxlIiB4bGluazpocmVmPSIjYSIvPiAgICA8L2NsaXBQYXRoPiAgICA8cGF0aCBjbGlwLXBhdGg9InVybCgjYikiIGQ9Ik0yMCA5SDR2MmgxNlY5ek00IDE1aDE2di0ySDR2MnoiLz48L3N2Zz4=);
+  width: 30px;
+  height: 25px;
+  display: inline-block;
+  background-position: center;
+}

@@ -1,0 +1,90 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display a group.
+ *
+ * Available variables:
+ * - group: The group entity with limited access to object properties and
+ *   methods. Only "getter" methods (method names starting with "get", "has",
+ *   or "is") and a few common methods such as "id" and "label" are available.
+ *   Calling other methods (such as group.delete) will result in an exception.
+ * - label: The title of the group.
+ * - content: All group items. Use {{ content }} to print them all,
+ *   or print a subset such as {{ content.field_example }}. Use
+ *   {{ content|without('field_example') }} to temporarily suppress the
+ *   printing of a given child element.
+ * - url: Direct URL of the current group.
+ * - attributes: HTML attributes for the containing element.
+ *   The attributes.class element may contain one or more of the following
+ *   classes:
+ *   - group: The current template type (also known as a "theming hook").
+ *   - group--[type]: The current group type. For example, if the group is a
+ *     "Classroom" it would result in "group--classroom". Note that the machine
+ *     name will often be in a short form of the human readable label.
+ *   - group--[view_mode]: The View Mode of the group; for example, a
+ *     teaser would result in: "group--teaser", and full: "group--full".
+ * - title_attributes: Same as attributes, except applied to the main title
+ *   tag that appears in the template.
+ * - content_attributes: Same as attributes, except applied to the main
+ *   content tag that appears in the template.
+ * - title_prefix: Additional output populated by modules, intended to be
+ *   displayed in front of the main title tag that appears in the template.
+ * - title_suffix: Additional output populated by modules, intended to be
+ *   displayed after the main title tag that appears in the template.
+ * - view_mode: View mode; for example, "teaser" or "full".
+ * - page: Flag for the full page state. Will be true if view_mode is 'full'.
+ *
+ * @see template_preprocess_group()
+ *
+ * @ingroup themeable
+ */
+#}
+
+<div{{ attributes.addclass('group-opigno-course') }}>
+
+  {{ title_prefix }}
+  {% if not page %}
+    <h2{{ title_attributes }}>
+      <a href="{{ url }}" rel="bookmark">{{ label }}</a>
+    </h2>
+  {% endif %}
+  {{ title_suffix }}
+  <div class="row">
+    {% if opigno_catalog_is_member(group.id()) %}
+      {{ get_progress() }}
+    {% endif %}
+    <div class="col-md-4">
+      <section>
+        <h2 class="h4 bg-primary color-white text-uppercase mb-0 px-3 py-2">{{ 'Information'|t }}</h2>
+        <div class="content bg-light py-2 pr-3">
+          <div class="lp-image">
+            {% if content.field_learning_path_media_image[0] %}
+              {{ content.field_learning_path_media_image }}
+            {% else %}
+              {{ opigno_catalog_get_default_image('learning_path') }}
+            {% endif %}
+          </div>
+          <div class="duration d-flex px-2 py-2 bg-white mt-2">
+            <div class="label">{{ 'Length'|t }}</div>
+            <div class="value text-right ml-auto">{{ group.field_learning_path_duration.value }}</div>
+          </div>
+          <div class="category d-flex px-2 py-2 bg-white mt-2">
+            <div class="label">{{ 'Subject'|t }}</div>
+            <div class="value text-right ml-auto">{{ learning_path_category }}</div>
+          </div>
+        </div>
+        {{ get_join_group_link(null, null, {'class': ['opigno-quiz-app-course-button', 'bg-success', 'color-white', 'd-block', 'px-2', 'py-2', 'text-center', 'text-uppercase', 'join-link']}) }}
+      </section>
+    </div>
+    <div id="group-content" {{ content_attributes.addClass('col-md-8') }}>
+      <h2 class="h4 bg-primary text-uppercase color-white mb-0 px-3 py-2">{{ 'About this training'|t }}</h2>
+      <div class="content bg-light px-2 pt-2">
+        <div class="bg-white px-3 py-3">
+          {{ content|without('field_learning_path_media_image', 'field_learning_path_duration', 'field_learning_path_category') }}
+        </div>
+      </div>
+      {{ get_start_link(null, {'class': ['opigno-quiz-app-course-button', 'bg-success', 'color-white', 'd-block', 'px-2', 'py-2', 'text-center', 'text-uppercase']}) }}
+    </div>
+    {{ get_training_content() }}
+  </div>
+</div>

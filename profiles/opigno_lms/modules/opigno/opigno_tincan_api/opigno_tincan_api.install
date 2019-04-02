@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno TinCan API module.
+ */
+
+use Drupal\Core\Link;
+use Drupal\Core\Render\Markup;
+
+/**
+ * Implements hook_requirements().
+ */
+function opigno_tincan_api_requirements($phase) {
+  $messenger = \Drupal::messenger();
+  $requirements = [];
+
+  // Check if the TinCanPHP library is installed.
+  $library_is_installed = class_exists('TinCan\Statement');
+
+  // Check if the module parameters are set.
+  $config = \Drupal::config('opigno_tincan_api.settings');
+  $endpoint = $config->get('opigno_tincan_api_endpoint');
+  $username = $config->get('opigno_tincan_api_username');
+  $password = $config->get('opigno_tincan_api_password');
+
+  if (empty($endpoint) || empty($username) || empty($password)) {
+    $is_configured = FALSE;
+  }
+  else {
+    $is_configured = TRUE;
+  }
+
+  $requirements['opigno_tincan_api']['title'] = 'Opigno TinCan API';
+
+  // If the site is in runtime, put in status page these information.
+  if ($phase == 'runtime') {
+    // Check if the TinCanPHP library is installed.
+    $requirements['opigno_tincan_api']['title'] = 'TinCanPHP';
+
+    if ($library_is_installed) {
+      $requirements['opigno_tincan_api']['value'] = t('Installed');
+      $requirements['opigno_tincan_api']['severity'] = REQUIREMENT_OK;
+    }
+    else {
+      $requirements['opigno_tincan_api']['value'] = t('Not Installed');
+      $requirements['opigno_tincan_api']['severity'] = REQUIREMENT_ERROR;
+      $requirements['opigno_tincan_api']['description'] = Markup::create(
+        "Please install the TinCanPHP library using Composer, with the command: <em>composer require rusticisoftware/tincan:@stable</em>"
+      );
+    }
+
+    // Check if the module parameters are set.
+    if ($is_configured) {
+      $requirements['opigno_tincan_api']['value'] = t('Configured');
+      $requirements['opigno_tincan_api']['severity'] = REQUIREMENT_OK;
+    }
+    else {
+      $requirements['opigno_tincan_api']['value'] = t('Not set');
+      $requirements['opigno_tincan_api']['severity'] = REQUIREMENT_WARNING;
+      $requirements['opigno_tincan_api']['description'] = t(
+        'Please configure the LRS connection in the @setting_page.',
+        ['@setting_page' => Link::createFromRoute('settings page', 'opigno_tincan_api.settings_form')->toString()]
+      );
+    }
+  }
+
+  // If during install or update, put the information in message.
+  if ($phase == 'install' || $phase == 'update') {
+    if (!$library_is_installed) {
+      $messenger->addWarning(Markup::create("Please install the TinCanPHP library using Composer, with the command: <em>composer require rusticisoftware/tincan:@stable</em>"));
+    }
+
+  }
+  return $requirements;
+}

@@ -1,0 +1,31 @@
+dashboard:
+  version: VERSION
+  css:
+    theme:
+      css/statistics.css: {}
+      css/dashboard.css: {}
+  js:
+    js/popover.js: {}
+
+training:
+  version: VERSION
+  css:
+    theme:
+      css/statistics.css: {}
+      css/training.css: {}
+  js:
+    js/popover.js: {}
+
+user:
+  version: VERSION
+  css:
+    theme:
+      css/statistics.css: {}
+      css/user.css: {}
+  js:
+    js/user.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+    - core/drupal.ajax

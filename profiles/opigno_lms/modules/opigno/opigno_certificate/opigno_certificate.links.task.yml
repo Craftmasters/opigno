@@ -1,0 +1,13 @@
+entity.certificate.canonical:
+  route_name: entity.certificate.canonical
+  base_route: entity.certificate.canonical
+  title: 'View'
+entity.certificate.edit_form:
+  route_name: entity.certificate.edit_form
+  base_route: entity.certificate.canonical
+  title: Edit
+entity.certificate.delete_form:
+  route_name: entity.certificate.delete_form
+  base_route: entity.certificate.canonical
+  title: Delete
+  weight: 10

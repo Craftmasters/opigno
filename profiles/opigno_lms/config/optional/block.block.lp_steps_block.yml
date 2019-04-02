@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_learning_path
+    - system
+  theme:
+    - platon
+id: lp_steps_block
+theme: platon
+region: sidebar_first
+weight: 0
+provider: null
+plugin: lp_steps_block
+settings:
+  id: lp_steps_block
+  label: 'LP Steps'
+  provider: opigno_learning_path
+  label_display: '0'
+visibility:
+  request_path:
+    id: request_path
+    pages: "/module/*\r\n/group/*/module/*"
+    negate: false
+    context_mapping: {  }

@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - opigno_module
+id: opigno_activity.activity
+label: Activity
+targetEntityType: opigno_activity
+cache: true

@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tincan_api.module.
+ */
+
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_api_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_modules module.
+    case 'help.page.opigno_tincan_api':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('API for sending Tincan statements to an LRS.') . '</p>';
+
+      // --- The USES section.
+      $output .= '<h3>' . t('Requirements') . '</h3>';
+      $output .= '<dl>';
+
+      $output .= '<dt>' . t('Install Tincan PHP library') . '</dt>';
+      $output .= '<dd>' . t('First of all, for using Opigno Tincan Api functionality you need to check if @tincan_library is installed.',
+          [
+            '@tincan_library' => Link::fromTextAndUrl(t('TinCan PHP library'), Url::fromUri('https://github.com/RusticiSoftware/TinCanPHP'))->toString(),
+          ]
+        )
+        . '</dd>';
+      $output .= '<dd>' . t('If not, install it with the command:') . ' ' . '<em>composer require rusticisoftware/tincan:@stable</em></dd>';
+      $output .= '<dl>';
+
+      $output .= '<dt>' . t('Configure LRS') . '</dt>';
+      $output .= '<dd>' . t('For using Opigno Tincan Api you need to have a connection with any Learning Record Store (LRS). @lrs_settings for configure LRS settings.',
+          [
+            '@lrs_settings' => Link::fromTextAndUrl(t('Go to page'), Url::fromRoute('opigno_tincan_api.settings_form'))->toString(),
+          ]
+        )
+        . '</dd>';
+
+      $output .= '<h3>' . t('Uses') . '</h3>';
+      $output .= '<dd>' . t('Opigno Tincan Api module provide a few submodules for each part of training (training, course, module, activity ect). They all are grouped in Tincan group in modules list. 
+         If you want to send tincan(xApi) statements for necessary part of training you need to enable related submodule.')
+          . '</dd>';
+
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Check if the library TinCanPHP is installed.
+ */
+function opigno_tincan_api_tincanphp_is_installed() {
+  return class_exists('TinCan\Statement');
+}

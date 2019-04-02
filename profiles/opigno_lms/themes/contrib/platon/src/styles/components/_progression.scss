@@ -1,0 +1,18 @@
+.progression {
+  flex: 1 0 65px;
+  max-width: 65px;
+
+  .chart {
+    background-color: #dadada;
+    height: 2px;
+    position: relative;
+
+    .bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background-color: red;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.field_video
+    - opigno_module.opigno_activity_type.opigno_video
+  module:
+    - video
+id: opigno_activity.opigno_video.field_video
+field_name: field_video
+entity_type: opigno_activity
+bundle: opigno_video
+label: Video
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_extensions: ''
+  file_directory: 'videos/[date:custom:Y]-[date:custom:m]'
+  max_filesize: ''
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: video

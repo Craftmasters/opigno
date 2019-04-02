@@ -1,0 +1,29 @@
+{
+  "name": "drupal/private_message",
+  "description": "A private message system for users to send messages to each other.",
+  "type": "drupal-module",
+  "homepage": "https://drupal.org/project/private_message",
+  "authors": [
+    {
+        "name": "Jay Friendly (Jaypan)",
+        "homepage": "https://www.jaypan.com",
+        "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://drupal.org/project/issues/private_message",
+    "source": "https://cgit.drupalcode.org/private_message"
+  },
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev",
+  "require": {
+    "drupal/message_notify": "^1.0"
+  },
+  "extra": {
+    "drush": {
+      "services": {
+        "drush.services.yml": "^9"
+      }
+    }
+  }
+}

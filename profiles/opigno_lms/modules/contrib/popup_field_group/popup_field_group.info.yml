@@ -1,0 +1,14 @@
+name: 'Popup Field Group'
+type: module
+description: 'Adds a new field group option "popup" which puts its children in a simple popup.'
+package : Fields
+dependencies:
+  - field_group:field_group
+
+# core: '8.x'
+
+# Information added by Drupal.org packaging script on 2018-07-19
+version: '8.x-1.3'
+core: '8.x'
+project: 'popup_field_group'
+datestamp: 1532001511

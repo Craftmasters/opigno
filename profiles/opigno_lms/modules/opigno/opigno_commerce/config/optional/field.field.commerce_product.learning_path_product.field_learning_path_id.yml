@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_type.learning_path_product
+    - field.storage.commerce_product.field_learning_path_id
+    - group.type.learning_path
+id: commerce_product.learning_path_product.field_learning_path_id
+field_name: field_learning_path_id
+entity_type: commerce_product
+bundle: learning_path_product
+label: 'Learning Path ID'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:group'
+  handler_settings:
+    target_bundles:
+      learning_path: learning_path
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

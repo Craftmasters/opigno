@@ -1,0 +1,31 @@
+name: Opigno Learning Path
+type: module
+description: Add the Learning Path feature to the opigno instance.
+# core: 8.x
+package: Opigno
+dependencies:
+  - better_exposed_filters:better_exposed_filters
+  - opigno_certificate:opigno_certificate
+  - config_rewrite:config_rewrite
+  - group:group
+  - ggroup
+  - opigno_class:opigno_class
+  - opigno_course:opigno_course
+  - drupal:path
+  - drupal:taxonomy
+  - tft:tft
+  - opigno_module:opigno_module
+  - opigno_module:opigno_module_group
+  - opigno_notification:opigno_notification
+  - opigno_group_manager:opigno_group_manager
+  - entity_browser:entity_browser
+  - dropzonejs:dropzonejs
+  - dropzonejs:dropzonejs_eb_widget
+  - opigno_learning_path:opigno_alter_entity_autocomplete
+configure: opigno_learning_path.learning_path_settings
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.3'
+core: '8.x'
+project: 'opigno_learning_path'
+datestamp: 1550773108

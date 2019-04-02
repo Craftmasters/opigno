@@ -1,0 +1,97 @@
+# Schema for the configuration files of the learning_path module.
+opigno_learning_path.learning_path_settings:
+  type: 'config_object'
+  label: 'Group settings'
+  mapping:
+    opigno_learning_path_notify_admin:
+      type: integer
+    opigno_learning_path_notify_users:
+      type: integer
+    opigno_learning_path_notify_admin_user_subscribed:
+      type: text
+    opigno_learning_path_notify_admin_user_approval:
+      type: text
+    opigno_learning_path_notify_admin_user_blocked:
+      type: text
+    opigno_learning_path_notify_user_user_subscribed:
+      type: text
+    opigno_learning_path_notify_user_user_approval:
+      type: text
+    opigno_learning_path_notify_user_user_blocked:
+      type: text
+    opigno_learning_path_notify_admin_mails:
+      type: string
+
+group_content_enabler.config.parent_role_mapping:
+  type: 'group_content_type'
+  label: 'Group content type'
+  mapping:
+    learning_path-1eb7047a7:
+      type: string
+    learning_path-3e4ccc6a3:
+      type: string
+    learning_path-9b4c10f4d:
+      type: string
+    learning_path-a416e6833:
+      type: string
+    learning_path-admin:
+      type: string
+    learning_path-anonymous:
+      type: string
+    learning_path-b2b679d24:
+      type: string
+    learning_path-content_manager:
+      type: string
+    learning_path-member:
+      type: string
+    learning_path-outsider:
+      type: string
+    learning_path-student:
+      type: string
+    learning_path-user_manager:
+      type: string
+
+group_content_enabler.config.child_role_mapping:
+  type: 'group_content_type'
+  label: 'Group content type'
+  mapping:
+    opigno_class-1eb7047a7:
+      type: string
+    opigno_class-3e4ccc6a3:
+      type: string
+    opigno_class-9b4c10f4d:
+      type: string
+    opigno_class-a416e6833:
+      type: string
+    opigno_class-admin:
+      type: string
+    opigno_class-anonymous:
+      type: string
+    opigno_class-b2b679d24:
+      type: string
+    opigno_class-coach:
+      type: string
+    opigno_class-member:
+      type: string
+    opigno_class-outsider:
+      type: string
+    opigno_class-student:
+      type: string
+    opigno_course-1eb7047a7:
+      type: string
+    opigno_course-3e4ccc6a3:
+      type: string
+    opigno_course-9b4c10f4d:
+      type: string
+    opigno_course-a416e6833:
+      type: string
+    opigno_course-admin:
+      type: string
+    opigno_course-anonymous:
+      type: string
+    opigno_course-b2b679d24:
+      type: string
+    opigno_course-member:
+      type: string
+    opigno_course-outsider:
+      type: string

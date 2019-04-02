@@ -1,0 +1,156 @@
+body.section-module {
+  &.fullscreen {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    #menu-wrapper,
+    .block-system_breadcrumb_block,
+    .block-page_title_block,
+    div#toolbar-administration,
+    footer#site-footer,
+    header#site-header {
+      display: none;
+    }
+
+    div#main {
+      max-width: 100%;
+    }
+  }
+
+  .lp_progress_wrapper {
+
+    @include media-breakpoint-down(sm) {
+      flex-flow: row wrap;
+    }
+
+    .lp_progress {
+      padding: 18px 70px;
+      color: #b3b3b3;
+
+      @include media-breakpoint-down(sm) {
+        padding: 15px;
+        flex: 1 0 100%;
+        margin-bottom: 1rem;
+      }
+
+      .lp_progress_label {
+        display: inline-block;
+        font-style: italic;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+      }
+
+      .lp_progress_value {
+        float: right;
+      }
+
+      .lp_progress_bar {
+        background-color: #dadada;
+        display: block;
+        height: 5px;
+        width: 100%;
+
+        .lp_progress_bar_completed {
+          background-color: #f0a794;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  .fullscreen-link,
+  .home-link {
+    flex: 0 0 76px;
+    max-width: 76px;
+
+    @include media-breakpoint-down(sm) {
+      height: 70px;
+      flex: 0 0 calc(50% - .5rem);
+      max-width: calc(50% - .5rem);
+    }
+
+    a {
+      font-size: 0;
+      background-size: 30px auto;
+
+      &:hover {
+        background-color: #9faf5b;
+      }
+    }
+  }
+
+  .home-link {
+    @include media-breakpoint-down(sm) {
+      margin-right: 0.5rem;
+    }
+
+    a {
+      @include svg-picto('picto-answer-home');
+    }
+  }
+
+  .fullscreen-link {
+    @include media-breakpoint-down(sm) {
+      margin-left: 0.5rem;
+    }
+
+    a {
+      @include svg-picto('picto-answer-fullscreen');
+    }
+  }
+
+  a#lp-steps-trigger {
+    @include svg-picto('picto-module-open');
+    max-width: 48px;
+    flex: 0 0 48px;
+    background-size: 30px;
+    margin-left: 0.5rem;
+  }
+
+  .form-actions {
+    border-top: 1rem solid #fff;
+    display: flex;
+    background-color: #dadada;
+    margin-top: 0;
+
+    input[type="submit"],
+    a.btn,
+    a.button {
+      padding: 14px 25px;
+      margin-top: 0 !important;
+      color: #fff;
+      text-transform: uppercase;
+      flex: 0 0 auto !important;
+      margin-left: auto;
+
+      @include media-breakpoint-down(sm) {
+        flex: 0 1 auto !important;
+      }
+
+      &:hover {
+        background-color: #9faf5b;
+      }
+
+      + input[type="submit"],
+      + a.button {
+        margin-left: 6px;
+      }
+    }
+  }
+
+  .content-wrapper {
+    .created,
+    .opigno_activity > div > .label {
+      display: none;
+    }
+
+    iframe {
+      width: 100%;
+      border: 0;
+
+      &[src*="opigno-scorm"] {
+        height: 670px;
+      }
+    }
+  }
+}

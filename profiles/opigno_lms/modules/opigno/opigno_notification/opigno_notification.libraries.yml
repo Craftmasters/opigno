@@ -1,0 +1,7 @@
+opigno_notification:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_notification.css: {}
+  js:
+    js/opigno_notification.js: {}

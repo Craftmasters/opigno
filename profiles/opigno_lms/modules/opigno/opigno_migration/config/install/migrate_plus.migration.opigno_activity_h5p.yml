@@ -1,0 +1,22 @@
+id: opigno_activity_h5p
+label: 'Opigno Group activity H5P (source: h5p question)'
+migration_group: opigno_migration
+langcode: en
+dependencies:
+  enforced:
+    module:
+    - opigno_migration
+source:
+  plugin: opigno_activity_h5p
+  node_type: h5p_content
+process:
+  id: vid
+  library_id: library_id
+  parameters: json_content
+  filtered_parameters: filtered
+destination:
+  plugin: 'entity:h5p_content'
+migration_dependencies:
+  required:
+    - opigno_users
+    - opigno_module_lesson

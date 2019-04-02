@@ -1,0 +1,8 @@
+langcode: en
+status: true
+id: opigno_certificate.template.default
+targetEntityType: opigno_certificate
+bundle: template
+mode: default
+content:
+hidden: {  }

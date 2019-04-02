@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_course.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_course_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_course module.
+    case 'help.page.opigno_course':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Adds course feature to your Opigno instance.') . '</p>';
+      return $output;
+
+    default:
+      return '';
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_course_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (in_array($form_id, ['group_opigno_course_edit_form', 'group_opigno_course_add_form'])) {
+    unset($form['badge_criteria']['widget']['#options']['_none']);
+
+    if (\Drupal::moduleHandler()->moduleExists('opigno_module')) {
+      $form['#attached']['library'][] = 'opigno_module/opigno_badges';
+    }
+  }
+
+  $destination = \Drupal::request()->get('destination', FALSE);
+  if ($destination === FALSE || substr($destination, -14) != 'course-content') {
+    return;
+  }
+
+  $destination_parts = explode('/', $destination);
+  $destination_id = $destination_parts[3];
+  if (!is_numeric($destination_id)) {
+    return;
+  }
+
+}

@@ -1,0 +1,43 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display the training content step.
+ *
+ * Available variables:
+ * - step: The step object with all the data.
+ * - group: The Group object which the steps is part of.
+ */
+#}
+<div class="lp_step">
+  <div class="lp_step_title_wrapper">
+    {% if step.mandatory %}
+      <span class="lp_step_required"></span>
+    {% endif %}
+    <h3 class="lp_step_title">{{ step.name }}</h3>
+  </div>
+  <div class="lp_step_content">
+    <div class="lp_step_summary">
+      <div class="lp_step_summary_title_wrapper">
+        <h3 class="lp_step_summary_title">{{ step.title }}</h3>
+        <h4 class="lp_step_summary_subtitle">{{ step.sub_title }}</h4>
+        {%  if step.description %}
+          <div class="lp_step_summary_description">{{ step.description }}</div>
+        {% endif %}
+      </div>
+      {{ step.summary_details_table }}
+    </div>
+    {% if step.typology == 'Course' %}
+    <div class="lp_step_details_wrapper">
+      {{ step.course_steps_table }}
+    </div>
+    {% endif %}
+  </div>
+  {% if step.typology == 'Course' %}
+    <div class="lp_step_show">
+      <span class="lp_step_show_text">{{ 'Show details'|t }}</span>
+    </div>
+    <div class="lp_step_hide">
+      <span class="lp_step_hide_text">{{ 'Hide details'|t }}</span>
+    </div>
+  {% endif %}
+</div>

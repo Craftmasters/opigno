@@ -1,0 +1,124 @@
+.lp_steps_block {
+  background-color: #f6f6f6;
+  padding: 32px 10px 32px;
+}
+
+.lp_steps_block_summary_state_passed,
+.lp_steps_block_summary_state_pending {
+  background-position: center;
+  background-size: 100%;
+  display: inline-block;
+  float: left;
+  height: 53px;
+  vertical-align: middle;
+  width: 53px;
+}
+
+.lp_steps_block_summary_state_passed {
+  background-image: url('../img/state_passed_big.png');
+}
+
+.lp_steps_block_summary_state_pending {
+  background-image: url('../img/state_pending_big.png');
+}
+
+.lp_steps_block_summary_title,
+.lp_steps_block_summary_score,
+.lp_steps_block_summary_progress {
+  color: #595858;
+  font-size: 16px;
+  margin: 0 0 0 70px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.lp_steps_block_summary_score,
+.lp_steps_block_summary_progress {
+  font-size: 15px;
+}
+
+.lp_steps_block_summary_title {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.lp_steps_block_title {
+  clear: both;
+  color: #706f6f;
+  margin-top: 40px;
+  font-weight: normal;
+  text-transform: unset;
+  font-size: 20px;
+}
+
+.lp_steps_block_table {
+  border-spacing: 0 6px;
+  margin: 0;
+  width: 100%;
+}
+
+.lp_steps_block_table th {
+  background-color: transparent;
+  color: #b2b1b1;
+  font-size: 14px;
+  font-style: italic;
+  font-weight: normal;
+  text-transform: unset;
+}
+
+.lp_steps_block_table tr:nth-child(2n) td:not([class*="ui-datepicker"]),
+.lp_steps_block_table tr:nth-child(2n+1) td:not([class*="ui-datepicker"]) {
+  background-color: #fff;
+  padding: 10px 15px;
+}
+
+.lp_steps_block_table td:nth-child(1) {
+  color: #595858;
+  font-size: 16px;
+}
+
+.lp_steps_block_table td:nth-child(2) {
+  color: #b2b1b1;
+  font-size: 16px;
+  text-align: right;
+}
+
+.lp_steps_block_table td:nth-child(3) {
+  color: #888787;
+  font-size: 14px;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.lp_steps_block_score {
+  color: #f9a295;
+}
+
+.lp_steps_block_score::after {
+  color: #b2b1b1;
+  content: '%';
+}
+
+.lp_steps_block_step_passed,
+.lp_steps_block_step_failed,
+.lp_steps_block_step_pending {
+  background-position: center;
+  background-size: 100%;
+  display: inline-block;
+  height: 34px;
+  margin-right: 15px;
+  vertical-align: middle;
+  width: 34px;
+}
+
+.lp_steps_block_step_passed {
+  background-image: url('../img/state_passed_big.png');
+}
+
+.lp_steps_block_step_failed {
+  background-image: url('../img/state_failed_big.png');
+}
+
+.lp_steps_block_step_pending {
+  background-image: url('../img/state_not_started_big.png');
+}

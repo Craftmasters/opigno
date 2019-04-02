@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.latest_active_trainings
+  module:
+    - system
+    - views
+  theme:
+    - platon
+id: dashboard_views_block_latest_active_trainings-block
+theme: platon
+region: content
+weight: -1
+provider: null
+plugin: 'views_block:latest_active_trainings-block'
+settings:
+  id: 'views_block:latest_active_trainings-block'
+  label: 'Dashboard: Latest active trainings'
+  provider: views
+  label_display: visible
+  views_label: ''
+  items_per_page: none
+visibility:
+  request_path:
+    id: request_path
+    pages: '<front>'
+    negate: false
+    context_mapping: {  }

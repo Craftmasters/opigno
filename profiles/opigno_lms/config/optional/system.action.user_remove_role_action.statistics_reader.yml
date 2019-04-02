@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.statistics_reader
+  module:
+    - user
+id: user_remove_role_action.statistics_reader
+label: 'Remove the Statistics reader role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: statistics_reader

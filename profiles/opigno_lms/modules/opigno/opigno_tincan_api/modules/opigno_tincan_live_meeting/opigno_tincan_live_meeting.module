@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tincan_live_meeting.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_live_meeting_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_live_meeting module.
+    case 'help.page.opigno_tincan_live_meeting':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Functionality for send tincan statements for Live meething (provided by opigno_moxtra module).') . '</p>';
+      return $output;
+
+    default:
+  }
+}

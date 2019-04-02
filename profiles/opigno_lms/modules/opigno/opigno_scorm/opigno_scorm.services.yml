@@ -1,0 +1,7 @@
+services:
+  opigno_scorm.scorm:
+    class: Drupal\opigno_scorm\OpignoScorm
+    arguments: ['@database']
+  opigno_scorm.scorm_player:
+    class: Drupal\opigno_scorm\OpignoScormPlayer
+    arguments: ['@database', '@opigno_scorm.scorm']

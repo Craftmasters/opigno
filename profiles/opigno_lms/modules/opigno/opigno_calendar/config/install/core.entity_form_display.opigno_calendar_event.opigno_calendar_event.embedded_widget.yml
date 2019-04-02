@@ -1,0 +1,80 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.opigno_calendar_event.embedded_widget
+    - field.field.opigno_calendar_event.opigno_calendar_event.field_calendar_event_members
+    - opigno_calendar_event.type.opigno_calendar_event
+  module:
+    - datetime_range
+    - field_group
+    - text
+third_party_settings:
+  field_group:
+    group_customize_calendar_item:
+      children:
+        - title
+        - description
+      parent_name: ''
+      weight: 2
+      format_type: popup
+      format_settings:
+        id: ''
+        classes: ''
+        popup_link:
+          show: 1
+          text: 'Customize calendar item'
+          classes: ''
+        popup_labels:
+          title: 'Customize calendar item'
+          close_text: Done
+        popup_settings:
+          modal: '1'
+          dialog_class: ''
+          close_on_escape: 1
+          height: auto
+          min_height: ''
+          max_height: ''
+          width: auto
+          min_width: ''
+          max_width: ''
+          position_horizontal: center
+          position_vertical: center
+        extra_css: ''
+      label: 'Customize calendar item'
+id: opigno_calendar_event.opigno_calendar_event.embedded_widget
+targetEntityType: opigno_calendar_event
+bundle: opigno_calendar_event
+mode: embedded_widget
+content:
+  date_daterange:
+    type: daterange_default
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  description:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      placeholder: ''
+      rows: 5
+    third_party_settings: {  }
+  displayed:
+    type: boolean_checkbox
+    weight: 1
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  field_calendar_event_members: true

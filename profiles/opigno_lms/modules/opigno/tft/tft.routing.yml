@@ -1,0 +1,87 @@
+tft.download_file:
+  path: 'tft/download/file/{media}'
+  defaults:
+    _controller: '\Drupal\tft\Controller\TFTController::downloadFile'
+    _title: 'Files'
+  requirements:
+    _entity_access: 'media.view'
+  options:
+    parameters:
+      media:
+        type: entity:media
+
+tft.directory:
+  path: 'tft/{taxonomy_term}'
+  defaults:
+    _controller: '\Drupal\tft\Controller\TFTController::listDirectory'
+    _title: 'Taxonomy File Tree'
+    taxonomy_term: null
+  requirements:
+    _entity_access: 'taxonomy_term.view'
+  options:
+    parameters:
+      taxonomy_term:
+        type: entity:taxonomy_term
+
+tft.group:
+  path: 'group/{group}/tft'
+  defaults:
+    _controller: '\Drupal\tft\Controller\TFTController::listGroup'
+    _title: 'Files'
+  requirements:
+    _entity_access: 'group.view'
+  options:
+    parameters:
+      group:
+        type: entity:group
+
+tft.add_term:
+  path: 'tft/term/add'
+  defaults:
+    _form: '\Drupal\tft\Form\AddFolderForm'
+    _title: 'Add a folder'
+  requirements:
+    _entity_create_access: taxonomy_term
+
+tft.edit_term:
+  path: 'tft/term/edit/{taxonomy_term}'
+  defaults:
+    _form: '\Drupal\tft\Form\EditFolderForm'
+    _title: 'Edit a folder'
+  requirements:
+    _entity_access: 'taxonomy_term.update'
+  options:
+    parameters:
+      taxonomy_term:
+        type: entity:taxonomy_term
+
+tft.delete_term:
+  path: 'tft/term/delete/{taxonomy_term}'
+  defaults:
+    _form: '\Drupal\tft\Form\DeleteFolderForm'
+    _title: 'Delete a folder'
+  requirements:
+    _entity_access: 'taxonomy_term.delete'
+  options:
+    parameters:
+      taxonomy_term:
+        type: entity:taxonomy_term
+
+tft.reorder_terms:
+  path: 'tft/terms/reorder/{taxonomy_term}'
+  defaults:
+    _form: '\Drupal\tft\Form\ReorderFolderForm'
+    _title: 'Reorder folders'
+  requirements:
+    _entity_access: 'taxonomy_term.reorder'
+  options:
+    parameters:
+      taxonomy_term:
+        type: entity:taxonomy_term
+
+tft.ajax_get_folder:
+  path: 'tft/ajax/get-folder'
+  defaults:
+    _controller: '\Drupal\tft\Controller\TFTController::ajaxGetFolder'
+  requirements:
+    _custom_access: '\Drupal\tft\Controller\TFTController::accessAjaxGetFolder'

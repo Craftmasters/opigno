@@ -1,0 +1,7 @@
+view_private_message:
+  version: VERSION
+  js:
+    js/view_private_message.js: {}
+  css:
+    theme:
+      css/view_private_message.css: {}

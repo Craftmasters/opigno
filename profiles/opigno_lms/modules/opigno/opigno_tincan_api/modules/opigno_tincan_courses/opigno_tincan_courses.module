@@ -1,0 +1,164 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_tincan_courses.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\group\Entity\Group;
+use Drupal\opigno_group_manager\OpignoGroupContext;
+use Drupal\opigno_tincan_api\OpignoTinCanApiStatements;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanActivityDefinitionTypes;
+use Drupal\opigno_tincan_api\OpignoTincanApiTinCanVerbs;
+use TinCan\Context;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_tincan_courses_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_tincan_courses module.
+    case 'help.page.opigno_tincan_courses':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Opigno Tincan Courses') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * {@inheritdoc}
+ *
+ * @throws \Exception
+ */
+function opigno_tincan_courses_user_module_status_presave(EntityInterface $entity) {
+  // Check if Tincan PHP library is installed.
+  $has_library = opigno_tincan_api_tincanphp_is_installed();
+  if (!$has_library) {
+    \Drupal::logger('opigno_tincan')
+      ->notice('Tincan statements can not be send. Tincan PHP library is not installed.');
+    return;
+  };
+
+  $route = \Drupal::routeMatch();
+  // Must work only after user answer on all questions.
+  if ($route->getRouteName() == 'opigno_module.take_module') {
+    /* @var $user_module_status UserModuleStatus */
+    $user_module_status = $entity;
+    $is_finished = $user_module_status->get('finished')->getValue()[0]['value'];
+    if (!$is_finished) {
+      // Module is not finished yet.
+      return;
+    }
+
+    // Get training context.
+    $gid = OpignoGroupContext::getCurrentGroupId();
+    $cid = OpignoGroupContext::getCurrentGroupContentId();
+
+    if (!$gid || !$cid) {
+      return;
+    }
+
+    $user = \Drupal::currentUser();
+    // Load group steps.
+    $group_steps = opigno_learning_path_get_steps($gid, $user->id());
+
+    // Load group courses substeps.
+    array_walk($group_steps, function ($step) use ($cid, $user, $gid) {
+      if ($step['typology'] === 'Course') {
+        $course_steps = opigno_learning_path_get_steps($step['id'], $user->id());
+        // Last course module.
+        $last_course_step = end($course_steps);
+        if ($last_course_step['cid'] == $cid) {
+          _opigno_tincan_courses_create_and_send_course_statements($gid, $step);
+        };
+      }
+    });
+
+  }
+
+  return $entity;
+}
+
+/**
+ * Creates and sends course statements.
+ *
+ * @param int $training_id
+ *   Group id.
+ * @param array $step
+ *   Array with course details.
+ *
+ * @throws \Exception
+ */
+function _opigno_tincan_courses_create_and_send_course_statements($training_id, array $step) {
+  /****
+   * - When user finish a course
+   * Actor: user
+   * Verb: xAPI/passed | xAPI/failed
+   * Object: xAPI/module
+   * Result: Get final course result
+   * Context: Training
+   */
+
+  // Get course group entity.
+  $course = Group::load($step['id']);
+
+  // Check if course is passed or not.
+  $required_score = isset($step['required score']) ? intval($step['required score']) : 0;
+  $user_score = isset($step['best score']) ? intval($step['best score']) : 0;
+  $passed = $user_score >= $required_score;
+  // Statement creation.
+  $statement = OpignoTinCanApiStatements::statementBaseCreation(
+    ($passed ? OpignoTincanApiTinCanVerbs::$passed : OpignoTincanApiTinCanVerbs::$failed),
+    OpignoTincanApiTinCanActivityDefinitionTypes::$module,
+    $course
+  );
+
+  if ($statement === FALSE) {
+    return;
+  }
+
+  // Context creation.
+  $context = new Context();
+
+  // Get parents.
+  $parent_ids = [$training_id];
+  OpignoTinCanApiStatements::contextSetGrouping(
+    $context,
+    $parent_ids,
+    OpignoTincanApiTinCanActivityDefinitionTypes::$group
+  );
+
+  // Set language in context.
+  OpignoTinCanApiStatements::contextSetLanguage(
+    $context,
+    $course->language()->getId()
+  );
+
+  // Get duration.
+  $duration_s = isset($step['time spent']) ? intval($step['time spent']) : 0;
+
+  // Set result.
+  $response = NULL;
+  OpignoTinCanApiStatements::setResult(
+    $statement,
+    $user_score,
+    100,
+    NULL,
+    $passed,
+    $response,
+    $duration_s
+  );
+  // Set statement context.
+  $statement->setContext($context);
+
+  // Sending statement.
+  OpignoTinCanApiStatements::sendStatement($statement);
+
+}

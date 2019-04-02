@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * @file
+ * This install file contains all the hooks called at the module installation.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function opigno_tincan_activity_schema() {
+  return [
+    'opigno_tincan_activity_type_properties' => [
+      'description' => 'Tincan activity properties.',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'fid' => [
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'activity_id' => [
+          'description' => 'Activity id from Tincan Package.',
+          'type' => 'text',
+        ],
+        'launch_filename' => [
+          'type' => 'text',
+        ],
+      ],
+      'indexes' => [
+        'id' => ['id'],
+      ],
+    ],
+    'opigno_tincan_activity_answers' => [
+      'description' => 'Tincan answer properties.',
+      'fields' => [
+        'uid' => [
+          'description' => 'The user ID this data belongs to.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'opigno_activity_id' => [
+          'description' => 'Opigno Activity id.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'registration' => [
+          'description' => 'UUID each LRS connection.',
+          'type' => 'text',
+          'not null' => TRUE,
+        ],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function opigno_tincan_activity_uninstall() {
+  \Drupal::state()->delete('opigno_tincan_activity_type_properties');
+  \Drupal::state()->delete('opigno_tincan_activity_answers');
+}

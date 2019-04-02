@@ -1,0 +1,8 @@
+<div{{ attributes.addClass('result-item result-item-h5p') }}>
+  <h3>{{ label }}</h3>
+  <div>{{ question_body }}</div>
+  <div>{{ score }}</div>
+  {% if content %}
+    {{- content -}}
+  {% endif %}
+</div>

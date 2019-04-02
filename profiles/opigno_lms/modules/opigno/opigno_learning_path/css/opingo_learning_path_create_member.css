@@ -1,0 +1,140 @@
+.ui-widget-overlay {
+  background: unset;
+}
+
+.ui-dialog {
+  background-color: #fff;
+  box-shadow: -5px 5px 10px rgba(61, 61, 60, 0.1);
+  border: 0 !important;
+  padding: 0;
+}
+
+.ui-dialog-titlebar {
+  background: unset;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: "Source Sans Pro", sans-serif;
+  margin-bottom: 1rem;
+  padding: 60px 40px 60px !important;
+}
+
+.ui-dialog-title {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.ui-dialog-titlebar-close {
+  font-size: 25px;
+  line-height: 25px;
+  margin: 0;
+  padding: 0;
+  width: 25px;
+}
+
+#drupal-modal {
+  color: #585857;
+  font-family: "Source Sans Pro", sans-serif;
+  padding: 0;
+}
+
+.learning-path-create-member-form .btn_create {
+  background-color: #f6f6f6 !important;
+  background-image: url('../img/create_user.png');
+  background-repeat: no-repeat;
+  background-position-x: 25px;
+  background-position-y: center;
+  border-left: solid 2.5px #95d5f4 !important;
+  display: block;
+  color: #585857 !important;
+  font-family: "Source Sans Pro", sans-serif;
+  height: 60px;
+  margin: 0 0 18px !important;
+  padding-left: 70px;
+  padding-top: 20px;
+  text-align: left;
+  width: 323px;
+}
+
+.learning-path-create-member-form .btn_create:hover {
+  background-color: #95d5f4 !important;
+  background-image: url('../img/create_user_hover.png');
+  color: #fff !important;
+  text-decoration: none;
+}
+
+.learning-path-create-user-form,
+.learning-path-create-class-form {
+  margin: 0 40px;
+  padding-bottom: 40px;
+  position: relative;
+}
+
+.learning-path-create-user-form::after,
+.learning-path-create-class-form::after {
+  display: table;
+  content: '';
+  clear: both;
+}
+
+.learning-path-create-user-form label,
+.learning-path-create-class-form label {
+  float: unset !important;
+  font-size: 15px;
+  font-weight: 700;
+  margin-left: 10px;
+  text-transform: uppercase;
+  width: 100% !important;
+}
+
+.learning-path-create-user-form .form-element-wrapper,
+.learning-path-create-class-form .form-element-wrapper {
+  width: 100% !important;
+}
+
+.learning-path-create-user-form .form-control,
+.learning-path-create-class-form .form-control {
+  background-color: #f6f6f6 !important;
+  margin-bottom: 50px;
+  padding: 20px 30px;
+  overflow-y: auto;
+}
+
+.learning-path-create-user-form .form-control::placeholder,
+.learning-path-create-class-form .form-control::placeholder {
+  font-style: italic;
+}
+
+.learning-path-create-class-form #select_all {
+  background: #f6f6f6 !important;
+  color: #868e96 !important;
+  font-style: italic;
+  font-weight: normal;
+  margin: 0;
+  padding: 20px 30px 20px 65px;
+  position: static;
+  text-align: left;
+  text-transform: none;
+}
+
+.learning-path-create-user-form .btn_create,
+.learning-path-create-class-form .btn_create {
+  background-color: #c3e86c !important;
+  bottom: 10px;
+  color: #fff !important;
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 700;
+  height: 60px;
+  margin: 0;
+  margin-left: -40px;
+  position: absolute;
+  text-transform: uppercase;
+  width: calc(100% + 80px);
+}
+
+.learning-path-create-user-form .btn_create:hover,
+.learning-path-create-class-form .btn_create:hover {
+  background-color: #9faf5b !important;
+}

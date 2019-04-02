@@ -1,0 +1,40 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - group.type.learning_path
+    - group.type.opigno_class
+id: group_content_type_27efa0097d858
+label: 'Learning Path: Subgroup (Class)'
+description: 'Adds <em class="placeholder">Class</em> groups to groups both publicly and privately.'
+group_type: learning_path
+content_plugin: 'subgroup:opigno_class'
+plugin_config:
+  group_cardinality: 0
+  entity_cardinality: 1
+  use_creation_wizard: true
+  parent_role_mapping:
+    learning_path-1eb7047a7: ''
+    learning_path-3e4ccc6a3: ''
+    learning_path-9b4c10f4d: ''
+    learning_path-a416e6833: ''
+    learning_path-admin: ''
+    learning_path-anonymous: ''
+    learning_path-b2b679d24: ''
+    learning_path-content_manager: ''
+    learning_path-member: ''
+    learning_path-outsider: ''
+    learning_path-student: ''
+    learning_path-user_manager: ''
+  child_role_mapping:
+    opigno_class-1eb7047a7: ''
+    opigno_class-3e4ccc6a3: ''
+    opigno_class-9b4c10f4d: ''
+    opigno_class-a416e6833: ''
+    opigno_class-admin: ''
+    opigno_class-anonymous: ''
+    opigno_class-b2b679d24: ''
+    opigno_class-coach: ''
+    opigno_class-member: ''
+    opigno_class-outsider: ''
+    opigno_class-student: ''

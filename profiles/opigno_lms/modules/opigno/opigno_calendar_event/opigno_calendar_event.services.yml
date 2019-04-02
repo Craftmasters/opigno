@@ -1,0 +1,7 @@
+services:
+  opigno_calendar_event.manager:
+    class: Drupal\opigno_calendar_event\CalendarEventManager
+    arguments: ['@entity_type.manager', '@entity_field.manager']
+  opigno_calendar_event.iCal:
+    class: Drupal\opigno_calendar_event\iCal\ICal
+    arguments: []

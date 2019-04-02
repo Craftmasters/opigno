@@ -1,0 +1,377 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_commerce.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\commerce_price\Price;
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\Entity\ProductVariationInterface;
+use Drupal\commerce_store\Entity\Store;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\group\Entity\Group;
+use Drupal\group\Entity\GroupContent;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_commerce_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_commerce module.
+    case 'help.page.opigno_commerce':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Integrated Opingo with commerce') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_commerce_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (in_array($form_id, ['group_learning_path_add_form', 'group_learning_path_edit_form'])) {
+    if (isset($form['field_lp_price'])) {
+      // Change label.
+      $form['field_lp_price']['widget'][0]['value']['#title'] = t('Price');
+      // Add currency suffix.
+      /* @var CurrentStoreInterface $cs */
+      $cs = \Drupal::service('commerce_store.current_store');
+      $store_default = $cs->getStore();
+      if ($store_default) {
+        $default_currency = $store_default->getDefaultCurrencyCode();
+        $form['field_lp_price']['widget'][0]['value']['#field_suffix'] = $default_currency;
+      };
+      // Attach library.
+      $form['#attached']['library'][] = 'opigno_commerce/oc_library';
+      // Add validation.
+      $form['#validate'][] = '_form_validation_field_lp_price';
+      // Add handler to form.
+      $form['actions']['submit']['#submit'][] = 'opigno_commerce_group_learning_path_edit_form_submit_handler';
+    }
+  }
+
+  if (in_array($form_id, ['commerce_store_online_add_form', 'commerce_store_online_edit_form'])) {
+    // Make field group address not required.
+    $form["address"]["widget"][0]["address"]["#required"] = FALSE;
+    // Attach library.
+    $form['#attached']['library'][] = 'opigno_commerce/oc_library';
+  }
+
+  $route = \Drupal::routeMatch();
+  if ($route->getRouteName() == 'commerce_cart.page') {
+    $form["actions"]["submit"]["#attributes"]["id"][] = 'edit-update-cart';
+    $form["actions"]["checkout"]["#attributes"]["id"][] = 'edit-submit';
+    // Attach library.
+    $form['#attached']['library'][] = 'opigno_commerce/oc_library';
+  }
+
+  if ($form_id == 'commerce_checkout_flow_multistep_default') {
+    // Attach library.
+    $form['#attached']['library'][] = 'opigno_commerce/oc_library';
+
+    if (isset($form['#step_id']) && $form['#step_id'] == 'complete') {
+      // Add message with link to catalogue.
+      $catalog_link = Link::createFromRoute(
+        'visit the training catalogue',
+        'view.opigno_training_catalog.training_catalogue')
+        ->toString();
+      $form['path_to_training'] = [
+        '#type' => 'item',
+        '#markup' => 'You can now ' . $catalog_link . ' and access the course that you bought.',
+      ];
+      // Unset message which provided by template.
+      unset($form["completion_message"]);
+      if (isset($form['instructions'])) {
+        // Unset payment instructions.
+        unset($form['instructions']);
+      }
+
+    }
+  }
+
+  if (in_array($form_id, ['commerce_checkout_flow_multistep_default', 'commerce_payment_method_credit_card_edit_form'])) {
+    if (isset($form['address'])) {
+      // Attach library.
+      $form['#attached']['library'][] = 'opigno_commerce/oc_library';
+    }
+  }
+}
+
+/**
+ * Submit handler for opigno_commerce_form_alter().
+ */
+function opigno_commerce_group_learning_path_edit_form_submit_handler($form, FormStateInterface $form_state) {
+  $form_id = $form['#form_id'];
+  $price = $form_state->getValue('field_lp_price')[0]['value'];
+
+  if ($form_id == 'group_learning_path_edit_form') {
+    $route = \Drupal::routeMatch();
+    /* @var Drupal\group\Entity\Group $group */
+    $group = $route->getParameter('group');
+    // @todo: make sure if group entity on this step is not updated.
+    if ($group->get('field_lp_price')->value == $price) {
+      // Product is already created and price is the same. Return.
+      return;
+    };
+  }
+  elseif ($form_id == 'group_learning_path_add_form') {
+    // Get group entity from form_state.
+    $group = $form_state->getFormObject()->getEntity();
+  }
+
+  // Check if product exist.
+  $result = \Drupal::entityQuery('commerce_product')
+    ->condition("field_learning_path_id", $group->id())
+    ->execute();
+  $product_id = reset($result);
+  $product = !empty($product_id) ? Product::load($product_id) : NULL;
+
+  // Create product.
+  if (!$product && !empty($price)) {
+    // Load default store.
+    /* @var CurrentStoreInterface $cs */
+    $cs = \Drupal::service('commerce_store.current_store');
+    $store_default = $cs->getStore();
+    // Create variation.
+    $default_currency = $store_default->getDefaultCurrencyCode();
+    $product_type_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_product_type');
+    $product_type = $product_type_storage->load('learning_path_product');
+    $variation = ProductVariation::create([
+      'type' => $product_type->getVariationTypeId(),
+      'sku' => "learning-path-{$group->id()}",
+      'price' => new Price($price, $default_currency),
+    ]);
+    $variation->save();
+
+    // Create product.
+    $product = Product::create([
+      'type' => 'learning_path_product',
+      'title' => "Access " . $group->label(),
+      'stores' => [$store_default],
+      'variations' => [$variation],
+      'field_learning_path_id' => [
+        'target_id' => $group->id(),
+      ],
+    ]);
+    $product->save();
+  }
+  // Training became free.
+  elseif ($product && empty($price)) {
+    // Check if someone bought the training.
+    $variations = $product->getVariationIds();
+    $order_item_storage = \Drupal::entityTypeManager()->getStorage('commerce_order_item');
+    $result = $order_item_storage->loadByProperties(['purchased_entity' => $variations]);
+    if ($result) {
+      // Only unpublish product.
+      // Don't delete because here can be created orders.
+      $product->setUnpublished();
+      $product->save();
+
+    }
+    else {
+      // Nobody bought the training.
+      $product->delete();
+    }
+  }
+  // Update product price.
+  elseif ($product && !empty($price)) {
+    // Update product variation.
+    $product_variation = $product->getDefaultVariation();
+    $price_obj = $product_variation->getPrice();
+    $price_currency = $price_obj->getCurrencyCode();
+    $new_price = new Price($price, $price_currency);
+    $product_variation->set('price', $new_price);
+    $product_variation->save();
+
+    if (!$product->isPublished()) {
+      // Publish if product is unpublished.
+      $product->setPublished();
+      $product->save();
+    }
+  }
+
+}
+
+/**
+ * Validation callback for opigno_commerce_form_alter().
+ */
+function _form_validation_field_lp_price(&$form, FormStateInterface $form_state) {
+  $store = Store::loadMultiple();
+  $price = $form_state->getValue('field_lp_price')[0]['value'];
+  if (!$store && $price != 0) {
+    // There are no any store created.
+    $form_state->setErrorByName('field_lp_price', t(
+      'You can not create Product because Store is not created yet. Please, contact admins for these.'));
+    $form_state->setRedirect('<current>');
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\commerce_cart\Form\AddToCartForm.
+ */
+function opigno_commerce_form_commerce_order_item_add_to_cart_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  // Add validation.
+  $form['#validate'][] = '_form_validation_commerce_order_item_add_to_cart_form';
+}
+
+/**
+ * Validation callback for checking if order is in cart.
+ */
+function _form_validation_commerce_order_item_add_to_cart_form(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\commerce_cart\Form\AddToCartForm $form_object */
+  $form_object = $form_state->getFormObject();
+  /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+  $order_item = $form_object->getEntity();
+  $product_variation = $order_item->getPurchasedEntity();
+  /* @var CurrentStoreInterface $cs */
+  $cs = \Drupal::service('commerce_store.current_store');
+  /* @var CartProviderInterface $cpi */
+  $cpi = \Drupal::service('commerce_cart.cart_provider');
+  $cart = $cpi->getCart('default', $cs->getStore());
+  if (!$cart) {
+    // Cart is empty.
+    return;
+  }
+  $items_in_cart = $cart->getItems();
+  $items_ids = array_map(function ($item) {
+    /* @var Drupal\commerce_order\Entity\OrderItem $item */
+    return $item->getPurchasedEntityId();
+  }, $items_in_cart);
+
+  if (in_array($product_variation->id(), $items_ids)) {
+    $form_state->setError($form, t('This training is already in @cart', [
+      '@cart' => Link::createFromRoute('your cart', 'commerce_cart.page')->toString(),
+    ]));
+    return $form_state->setRedirect('<current>');
+  }
+
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for views_form_commerce_cart_form_default.
+ */
+function opigno_commerce_form_views_form_commerce_cart_form_default_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $view = reset($form_state->getBuildInfo()['args']);
+  if (!empty($view->result)) {
+    foreach ($view->result as $row) {
+      /** @var \Drupal\commerce_order\Entity\OrderItemInterface $order_item */
+      $order_item = $row->_relationship_entities['order_items'];
+      $product_variation = $order_item->getPurchasedEntity();
+      if ($product_variation instanceof ProductVariationInterface) {
+        // Restrict quantity to 1.
+        $form['edit_quantity'][$row->index]['#min'] = 1;
+        $form['edit_quantity'][$row->index]['#max'] = 1;
+      }
+    }
+  }
+}
+
+/**
+ * Implements opingo_commerce_check_if_training_bough().
+ *
+ * Check if user bought access to training.
+ *
+ * @param int $group_id
+ *   Group ID.
+ * @param int $user_id
+ *   User ID.
+ *
+ * @return bool
+ *   Training was bought.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function opingo_commerce_check_if_training_bought($group_id, $user_id) {
+  // Check if training is free.
+  $group = Group::load($group_id);
+  if ($group->hasField('field_lp_price') && $group->get('field_lp_price')->value == 0) {
+    return TRUE;
+  };
+  // Load product.
+  $product = \Drupal::entityTypeManager()
+    ->getStorage('commerce_product')
+    ->loadByProperties(['field_learning_path_id' => $group_id]);
+  if (!$product = reset($product)) {
+    // Product was deleted.
+    return FALSE;
+  }
+  // Get variation.
+  $product_variation = $product->getDefaultVariation();
+
+  // Load orders.
+  $orders = \Drupal::entityTypeManager()
+    ->getStorage('commerce_order')
+    ->loadByProperties(['uid' => $user_id]);
+  if (!$orders) {
+    return FALSE;
+  };
+
+  foreach ($orders as $order) {
+    /* @var Drupal\commerce_order\Entity\Order$order */
+    $status = $order->getState();
+    if ($status->getValue()['value'] != 'completed') {
+      // Order isn't completed.
+      return FALSE;
+    };
+
+    $items = $order->getItems();
+    foreach ($items as $item) {
+      $pid = $item->getPurchasedEntityId();
+      if ($pid == $product_variation->id()) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * Create membership for user after success payment.
+ */
+function opigno_commerce_commerce_order_update(EntityInterface $entity) {
+  $order = $entity;
+  $user = \Drupal::currentUser();
+  // If checkout flow is completed.
+  if ($order->getState()->getValue()['value'] == 'completed') {
+    // Get orders.
+    /* @var \Drupal\commerce_order\Entity\OrderItem $order */
+    $items = $order->getItems();
+    foreach ($items as $item) {
+      /* @var Drupal\commerce_product\Entity\ProductVariation $product_variation */
+      $product_variation = $item->getPurchasedEntity();
+      /* @var Drupal\commerce_product\Entity\Product $product */
+      $product = $product_variation->getProduct();
+      if ($product->hasField('field_learning_path_id')) {
+        $group = $product->field_learning_path_id->entity;
+        // Make user member of training to allow access.
+        /** @var \Drupal\group\GroupMembershipLoaderInterface $membership_service */
+        $membership_service = \Drupal::service('group.membership_loader');
+        $is_member = $membership_service->load($group, $user);
+        if (!$is_member) {
+          /** @var \Drupal\group\Plugin\GroupContentEnablerInterface $plugin */
+          $plugin = $group->getGroupType()->getContentPlugin('group_membership');
+          $group_content = GroupContent::create([
+            'type' => $plugin->getContentTypeConfigId(),
+            'gid' => $group->id(),
+            'entity_id' => $user->id(),
+          ]);
+          $group_content->save();
+        }
+      }
+    }
+  }
+
+}

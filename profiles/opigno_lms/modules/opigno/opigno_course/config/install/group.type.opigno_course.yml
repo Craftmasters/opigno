@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {  }
+id: opigno_course
+label: Course
+description: 'A group of Learning Path content.'
+creator_membership: true
+creator_wizard: false
+creator_roles:
+  - opigno_course-admin

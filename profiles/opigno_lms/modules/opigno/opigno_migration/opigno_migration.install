@@ -1,0 +1,138 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Opigno Migration module.
+ */
+
+use Drupal\Core\Database\Database;
+
+/**
+ * Schema for migration temporary database table.
+ */
+function opigno_migration_schema() {
+  $schema['pm_thread_delete_time_migration'] = [
+    'description' => 'Stores PM thread delete time data.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique delete ID.',
+      ],
+      'thread_id' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'Thread ID.',
+      ],
+      'owner' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'Owner User ID.',
+      ],
+      'delete_time' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Whether the user has deleted this message.',
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'thread_id' => ['thread_id'],
+      'owner' => ['owner'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Removes migration temporary database table.
+ */
+function opigno_migration_uninstall() {
+  // Remove migration additional table.
+  try {
+    $db_connection = Database::getConnection('default', 'default');
+    $db_connection->schema()->dropTable('pm_thread_delete_time_migration');
+  }
+  catch (Exception $e) {
+    \Drupal::logger('opigno_migration')->error($e->getMessage());
+  }
+
+  // Remove module configs.
+  $configs = [
+    'migrate_plus.migration_group.opigno_migration',
+    'migrate_plus.migration.opigno_activity_h5p',
+    'migrate_plus.migration.opigno_activity_file_upload',
+    'migrate_plus.migration.long_answer_activity',
+    'migrate_plus.migration.scorm_activity',
+    'migrate_plus.migration.tincan_activity',
+    'migrate_plus.migration.module_lesson',
+    'migrate_plus.migration.learning_path_course',
+    'migrate_plus.migration.learning_path_class',
+    'migrate_plus.migration.certificate',
+    'migrate_plus.migration.events',
+    'migrate_plus.migration.slide_activity',
+    'migrate_plus.migration.opigno_pm_thread',
+    'migrate_plus.migration.opigno_pm_thread_access_time',
+    'migrate_plus.migration.opigno_pm_thread_delete_time',
+    'migrate_plus.migration.opigno_pm_message',
+    'migrate_plus.migration.opigno_forum_migration_forum_comment',
+    'migrate_plus.migration.opigno_forum_migration_forum',
+    'migrate_plus.migration.taxonomy_term',
+    'migrate_plus.migration.taxonomy_vocabulary',
+    'migrate_plus.migration.files',
+    'migrate_plus.migration.opigno_users',
+  ];
+  foreach ($configs as $config) {
+    try {
+      \Drupal::configFactory()->getEditable($config)->delete();
+    }
+    catch (Exception $e) {
+      \Drupal::logger('opigno_migration')->error($e->getMessage());
+    }
+  }
+}
+
+/**
+ * Fills temporary table with data from source database table.
+ */
+function opigno_migration_install() {
+  $connect = FALSE;
+  try {
+    $db_legacy_connect = Database::getConnection('default', 'legacy');
+    $connect = TRUE;
+  }
+  catch (Exception $e) {
+    $message = 'Connect to migration database failed: ';
+    \Drupal::logger('opigno_migration')->error($message . $e->getMessage());
+    $messenger = \Drupal::messenger();
+    $messenger->addError($message . $e->getMessage());
+  }
+
+  try {
+    if ($connect && !empty($db_legacy_connect)) {
+      $query = $db_legacy_connect->select('pm_index', 'pmi')
+        ->fields('pmi');
+      $result = $query->execute()->fetchAll();
+      if ($result) {
+        $db_connect = \Drupal::service('database');
+        foreach ($result as $item) {
+          $fields = [
+            'thread_id' => $item->thread_id,
+            'owner' => $item->recipient,
+            'delete_time' => $item->deleted,
+          ];
+          $db_connect->insert('pm_thread_delete_time_migration')
+            ->fields($fields)
+            ->execute();
+        }
+      }
+    }
+  }
+  catch (Exception $e) {
+    \Drupal::logger('opigno_migration')->error($e->getMessage());
+  }
+}

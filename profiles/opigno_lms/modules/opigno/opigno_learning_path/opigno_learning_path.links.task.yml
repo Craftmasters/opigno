@@ -1,0 +1,34 @@
+#opigno_learning_path.manager.index:
+#  route_name: opigno_learning_path.manager.index
+#  title: 'Learning path manager'
+#  base_route: entity.group.canonical
+
+opigno_learning_path.courses:
+  route_name: opigno_learning_path.learning_path_courses
+  title: 'Learning path courses'
+  base_route: entity.group.canonical
+
+opigno_learning_path.modules:
+  route_name: opigno_learning_path.learning_path_modules
+  title: 'Learning path modules'
+  base_route: entity.group.canonical
+
+opigno_learning_path.steps.start:
+  route_name: opigno_learning_path.steps.start
+  title: 'Start'
+  base_route: entity.group.canonical
+
+opigno_learning_path.results:
+  route_name: opigno_learning_path.results
+  title: 'Results'
+  base_route: entity.group.canonical
+
+opigno_learning_path.steps.my_result:
+  route_name: opigno_learning_path.steps.finish
+  title: 'My result'
+  base_route: entity.group.canonical
+
+opigno_learning_path.learning_path_settings:
+  route_name: opigno_learning_path.learning_path_settings
+  title: 'Settings'
+  base_route: opigno_learning_path.learning_path_settings

@@ -1,0 +1,189 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_class.module.
+ */
+
+use Drupal\block\Entity\Block;
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\group\Entity\Group;
+use Drupal\views\ViewExecutable;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
+
+/**
+ * Implements hook_help().
+ */
+function opigno_class_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the opigno_class module.
+    case 'help.page.opigno_class':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Adds the classes to your Opigno instance. Works well with Opigno Learning Path.') . '</p>';
+      return $output;
+
+    default:
+      return '';
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function opigno_class_preprocess_page(&$variables) {
+  $route = \Drupal::routeMatch();
+  $route_name = $route->getRouteName();
+
+  /** @var \Drupal\group\Entity\GroupInterface $group */
+  $group = $route->getParameter('group');
+  if ($group && !is_object($group)) {
+    $group = Group::load($group);
+  }
+
+  if ($group === NULL || $group->bundle() !== 'opigno_class') {
+    return;
+  }
+
+  if ($route_name === 'entity.group.canonical') {
+    $user = \Drupal::currentUser();
+    if ($user->hasPermission('manage group members in any group')
+      || $group->hasPermission('administer members', $user)) {
+      // If user can manage group members, add link to the members overview.
+      $url = Url::fromRoute('opigno_learning_path.membership.overview', [
+        'group' => $group->id(),
+      ]);
+      $link = Link::fromTextAndUrl(t('Manage members'), $url)->toRenderable();
+      array_unshift($variables['page']['content'], $link);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_class_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id === 'group_content_opigno_class-group_membership_add_form') {
+    // Add redirection after member is added.
+    $form['actions']['submit']['#submit'][] = '_opigno_class_group_membership_add_form_submit';
+    array_unshift($form['#validate'], '_opigno_class_group_membership_add_form_validate');
+  }
+}
+
+/**
+ * Custom validate callback for adding user to Class group form.
+ *
+ * @see opigno_class_form_alter()
+ */
+function _opigno_class_group_membership_add_form_validate($form, FormStateInterface $form_state) {
+  $values = $form_state->getValues();
+  $entity_id = $values['entity_id'][0]['target_id'];
+
+  $start_pos = strrpos($entity_id, '(') + 1;
+  $end_pos = strrpos($entity_id, ')');
+
+  if ($start_pos !== FALSE && $end_pos !== FALSE && $end_pos == (strlen($entity_id) - 1)) {
+    // If submitted string contains uid.
+    $uid = substr($entity_id, $start_pos, $end_pos - $start_pos);
+  }
+  else {
+    // If submitted string doesn't contain uid.
+    $user = user_load_by_name($entity_id);
+    if ($user) {
+      $uid = $user->id();
+    }
+  }
+
+  if (!empty($uid)) {
+    // Replace submitted value with user ID.
+    $form_state->setValue('entity_id', [['target_id' => $uid]]);
+  }
+}
+
+/**
+ * Submit callback for opigno_class_form_alter().
+ */
+function _opigno_class_group_membership_add_form_submit($form, FormStateInterface $form_state) {
+  $route = \Drupal::routeMatch();
+  $group = $route->getParameter('group');
+  $form_state->setRedirect('opigno_learning_path.membership.overview', [
+    'group' => $group->id(),
+  ]);
+}
+
+/**
+ * Implements hook_views_query_alter().
+ */
+function opigno_class_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
+  $user = \Drupal::currentUser();
+  // Show classes where user has role 'opigno_class-class_manager'.
+  if ($view->id() === 'opigno_classes' && !$user->hasPermission('manage group members in any group')) {
+    $uid = $user->id();
+    $connection = Database::getConnection();
+    $query_c = $connection
+      ->select('group_content_field_data', 'g_c_f_d')
+      ->fields('g_c_f_d', ['gid']);
+    $query_c->leftJoin('group_content__group_roles', 'g_c_g_r', 'g_c_f_d.id = g_c_g_r.entity_id');
+    $query_c->condition('g_c_g_r.group_roles_target_id', 'opigno_class-class_manager');
+    $query_c->condition('g_c_f_d.entity_id', $uid);
+    $query_c->condition('g_c_f_d.type', 'opigno_class-group_membership');
+    $classes = $query_c->execute()->fetchAllAssoc('gid');
+
+    $class_ids = [];
+    foreach ($classes as $class) {
+      $class_ids[] = $class->gid;
+    }
+
+    if (!empty($class_ids)) {
+      $group_and = $query->setWhereGroup('AND');
+      $query->addWhere($group_and, 'groups_field_data.id', $class_ids, 'IN');
+    }
+    else {
+      $group_and = $query->setWhereGroup('AND');
+      $query->addWhere($group_and, 'groups_field_data.id', -1);
+    }
+  }
+}
+
+/**
+ * Implements hook_block_access().
+ */
+function opigno_class_block_access(Block $block, $operation, AccountInterface $account) {
+  if ($block->id() == 'opignoadmin') {
+    $user = \Drupal::currentUser();
+    $uid = $user->id();
+    $roles = $user->getRoles();
+    $access = FALSE;
+    foreach ($roles as $role) {
+      if (in_array($role, ['administrator', 'content_manager', 'user_manager']) || $uid == 1) {
+        $access = TRUE;
+      }
+    }
+
+    if (!$access) {
+      $connection = Database::getConnection();
+      $query_c = $connection
+        ->select('group_content_field_data', 'g_c_f_d')
+        ->fields('g_c_f_d', ['gid']);
+      $query_c->leftJoin('group_content__group_roles', 'g_c_g_r', 'g_c_f_d.id = g_c_g_r.entity_id');
+      $query_c->condition('g_c_g_r.group_roles_target_id', 'opigno_class-class_manager');
+      $query_c->condition('g_c_f_d.entity_id', $uid);
+      $query_c->condition('g_c_f_d.type', 'opigno_class-group_membership');
+      $classes_count = $query_c->countQuery()->execute()->fetchField();
+
+      if ($classes_count > 0) {
+        $access = TRUE;
+      }
+    }
+
+    if (!$access) {
+      return AccessResult::forbidden();
+    }
+  }
+}

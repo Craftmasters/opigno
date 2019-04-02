@@ -1,0 +1,4 @@
+opigno_course.course-content:
+  route_name: opigno_course.course-content
+  title: 'Course content'
+  base_route: entity.group.canonical

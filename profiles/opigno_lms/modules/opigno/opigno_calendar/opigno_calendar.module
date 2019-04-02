@@ -1,0 +1,377 @@
+<?php
+
+/**
+ * @file
+ * Contains opigno_calendar.module.
+ */
+
+use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
+use Drupal\group\Entity\Group;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_theme().
+ */
+function opigno_calendar_theme($existing, $type, $theme, $path) {
+  return [
+    'block__opigno_calendar' => [
+      'base hook' => 'block',
+      'add_event_link' => NULL,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function opigno_calendar_page_attachments(array &$page) {
+  $route = \Drupal::routeMatch()->getRouteName();
+  // Attach library to front page.
+  if ($route == 'view.frontpage.page_1') {
+    $page['#attached']['library'][] = 'opigno_calendar/month_block';
+  };
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_calendar_preprocess_calendar_month_col(&$variables) {
+  if (empty($variables['item']['entry'])) {
+    return;
+  }
+
+  $entry = &$variables['item']['entry'];
+  if (!is_array($entry) || isset($entry['#theme'])) {
+    return;
+  }
+
+  $attached = [
+    'library' => [
+      'opigno_calendar/month_block',
+    ],
+  ];
+  if (isset($entry[0]['#theme']) && $entry[0]['#theme'] === 'calendar_empty_day') {
+    $entry['#attached'] = $attached;
+    return;
+  }
+
+  /** @var \Drupal\views\ViewExecutable $view */
+  $view = $entry[0]['#view'];
+  if (($view->getDisplay()->getOption('css_class') !== 'opigno-calendar-views'
+    && $view->getDisplay()->getOption('css_class') !== 'view-opigno-calendar')
+    || ($view->current_display !== 'month_block' && $view->current_display !== 'page_month')
+  ) {
+    return;
+  }
+
+  $date = new DateTimePlus($variables['item']['date']);
+
+  $entry = [
+    '#attached' => $attached,
+    'date_box' => [
+      '#theme_wrappers' => ['container'],
+      '#attributes' => [
+        'class' => ['date-box'],
+      ],
+      'content' => [
+        'day' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => [
+            'class' => ['date-day'],
+          ],
+          '#value' => $date->format('d'),
+        ],
+        'month' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => [
+            'class' => ['date-month'],
+          ],
+          '#value' => $date->format('F'),
+        ],
+        'year' => [
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => [
+            'class' => ['date-year'],
+          ],
+          '#value' => $date->format('Y'),
+        ],
+      ],
+    ],
+    'day_label' => [
+      '#type' => 'html_tag',
+      '#tag' => 'h4',
+      '#attributes' => [
+        'class' => ['title'],
+      ],
+      '#value' => t('Events of the day'),
+    ],
+    'items' => [
+      '#theme_wrappers' => ['container'],
+      '#attributes' => [
+        'class' => ['items'],
+      ],
+      'content' => $entry,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function opigno_calendar_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  if (isset($variables['elements']['content']['#view_id'])) {
+    if (\Drupal::routeMatch()->getRouteName() == 'view.opigno_calendar.page_month'
+        && $variables['elements']['content']['#view_id'] == 'opigno_calendar'
+        && $hook == 'block') {
+      $suggestions[] = 'block__opigno_calendar';
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function opigno_calendar_preprocess_block__opigno_calendar(&$variables) {
+  $user = \Drupal::currentUser();
+  if (isset($variables['elements']['content']['#view_id'])) {
+    if ($variables['elements']['content']['#view_id'] == 'opigno_calendar'
+       && $user->hasPermission('create opigno_calendar_event')) {
+      // Add to calendar block 'add event' button.
+      $url = Url::fromRoute('entity.opigno_calendar_event.add_form', [
+        'opigno_calendar_event_type' => 'opigno_calendar_event',
+      ]);
+      if ($url->access()) {
+        $variables['add_event_link'] = Markup::create(
+          "<div class='next-link d-flex justify-content-end mb-4 text-uppercase'><a class='btn btn-success color-white add_event_link' href='" . $url->toString() . "'>" . t('add event') . "</a></div>"
+        );
+      }
+    }
+  }
+  return $variables;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function opigno_calendar_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'opigno_calendar_event_opigno_calendar_event_form') {
+    /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
+    $form_object = $form_state->getFormObject();
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $form_object->getEntity();
+    if (!$entity->hasField('field_calendar_event_members')) {
+      return;
+    }
+
+    $current_user = \Drupal::currentUser();
+    // Add redirect handler to form.
+    $form['actions']['submit']['#submit'][] = 'opigno_calendar_event_form_submit_handler';
+
+    // Add filters for the members field.
+    $form['members'] = [
+      '#type' => 'container',
+      '#weight' => 5,
+    ];
+
+    $form['members']['title'] = [
+      '#type' => 'label',
+      '#title' => t('Members'),
+    ];
+
+    /** @var \Drupal\group\Entity\Group[] $classes */
+    $classes = \Drupal::entityTypeManager()
+      ->getStorage('group')
+      ->loadByProperties(['type' => 'opigno_class']);
+
+    $options = [];
+    foreach ($classes as $class) {
+      if ($class->getMember($current_user) !== FALSE) {
+        $options[$class->id()] = $class->label();
+      }
+    }
+
+    uasort($options, 'strcasecmp');
+    $options = ['All' => t('Filter by class')] + $options;
+
+    $form['members']['class'] = [
+      '#type' => 'select',
+      '#wrapper_attributes' => [
+        'class' => [''],
+      ],
+      '#options' => $options,
+      '#default_value' => t('All'),
+      '#ajax' => [
+        'callback' => '_opigno_calendar_update_members',
+        'event' => 'change',
+        'wrapper' => 'members',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Verifying entry...'),
+        ],
+      ],
+    ];
+
+    /** @var \Drupal\group\Entity\Group[] $trainings */
+    $trainings = \Drupal::entityTypeManager()
+      ->getStorage('group')
+      ->loadByProperties(['type' => 'learning_path']);
+
+    $options = [];
+    foreach ($trainings as $training) {
+      if ($training->getMember($current_user) !== FALSE) {
+        $options[$training->id()] = $training->label();
+      }
+    }
+
+    uasort($options, 'strcasecmp');
+    $options = ['All' => t('Filter by training')] + $options;
+
+    $form['members']['training'] = [
+      '#type' => 'select',
+      '#wrapper_attributes' => [
+        'class' => [''],
+      ],
+      '#options' => $options,
+      '#default_value' => t('All'),
+      '#ajax' => [
+        'callback' => '_opigno_calendar_update_members',
+        'event' => 'change',
+        'wrapper' => 'members',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Verifying entry...'),
+        ],
+      ],
+    ];
+
+    $form['members']['field_calendar_event_members'] = $form['field_calendar_event_members'];
+    unset($form['field_calendar_event_members']);
+
+    $members = &$form['members']['field_calendar_event_members'];
+    $members['#prefix'] = '<div id="members">';
+    $members['#suffix'] = '</div>';
+    unset($members['widget']['#title']);
+
+    $form['#attached']['library'][] = 'opigno_calendar/form';
+  }
+}
+
+/**
+ * Submit callback used in opigno_calendar_form_alter().
+ *
+ * @see opigno_calendar_form_alter()
+ */
+function opigno_calendar_event_form_submit_handler(&$form, FormStateInterface $form_state) {
+  // Set redirect to calendar page.
+  $form_state->setRedirect('view.opigno_calendar.page_month');
+}
+
+/**
+ * AJAX callback used in the opigno_calendar_form_alter().
+ *
+ * @see opigno_calendar_form_alter()
+ */
+function _opigno_calendar_update_members(array $form, FormStateInterface $form_state) {
+  $members_wrapper = &$form['members']['field_calendar_event_members'];
+  $members = &$members_wrapper['widget'];
+
+  // Get the current values that are selected.
+  $current_selected_users = $form_state->getValue('field_calendar_event_members');
+
+  // Keep the users that were previously selected as selected.
+  foreach ($current_selected_users as $user) {
+    $members['#default_value'][$user['target_id']] = $user['target_id'];
+  }
+
+  // Remove from the list of option users the ones that are not selected.
+  foreach ($members['#options'] as $uid => $name) {
+    if (!in_array($uid, $members['#default_value'])) {
+      unset($members['#options'][$uid]);
+    }
+  }
+
+  // Add to the users of the new group to the options.
+  $class_id = $form_state->getValue('class');
+  $training_id = $form_state->getValue('training');
+
+  $class = isset($class_id) ? Group::load($class_id) : NULL;
+  $training = isset($training_id) ? Group::load($training_id) : NULL;
+
+  $class_members = isset($class) ? $class->getMembers() : [];
+  $training_members = isset($training) ? $training->getMembers() : [];
+
+  $class_users = array_map(function ($member) {
+    /** @var \Drupal\group\GroupMembership $member */
+    return $member->getUser();
+  }, $class_members);
+
+  $training_users = array_map(function ($member) {
+    /** @var \Drupal\group\GroupMembership $member */
+    return $member->getUser();
+  }, $training_members);
+
+  if (!empty($class_users) && !empty($training_users)) {
+    $users = array_uintersect($class_users, $training_users, function ($user1, $user2) {
+      /** @var \Drupal\user\UserInterface $user1 */
+      /** @var \Drupal\user\UserInterface $user2 */
+      return $user2->id() - $user1->id();
+    });
+  }
+  else {
+    $users = array_merge($class_users, $training_users);
+  }
+
+  foreach ($users as $user) {
+    /** @var \Drupal\user\UserInterface $user */
+    $members['#options'][$user->id()] = $user->getDisplayName();
+  }
+
+  uasort($members['#options'], 'strcasecmp');
+  return $members_wrapper;
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function opigno_calendar_views_pre_render(ViewExecutable $view) {
+  if ($view->id() !== 'opigno_calendar') {
+    return;
+  }
+
+  $account = Drupal::currentUser();
+  if (!empty($view->result)) {
+    foreach ($view->result as $key => $result) {
+      if (empty($result->_entity)) {
+        continue;
+      }
+
+      // Allow access for admins and other user with according permissions.
+      if ($account->hasPermission('manage group members in any group')
+        || $account->hasPermission('manage group content in any group')) {
+        continue;
+      }
+
+      // If current user is a direct member of the calendar event.
+      if ($result->_entity->hasField('field_calendar_event_members')) {
+        $members = array_map(function ($member) {
+          return (int) $member['target_id'];
+        }, $result->_entity->get('field_calendar_event_members')->getValue());
+
+        if (in_array($account->id(), $members)) {
+          continue;
+        }
+      }
+      else {
+        continue;
+      }
+
+      unset($view->result[$key]);
+    }
+  }
+}

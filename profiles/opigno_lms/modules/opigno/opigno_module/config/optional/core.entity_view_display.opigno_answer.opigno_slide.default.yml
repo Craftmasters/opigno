@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - opigno_module.opigno_answer_type.opigno_slide
+id: opigno_answer.opigno_slide.default
+targetEntityType: opigno_answer
+bundle: opigno_slide
+mode: default
+content: {  }
+hidden:
+  activity: true
+  module: true

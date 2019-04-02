@@ -1,0 +1,59 @@
+@mixin svg-picto($picto, $transparentBg: true, $hover: true) {
+  @extend .#{$picto}!optional;
+  @extend .#{$picto + '-mobile'}!optional;
+
+  font-size: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  @if $transparentBg == true {
+    background-color: transparent;
+  }
+
+  @if $hover == true {
+    &.is-active,
+    &:hover {
+      @extend .#{$picto}-hover!optional;
+      @extend .#{$picto + '-mobile-hover'}!optional;
+    }
+  }
+}
+
+@mixin make-button($backgroundColor: '#fff', $borderColor: '#88c1e6', $color: '') {
+  padding: 0.75rem 2rem;
+  background-color: $backgroundColor;
+  position: relative;
+  z-index: 0;
+  display: block;
+
+  @if $color != '' {
+    color: $color;
+  }
+
+  span {
+    position: relative;
+  }
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 2px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: $borderColor;
+    transition: width 0.2s;
+    z-index: -1;
+  }
+
+  &.active,
+  &:hover {
+    color: #fff;
+    text-decoration: none;
+
+    &::after {
+      width: 100%;
+    }
+  }
+}

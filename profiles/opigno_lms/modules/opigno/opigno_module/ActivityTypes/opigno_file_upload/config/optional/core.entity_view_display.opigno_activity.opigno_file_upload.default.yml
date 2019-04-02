@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.opigno_activity.opigno_file_upload.opigno_allowed_extension
+    - field.field.opigno_activity.opigno_file_upload.opigno_evaluation_method
+    - field.field.opigno_activity.opigno_file_upload.opigno_body
+    - opigno_module.opigno_activity_type.opigno_file_upload
+  module:
+    - text
+id: opigno_activity.opigno_file_upload.default
+targetEntityType: opigno_activity
+bundle: opigno_file_upload
+mode: default
+content:
+  opigno_body:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+hidden:
+  opigno_allowed_extension: true
+  opigno_evaluation_method: true
+  name: true
+  uid: true

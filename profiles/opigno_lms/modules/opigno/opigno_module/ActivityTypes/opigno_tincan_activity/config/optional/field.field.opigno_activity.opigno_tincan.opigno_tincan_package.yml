@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.opigno_activity.opigno_tincan_package
+    - opigno_module.opigno_activity_type.opigno_tincan
+  module:
+    - opigno_tincan_api
+id: opigno_activity.opigno_tincan.opigno_tincan_package
+field_name: opigno_tincan_package
+entity_type: opigno_activity
+bundle: opigno_tincan
+label: 'Tincan package'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_extensions: zip
+  file_directory: opigno_tincan
+  max_filesize: ''
+  description_field: 0
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: opigno_tincan_package

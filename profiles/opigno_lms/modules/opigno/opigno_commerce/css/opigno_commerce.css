@@ -1,0 +1,31 @@
+.field--name-field-lp-price input {
+  width: 50%;
+  display: inline-block;
+}
+
+.field--name-field-lp-price span {
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+#commerce-checkout-flow-multistep-default #edit-actions-next {
+  background-color: #c2e76b !important;
+}
+
+#commerce-checkout-flow-multistep-default #edit-actions-next:hover {
+  background-color: #b4e24a !important;
+}
+
+#commerce-checkout-flow-multistep-default #edit-actions-next + a {
+  font-weight: 400;
+  padding: 25px;
+  margin: 0;
+  margin-left: .5rem;
+  color: #212529;
+}
+
+.form-item-payment-method-billing-information-address-0-address-address-line2 label,
+.form-item-payment-information-add-payment-method-billing-information-address-0-address-address-line2 label,
+.form-item-payment-information-billing-information-address-0-address-address-line2 label {
+  visibility: hidden;
+}

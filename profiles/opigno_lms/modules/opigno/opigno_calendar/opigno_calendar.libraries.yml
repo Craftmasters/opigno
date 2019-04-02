@@ -1,0 +1,25 @@
+month_block:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_calendar_month_block.css: {}
+  js:
+    js/opigno_calendar_month_block.js: {}
+  dependencies:
+    - core/jquery
+form:
+  version: VERSION
+  js:
+    js/opigno_calendar_form.js: {}
+  dependencies:
+    - core/jquery
+
+datetime:
+  version: VERSION
+  css:
+    theme:
+      css/opigno_calendar_datetime.css: {}
+  js:
+    js/opigno_calendar_datetime.js: {}
+  dependencies:
+    - core/jquery.ui.datepicker

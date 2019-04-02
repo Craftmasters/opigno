@@ -1,0 +1,25 @@
+.block-system_breadcrumb_block {
+  padding-bottom: 0.5em;
+
+  ul:not(.contextual-links) {
+    margin-bottom: 0;
+
+    li {
+      + li {
+        &::before {
+          content: '';
+          display: inline-block;
+          width: 7px;
+          height: 11px;
+          margin-right: 5px;
+          vertical-align: middle;
+          @extend .picto-breadcrumb;
+        }
+      }
+
+      a {
+        color: #b3b3b2;
+      }
+    }
+  }
+}

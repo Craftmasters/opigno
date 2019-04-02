@@ -1,0 +1,883 @@
+<?php
+
+/**
+ * @file
+ * Opigno module app install/update functionality.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
+
+/**
+ * Implements hook_schema().
+ */
+function opigno_module_schema() {
+  // Create the opigno module relationship table.
+  $schema['opigno_module_relationship'] = [
+    'description' => 'Table storing what activities belong to what modules',
+    'fields' => [
+      'omr_id' => [
+        'type' => 'serial',
+        'size' => 'normal',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The primary identifier of this relationship.',
+      ],
+      'omr_pid' => [
+        'type' => 'int',
+        'size' => 'normal',
+        'unsigned' => TRUE,
+        'not null' => FALSE,
+        'default' => NULL,
+        'description' => 'The parent relationship of this relationship.',
+      ],
+      'parent_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The Module that this activity belongs to.',
+      ],
+      'parent_vid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The Module version that this activity belongs to.',
+      ],
+      'child_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The Activity ID.',
+      ],
+      'child_vid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The Activity version ID.',
+      ],
+      'activity_status' => [
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+        'description' => 'The status of the Activity in this Module. 0=random, 1=always',
+      ],
+      'weight' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The weight of this Activity in the Module.',
+      ],
+      'max_score' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The max score of the Activity in this Module.',
+      ],
+      'auto_update_max_score' => [
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Boolean indicating whether updates to the Activity will update the max score of the Activity in the Module.',
+      ],
+    ],
+    'primary key' => ['omr_id'],
+    'unique keys' => [
+      'parent_child' => [
+        'parent_id',
+        'parent_vid',
+        'child_id',
+        'child_vid',
+      ],
+    ],
+    'indexes' => [
+      'parent_vid' => ['parent_vid'],
+      'child_vid' => ['child_vid'],
+      'parent_id' => ['parent_id'],
+      'child_id' => ['child_id'],
+    ],
+  ];
+
+  $schema['opigno_module_result_options'] = [
+    'description' => 'Table storing result options for module.',
+    'fields' => [
+      'option_id' => [
+        'type' => 'serial',
+        'size' => 'normal',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'The primary identifier for the range.',
+      ],
+      'module_id' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Module identifier.',
+      ],
+      'module_vid' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Module revision identifier.',
+      ],
+      'option_start' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'Score range low value.',
+      ],
+      'option_end' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'description' => 'Score range high value.',
+      ],
+      'option_name' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'The name of this range.',
+      ],
+      'option_summary' => [
+        'type' => 'text',
+        'description' => 'The text to show when this range is met.',
+      ],
+      'option_summary_format' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'description' => 'Text format of the range text.',
+      ],
+    ],
+    'primary key' => ['option_id'],
+    'indexes' => [
+      'module_id' => ['module_id', 'module_vid'],
+    ],
+  ];
+
+  $schema['opigno_module_badges'] = [
+    'description' => 'Opigno Module Badges',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'uid' => [
+        'description' => 'User ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'gid' => [
+        'description' => 'Training ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'entity_id' => [
+        'description' => 'Entity ID',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'typology' => [
+        'description' => 'Typology',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ],
+      'badges' => [
+        'description' => 'Badges count',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['id'],
+    'indexes' => [
+      'uid' => ['uid'],
+      'gid' => ['gid'],
+      'entity_id' => ['entity_id'],
+      'typology' => ['typology'],
+    ],
+    'foreign keys' => [
+      'users' => ['uid' => 'uid'],
+      'entity_id' => ['entity_id'],
+      'typology' => ['typology'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function opigno_module_install() {
+  // Give an access to specific Opigno module permissions.
+  $role = Role::load(RoleInterface::AUTHENTICATED_ID);
+  $issueAccessPermissions = [
+    'view published module entities',
+    'access editor',
+  ];
+  foreach ($issueAccessPermissions as $permission) {
+    $role->grantPermission($permission);
+  }
+  $role->save();
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function opigno_module_requirements($phase) {
+  $requirements = [];
+  $message = t('pdf.js library is not installed. Please install it from <a href="@library">here</a> and place in <em>libraries/</em> folder', ['@library' => 'http://mozilla.github.io/pdf.js/getting_started/']);
+  $pdf_js_library = file_exists('libraries/pdf.js/build/pdf.js') && file_exists('libraries/pdf.js/build/pdf.worker.js');
+
+  if ($phase == 'runtime') {
+    if (!$pdf_js_library) {
+      $requirements += [
+        'opigno_module' => [
+          'title' => t('Slide activity'),
+          'value' => $message,
+          'severity' => REQUIREMENT_ERROR,
+        ],
+      ];
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Give an access to specific Opigno module permissions.
+ *
+ * Implements hook_update_N().
+ */
+function opigno_module_update_8001() {
+  $role = Role::load(RoleInterface::AUTHENTICATED_ID);
+  $issueAccessPermissions = [
+    "view published module entities",
+  ];
+  foreach ($issueAccessPermissions as $permission) {
+    $role->grantPermission($permission);
+  }
+  $role->save();
+}
+
+/**
+ * Make OpignoAnswer revisionable.
+ */
+function opigno_module_update_8002() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  // Add revisionable metadata fields to the opigno_answer entity type.
+  $entity_type = $definition_update_manager->getEntityType('opigno_answer');
+  $entity_type_id = $entity_type->id();
+
+  $revision_metadata_keys = [
+    'revision_user' => 'revision_user',
+    'revision_created' => 'revision_created',
+    'revision_log_message' => 'revision_log_message',
+  ];
+  $entity_type->set('revision_metadata_keys', $revision_metadata_keys);
+
+  $definition_update_manager->updateEntityType($entity_type);
+
+  // Add the revision metadata fields.
+  $revision_created = BaseFieldDefinition::create('created')
+    ->setLabel(t('Revision create time'))
+    ->setDescription(t('The time that the current revision was created.'))
+    ->setRevisionable(TRUE);
+  $definition_update_manager->installFieldStorageDefinition('revision_created', $entity_type_id, $entity_type_id, $revision_created);
+
+  $revision_user = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Revision user'))
+    ->setDescription(t('The user ID of the author of the current revision.'))
+    ->setSetting('target_type', 'user')
+    ->setRevisionable(TRUE);
+  $definition_update_manager->installFieldStorageDefinition('revision_user', $entity_type_id, $entity_type_id, $revision_user);
+
+  $revision_log_message = BaseFieldDefinition::create('string_long')
+    ->setLabel(t('Revision log message'))
+    ->setDescription(t('Briefly describe the changes you have made.'))
+    ->setRevisionable(TRUE)
+    ->setDefaultValue('')
+    ->setDisplayOptions('form', [
+      'type' => 'string_textarea',
+      'weight' => 25,
+      'settings' => [
+        'rows' => 4,
+      ],
+    ]);
+  $definition_update_manager->installFieldStorageDefinition('revision_log_message', $entity_type_id, $entity_type_id, $revision_log_message);
+}
+
+/**
+ * Give an access to specific Opigno module permissions.
+ */
+function opigno_module_update_8003() {
+  // Allow users to use the H5P editor.
+  $role = Role::load(RoleInterface::AUTHENTICATED_ID);
+  $role->grantPermission('access editor');
+  $role->save();
+}
+
+/**
+ * Creates the hide_results field in opigno_module.
+ */
+function opigno_module_update_8004() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Do not display results at the end of the module'))
+    ->setDescription(t('If you check this option, the correct answers won’t be displayed to the users at the end of the module.'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(TRUE)
+    ->setDefaultValue(FALSE)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'weight' => 2,
+    ]);
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('hide_results', 'opigno_module', 'opigno_module', $field);
+}
+
+/**
+ * Creates Badge fields for opigno_module entity.
+ */
+function opigno_module_update_8005() {
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $field = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Activate badge system for this module'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(TRUE)
+    ->setDefaultValue(FALSE)
+    ->setDisplayOptions('form', [
+      'type' => 'boolean_checkbox',
+      'weight' => 1,
+    ]);
+  $definition_manager->installFieldStorageDefinition('badge_active', 'opigno_module', 'opigno_module', $field);
+
+  $field = BaseFieldDefinition::create('string')
+    ->setLabel(t('Name'))
+    ->setDisplayOptions('form', [
+      'type' => 'string_textfield',
+      'weight' => 1,
+    ]);
+  $definition_manager->installFieldStorageDefinition('badge_name', 'opigno_module', 'opigno_module', $field);
+
+  $field = BaseFieldDefinition::create('string_long')
+    ->setLabel(t('Badge description'))
+    ->setRevisionable(FALSE)
+    ->setTranslatable(FALSE)
+    ->setRequired(FALSE)
+    ->setDefaultValue('')
+    ->setDisplayOptions('form', [
+      'type' => 'string_textarea',
+      'weight' => 2,
+      'settings' => [
+        'rows' => 3,
+      ],
+    ]);
+  $definition_manager->installFieldStorageDefinition('badge_description', 'opigno_module', 'opigno_module', $field);
+
+  $options = [
+    'finished' => 'Finished',
+    'success' => 'Success',
+  ];
+  $field = BaseFieldDefinition::create('list_string')
+    ->setLabel(t('Badge criteria'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(TRUE)
+    ->setDefaultValue('finished')
+    ->setSetting('allowed_values', $options)
+    ->setDisplayOptions('form', [
+      'type' => 'options_buttons',
+      'weight' => 3,
+    ]);
+  $definition_manager->installFieldStorageDefinition('badge_criteria', 'opigno_module', 'opigno_module', $field);
+
+  $field = BaseFieldDefinition::create('image')
+    ->setLabel(t('Badge image'))
+    ->setTranslatable(FALSE)
+    ->setSettings([
+      'alt_field' => FALSE,
+      'alt_field_required' => FALSE,
+      'file_extensions' => 'png',
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'image',
+      'weight' => 4,
+    ])
+    ->setDisplayConfigurable('form', TRUE);
+  $definition_manager->installFieldStorageDefinition('badge_image', 'opigno_module', 'opigno_module', $field);
+}
+
+/**
+ * Creates badges table.
+ */
+function opigno_module_update_8006() {
+  $schema = \Drupal::database()->schema();
+  $table_name = 'opigno_module_badges';
+  if (!$schema->tableExists($table_name)) {
+    $table = [
+      'description' => 'Opigno Module Badges',
+      'fields' => [
+        'id' => [
+          'type' => 'serial',
+          'not null' => TRUE,
+        ],
+        'uid' => [
+          'description' => 'User ID',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'gid' => [
+          'description' => 'Training ID',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'entity_id' => [
+          'description' => 'Entity ID',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'typology' => [
+          'description' => 'Typology',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'badges' => [
+          'description' => 'Badges count',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+          'default' => 0,
+        ],
+      ],
+      'primary key' => ['id'],
+      'indexes' => [
+        'uid' => ['uid'],
+        'gid' => ['gid'],
+        'entity_id' => ['entity_id'],
+        'typology' => ['typology'],
+      ],
+      'foreign keys' => [
+        'users' => ['uid' => 'uid'],
+        'entity_id' => ['entity_id'],
+        'typology' => ['typology'],
+      ],
+    ];
+    $schema->createTable($table_name, $table);
+  }
+}
+
+/**
+ * Create new media image field in opigno_module entity.
+ */
+function opigno_module_update_8007() {
+  // Create a new field definition.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Image'))
+    ->setDescription(t('Set here a module image'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(FALSE)
+    ->setRequired(FALSE)
+    ->setSetting('target_type', 'media')
+    ->setSetting('handler', 'default')
+    ->setSetting('handler_settings', ['target_bundles' => ['image']])
+    ->setDisplayOptions('view', [
+      'label' => 'above',
+      'type' => 'media_thumbnail',
+      'weight' => 0,
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'entity_browser_entity_reference',
+      'weight' => 26,
+      'settings' => [
+        'entity_browser' => 'media_entity_browser_groups',
+        'field_widget_display' => 'rendered_entity',
+        'field_widget_remove' => TRUE,
+        'open' => TRUE,
+        'selection_mode' => 'selection_append',
+        'field_widget_display_settings' => [
+          'view_mode' => 'image_only',
+        ],
+        'field_widget_edit' => FALSE,
+        'field_widget_replace' => FALSE,
+        'third_party_settings' => [
+          'type' => 'entity_browser_entity_reference',
+        ],
+      ],
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('module_media_image', 'opigno_module', 'opigno_module', $field);
+
+}
+
+/**
+ * Update view and media_browser_widget configs.
+ */
+function opigno_module_update_8008() {
+  $config_path = drupal_get_path('module', 'opigno_module')
+    . '/config/optional';
+  /* @var Drupal\Core\Config\CachedStorage $config_storage */
+
+  $storage = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+
+  $configs = [
+    'entity_browser.browser.media_entity_browser_file_pdf',
+    'views.view.media_browser_file_pdf',
+  ];
+
+  foreach ($configs as $item) {
+    $data = $storage->read($item);
+    $config_storage->write($item, $data);
+  }
+}
+
+/**
+ * Update tables for opigno_activity entity.
+ */
+function opigno_module_update_8009() {
+  $table = 'opigno_activity';
+  $table_revision = 'opigno_activity_revision';
+  $table_field_data = 'opigno_activity_field_data';
+  $table_field_revision = 'opigno_activity_field_revision';
+  $backup_table = 'backup_opigno_activity';
+
+  $connection = Database::getConnection();
+  $schema = $connection->schema();
+
+  // Doesn't apply updates ff target tables are already exist.
+  if ($schema->tableExists($table_field_data) && $schema->tableExists($table_field_revision)) {
+    return;
+  };
+
+  // Make backup of main table.
+  $schema->renameTable($table, $backup_table);
+  // Drop revision table.
+  $schema->dropTable($table_revision);
+
+  // Insert new field in main table.
+  $spec = [
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => 1,
+  ];
+
+  $schema->addField($backup_table, 'default_langcode', $spec);
+
+  // Create new tables for opigno_module.
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_activity')) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+    $entity_type_manager->clearCachedDefinitions();
+
+    $definition = $entity_type_manager->getDefinition('opigno_activity');
+    $entity_definition_update_manager->installEntityType($definition);
+  }
+
+  // Insert data back into main tables from backup.
+  $backup = $connection->select($backup_table, 'tr');
+  $backup->fields('tr', [
+    'id',
+    'vid',
+    'type',
+    'langcode',
+    'uid',
+    'uuid',
+    'name',
+    'status',
+    'created',
+    'changed',
+    'default_langcode',
+  ]);
+  $results = $backup->execute()->fetchAll();
+
+  foreach ($results as $result) {
+    // Insert into $table.
+    $connection->insert($table)
+      ->fields([
+        'id' => $result->id,
+        'vid' => $result->vid,
+        'type' => $result->type,
+        'uuid' => $result->uuid,
+        'langcode' => $result->langcode,
+      ])
+      ->execute();
+
+    // Insert into $table_revision.
+    $connection->insert($table_revision)
+      ->fields([
+        'id' => $result->id,
+        'vid' => $result->vid,
+        'langcode' => $result->langcode,
+        'revision_created' => $result->created,
+        'revision_user' => NULL,
+        'revision_log_message' => NULL,
+      ])
+      ->execute();
+
+    // Insert into $table_field_data.
+    $connection->insert($table_field_data)
+      ->fields([
+        'id' => $result->id,
+        'vid' => $result->vid,
+        'type' => $result->type,
+        'langcode' => $result->langcode,
+        'uid' => $result->uid,
+        'name' => $result->name,
+        'status' => $result->status,
+        'created' => $result->created,
+        'changed' => $result->changed,
+        'default_langcode' => $result->default_langcode,
+      ])
+      ->execute();
+
+    // Insert into $table_field_revision.
+    $connection->insert($table_field_revision)
+      ->fields([
+        'id' => $result->id,
+        'vid' => $result->vid,
+        'langcode' => $result->langcode,
+        'uid' => $result->uid,
+        'name' => $result->name,
+        'status' => $result->status,
+        'created' => $result->created,
+        'changed' => $result->changed,
+        'default_langcode' => $result->default_langcode,
+      ])
+      ->execute();
+  }
+
+}
+
+/**
+ * Update tables for opigno_module entity.
+ */
+function opigno_module_update_8010() {
+  // Delete old image fields for opigno_module entity.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $old_module_image = $definition_manager->getFieldStorageDefinition('module_image', 'opigno_module');
+  if ($old_module_image) {
+    $definition_manager->uninstallFieldStorageDefinition($old_module_image);
+  }
+  $old_badge_image = $definition_manager->getFieldStorageDefinition('badge_image', 'opigno_module');
+  if ($old_badge_image) {
+    $definition_manager->uninstallFieldStorageDefinition($old_badge_image);
+  }
+
+  $table = 'opigno_module';
+  $table_revision = 'opigno_module_revision';
+  $table_field_data = 'opigno_module_field_data';
+  $table_field_revision = 'opigno_module_field_revision';
+  $backup_table = 'backup_opigno_module';
+
+  $connection = Database::getConnection();
+  $schema = $connection->schema();
+
+  // Doesn't apply updates ff target tables are already exist.
+  if ($schema->tableExists($table_field_data) && $schema->tableExists($table_field_revision)) {
+    return;
+  };
+
+  // Make backup of main table.
+  $schema->renameTable($table, $backup_table);
+  // Drop revision table.
+  $schema->dropTable($table_revision);
+
+  // Insert new field in main table.
+  $spec = [
+    'type' => 'int',
+    'size' => 'tiny',
+    'not null' => TRUE,
+    'default' => 1,
+  ];
+
+  $schema->addField($backup_table, 'default_langcode', $spec);
+
+  // Create new tables for opigno_module.
+  $schema = \Drupal::database()->schema();
+  if (!$schema->tableExists('opigno_module')) {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $entity_definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+
+    $entity_type_manager->clearCachedDefinitions();
+
+    $definition = $entity_type_manager->getDefinition('opigno_module');
+    $entity_definition_update_manager->installEntityType($definition);
+  }
+
+  // Insert data back into main tables from backup.
+  $results = $connection->select($backup_table, 'bt')
+    ->fields('bt')
+    ->execute()
+    ->fetchAll();
+
+  foreach ($results as $result) {
+    // Insert into $table.
+    $connection->insert($table)
+      ->fields([
+        'id' => $result->id,
+        'vid' => $result->vid,
+        'uuid' => $result->uuid,
+        'langcode' => $result->langcode,
+      ])
+      ->execute();
+
+    // Insert into $table_revision.
+    $connection->insert($table_revision)
+      ->fields([
+        'id' => $result->id,
+        'vid' => $result->vid,
+        'langcode' => $result->langcode,
+        'revision_created' => $result->created,
+        'revision_user' => NULL,
+        'revision_log_message' => NULL,
+      ])
+      ->execute();
+
+    // Convert to array and unset unnecessary fields.
+    $result = (array) $result;
+    unset($result['uuid']);
+
+    // Insert into $table_field_data.
+    $connection->insert($table_field_data)
+      ->fields($result)
+      ->execute();
+
+    // Insert into $table_field_revision.
+    $connection->insert($table_field_revision)
+      ->fields($result)
+      ->execute();
+  }
+
+  // Update opigno_score_modules view.
+  $config_path = drupal_get_path('module', 'opigno_module')
+    . '/config/optional';
+  /* @var Drupal\Core\Config\CachedStorage $config_storage */
+  $storage = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $data = $storage->read('views.view.opigno_score_modules');
+  $config_storage->write('views.view.opigno_score_modules', $data);
+
+}
+
+/**
+ * Replace badge_image field with badge_media_image field.
+ */
+function opigno_module_update_8011() {
+  // Create new field.
+  $field = BaseFieldDefinition::create('entity_reference')
+    ->setLabel(t('Badge image'))
+    ->setRevisionable(TRUE)
+    ->setTranslatable(FALSE)
+    ->setSetting('target_type', 'media')
+    ->setSetting('handler', 'default')
+    ->setSetting('handler_settings', ['target_bundles' => ['image_png']])
+    ->setDisplayOptions('view', [
+      'label' => 'above',
+      'type' => 'media_thumbnail',
+      'weight' => 0,
+    ])
+    ->setDisplayOptions('form', [
+      'type' => 'entity_browser_entity_reference',
+      'weight' => 4,
+      'settings' => [
+        'entity_browser' => 'media_entity_browser_badge_images',
+        'field_widget_display' => 'rendered_entity',
+        'field_widget_remove' => TRUE,
+        'open' => TRUE,
+        'selection_mode' => 'selection_append',
+        'field_widget_display_settings' => [
+          'view_mode' => 'image_only',
+        ],
+        'field_widget_edit' => FALSE,
+        'field_widget_replace' => FALSE,
+        'third_party_settings' => [
+          'type' => 'entity_browser_entity_reference',
+        ],
+      ],
+    ])
+    ->setDisplayConfigurable('form', TRUE)
+    ->setDisplayConfigurable('view', TRUE);
+
+  // Install the new definition.
+  $definition_manager = \Drupal::entityDefinitionUpdateManager();
+  $definition_manager->installFieldStorageDefinition('badge_media_image', 'opigno_module', 'opigno_module', $field);
+
+  // Delete old field.
+  $old_field = FieldConfig::loadByName('opigno_module', 'opigno_module', 'badge_image');
+  if (!empty($old_field)) {
+    $old_field->delete();
+  }
+  $old_field_storage = FieldStorageConfig::loadByName('opigno_module', 'badge_image');
+  if (!empty($old_field_storage)) {
+    $old_field_storage->delete();
+  }
+}
+
+/**
+ * Update configuration for Slide activity type.
+ */
+function opigno_module_update_8012() {
+  // Install module.
+  \Drupal::service('module_installer')->install(['pdf']);
+
+  // Update configs for Slide activity type.
+  $config_path = drupal_get_path('module', 'opigno_module')
+    . '/config/optional';
+  /* @var Drupal\Core\Config\CachedStorage $config_storage */
+  $storage = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $data = $storage->read('core.entity_view_display.media.pdf_file.embedded_display');
+  $config_storage->write('core.entity_view_display.media.pdf_file.embedded_display', $data);
+  $data = $storage->read('core.entity_view_display.opigno_activity.opigno_slide.activity');
+  $config_storage->write('core.entity_view_display.opigno_activity.opigno_slide.activity', $data);
+}
+
+/**
+ * Update permissions for Global Content Manager.
+ */
+function opigno_module_update_8013() {
+  $role = Role::load('content_manager');
+  $role->grantPermission('access media_entity_browser_badge_images entity browser pages');
+  $role->save();
+}
+
+/**
+ * Make field "name" for "opigno_module" entity required.
+ */
+function opigno_module_update_8014() {
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  /* @var \Drupal\Core\Field\BaseFieldDefinition $field_definition */
+  $field_definition = $definition_update_manager->getFieldStorageDefinition('name', 'opigno_module');
+  $field_definition->setRequired(TRUE);
+  $field_definition->setDefaultValue(NULL);
+  $definition_update_manager->updateFieldStorageDefinition($field_definition);
+}

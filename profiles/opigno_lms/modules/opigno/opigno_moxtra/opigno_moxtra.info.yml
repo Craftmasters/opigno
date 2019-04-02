@@ -1,0 +1,24 @@
+name: Opigno Moxtra
+type: module
+description: Integrates Moxtra with opigno.
+# core: 8.x
+package: Opigno
+dependencies:
+  - drupal:datetime_range
+  - group:group
+  - drupal:media
+  - multiselect:multiselect
+  - opigno_calendar:opigno_calendar
+  - opigno_calendar_event:opigno_calendar_event
+  - opigno_class:opigno_class
+  - opigno_learning_path:opigno_learning_path
+  - opigno_module:opigno_module
+  - opigno_group_manager:opigno_group_manager
+  - tft:tft
+configure: opigno_moxtra.settings
+
+# Information added by Drupal.org packaging script on 2019-02-21
+version: '8.x-1.2'
+core: '8.x'
+project: 'opigno_moxtra'
+datestamp: 1550773123
